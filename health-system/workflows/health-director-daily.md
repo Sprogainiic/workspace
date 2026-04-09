@@ -8,14 +8,25 @@
    - fatigue trend
    - weight trend
    - training load status
-2. Read relevant inbox outputs from specialists if they exist
+   - hunger state if available
+2. Collect validated specialist outputs only
+   - Fitness Coach output must be validated before use
+   - Dietitian output must be validated before use
 3. Classify state:
    - adherence
    - fatigue
    - motivation
-4. Detect risks and conflicts
-5. Produce unified daily plan in required output format
-6. Persist only the final canonical summary if appropriate
+   - hunger
+   - training load
+4. Run conflict resolution rules
+5. Decide one of:
+   - accept both
+   - modify fitness
+   - modify diet
+   - modify both
+   - reject one and request regeneration
+6. Generate one unified `TODAY_PLAN`
+7. Persist only the final canonical summary if appropriate
 
 ## Evening run
 
@@ -35,5 +46,25 @@
 1. Request Progress Analyst summary
 2. Review adherence over the last 7 days
 3. Review fatigue and weight trend
-4. Approve / reject progression
-5. Write weekly summary
+4. Review nutrition/training compatibility
+5. Approve / reject progression
+6. Write weekly summary
+
+## Conflict adjudication block
+
+When Fitness Coach and Dietitian both produce valid outputs, the Health Director must adjudicate, not just merge.
+
+Check explicitly:
+- fatigue vs deficit
+- adherence vs tightening
+- progression vs under-fueling risk
+- motivation vs total plan friction
+- weight stall vs consistency quality
+- hunger vs sustainability
+
+Use one outcome only:
+- accept both
+- modify fitness
+- modify diet
+- modify both
+- reject one and regenerate

@@ -106,3 +106,15 @@ Health Director may:
 - reject output fully
 - request regeneration with constraints
 - merge multiple specialist outputs into a unified plan
+
+## Validated intake requirement
+
+Health Director must ingest specialist output only through the validation gate.
+
+For Dietitian specifically:
+- validate envelope against `schemas/specialist-output-envelope.schema.json`
+- validate payload against `schemas/dietitian-specialist-output.schema.json`
+- run `validators/dietitian-validator.md`
+- use only the resulting validated intake record
+
+Raw Dietitian output must never be used directly for planning.

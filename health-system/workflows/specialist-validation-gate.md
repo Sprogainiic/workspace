@@ -7,6 +7,13 @@
 3. Health Director ingests only if validation passes or warns safely
 4. If fail, output is rejected or regeneration is requested
 
+Hard rule:
+- Health Director may not read raw specialist output directly.
+- Only these may enter planning:
+  - validated accepted payload
+  - validated warn payload with explicit modification note
+  - rejected payload paired with regeneration request
+
 ## Validation pipeline
 
 ### Step 1: Parse output
@@ -20,6 +27,18 @@
 Minimum set:
 - `schemas/specialist-output-envelope.schema.json`
 - specialist schema (e.g. `schemas/fitness-coach-output.schema.json`, `schemas/dietitian-specialist-output.schema.json`)
+
+Dietitian intake sequence:
+1. validate envelope against `schemas/specialist-output-envelope.schema.json`
+2. validate payload against `schemas/dietitian-specialist-output.schema.json`
+3. run `validators/dietitian-validator.md`
+4. return combined result:
+   - status
+   - schema_errors
+   - contract_violations
+   - priority_conflicts
+   - safe_to_ingest
+   - recommended_action
 
 ### Step 3: Contract validation
 - enforce specialist domain boundaries
@@ -40,3 +59,6 @@ Minimum set:
 
 The Health Director must not directly trust specialist output.
 It must always pass through validation first.
+
+For Dietitian specifically, raw output is never used for planning.
+Only validated accepted payloads or validated warn payloads with explicit modification notes may be integrated.

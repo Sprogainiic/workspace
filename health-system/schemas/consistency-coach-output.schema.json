@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/consistency-coach-output.schema.json",
+  "title": "Consistency Coach Output (content payload)",
+  "type": "object",
+  "required": [
+    "BEHAVIOR_STATE",
+    "PRIMARY_INTERVENTION",
+    "MINIMUM_ACTION",
+    "FRICTION_REDUCTION",
+    "REENTRY_STRATEGY",
+    "ESCALATION_FLAGS"
+  ],
+  "properties": {
+    "BEHAVIOR_STATE": {
+      "type": "object",
+      "required": ["Summary"],
+      "properties": {
+        "Summary": { "type": "string", "minLength": 5 }
+      },
+      "additionalProperties": true
+    },
+    "PRIMARY_INTERVENTION": { "type": "string", "minLength": 10 },
+    "MINIMUM_ACTION": { "type": "string", "minLength": 5 },
+    "FRICTION_REDUCTION": { "type": "string", "minLength": 5 },
+    "REENTRY_STRATEGY": { "type": "string", "minLength": 10 },
+    "ESCALATION_FLAGS": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

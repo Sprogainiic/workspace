@@ -184,6 +184,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "insufficient_data"
     },
@@ -191,6 +193,10 @@
       "progression_reentry_gate"
     ],
     "ADJUDICATION_ACTION": "monitor_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -392,11 +398,17 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [],
     "ADJUDICATION_ACTION": "monitor_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -598,11 +610,17 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [],
     "ADJUDICATION_ACTION": "modify_both_light",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "minimum or simplified",
       "nutrition": "simplified, non-restrictive",
@@ -807,6 +825,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable but fatigued",
       "analyst_classification": "unstable"
     },
@@ -815,6 +835,10 @@
       "chef_execution_rules_stability_mode"
     ],
     "ADJUDICATION_ACTION": "modify_both_heavy",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "minimum or simplified",
       "nutrition": "simplified, non-restrictive",
@@ -1019,6 +1043,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable but fatigued",
       "analyst_classification": "unstable"
     },
@@ -1027,6 +1053,10 @@
       "chef_execution_rules_stability_mode"
     ],
     "ADJUDICATION_ACTION": "modify_both_heavy",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "minimum or simplified",
       "nutrition": "simplified, non-restrictive",
@@ -1231,6 +1261,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable but fatigued",
       "analyst_classification": "unstable"
     },
@@ -1239,6 +1271,10 @@
       "chef_execution_rules_stability_mode"
     ],
     "ADJUDICATION_ACTION": "modify_both_heavy",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "minimum or simplified",
       "nutrition": "simplified, non-restrictive",
@@ -1443,6 +1479,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable but fatigued",
       "analyst_classification": "unstable"
     },
@@ -1451,6 +1489,10 @@
       "chef_execution_rules_stability_mode"
     ],
     "ADJUDICATION_ACTION": "modify_both_heavy",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "minimum or simplified",
       "nutrition": "simplified, non-restrictive",

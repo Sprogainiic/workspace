@@ -229,6 +229,8 @@ def classify_and_adjudicate(state, consistency_payload, analyst_payload, stable_
         (state.adherence == 'low' and 'overload_risk' in escalation_flags and state.training_load != 'low' and state.nutrition_pressure != 'low')
     )
 
+    progression_attempted = 'progression_rule' in json.dumps(analyst_payload) or 'progression_rule' in json.dumps({'consistency': consistency_payload, 'state': state.__dict__}) or (state.behavior_state == 'stable' and state.training_load in ('low', 'medium'))
+
     # progression re-entry gating
     progression_unlocked = stable_streak >= 3 and state.behavior_state == 'stable' and state.fatigue == 'low' and state.adherence == 'high'
 
@@ -251,6 +253,16 @@ def classify_and_adjudicate(state, consistency_payload, analyst_payload, stable_
     else:
         action = 'monitor_only'
 
+    if progression_attempted:
+        if action in ('hold_progression', 'modify_both_light', 'modify_both_heavy') or not progression_unlocked:
+            progression_status = 'blocked'
+        elif action == 'accept_all' and progression_unlocked:
+            progression_status = 'permitted'
+        else:
+            progression_status = 'not_applicable'
+    else:
+        progression_status = 'not_applicable'
+
     final = {
         'training': 'minimum or simplified' if action in ('modify_both_heavy', 'modify_both_light', 'hold_progression', 'modify_fitness') else 'as proposed',
         'nutrition': 'simplified, non-restrictive' if action in ('modify_both_heavy', 'modify_both_light', 'modify_diet', 'hold_progression', 'friction_reduction_only') else 'as proposed',
@@ -259,7 +271,7 @@ def classify_and_adjudicate(state, consistency_payload, analyst_payload, stable_
         'stability_mode': heavy_global_instability,
         'anchor': consistency_payload['MINIMUM_ACTION']
     }
-    return behavior_summary, local_conflict, heavy_global_instability, friction_only, progression_unlocked, action, final
+    return behavior_summary, local_conflict, heavy_global_instability, friction_only, progression_unlocked, progression_attempted, progression_status, action, final
 
 
 def run_scenario(name, states):
@@ -275,8 +287,11 @@ def run_scenario(name, states):
         'monitor_only_days': 0,
         'chef_stability_days': 0,
         'analyst_classifications': {},
-        'blocked_progression_days': 0,
-        'allowed_progression_days': 0
+        'progression_pressure_days': 0,
+        'progression_attempted_days': 0,
+        'progression_blocked_days': 0,
+        'progression_permitted_days': 0,
+        'progression_not_applicable_days': 0
     }
 
     stable_streak = 0
@@ -291,7 +306,7 @@ def run_scenario(name, states):
         consistency = consistency_output(s)
         analyst = progress_output(s)
         chef = chef_output(s, diet, consistency)
-        behavior_summary, local_conflict, heavy_global_instability, friction_only, progression_unlocked, action, final = classify_and_adjudicate(s, consistency['recommendations'][0]['payload'], analyst, stable_streak)
+        behavior_summary, local_conflict, heavy_global_instability, friction_only, progression_unlocked, progression_attempted, progression_status, action, final = classify_and_adjudicate(s, consistency['recommendations'][0]['payload'], analyst, stable_streak)
 
         trace = {
             'day': s.day,
@@ -317,6 +332,8 @@ def run_scenario(name, states):
                 'local_conflict': local_conflict,
                 'friction_only': friction_only,
                 'progression_unlocked': progression_unlocked,
+                'progression_attempted': progression_attempted,
+                'progression_status': progression_status,
                 'behavior_summary': behavior_summary,
                 'analyst_classification': analyst['recommendations'][0]['payload']['PROGRESS_CLASSIFICATION']
             },
@@ -329,6 +346,10 @@ def run_scenario(name, states):
                 'progression_reentry_gate' if not progression_unlocked and s.behavior_state == 'stable' and s.fatigue == 'low' else None,
             ] if r],
             'ADJUDICATION_ACTION': action,
+            'PROGRESSION_POSTURE': {
+                'attempted': progression_attempted,
+                'status': progression_status
+            },
             'FINAL_PLAN': final,
             'CROSS_AGENT_CONSISTENCY_CHECK': {
                 'fitness_vs_diet': True,
@@ -350,10 +371,15 @@ def run_scenario(name, states):
         stats['chef_stability_days'] += 1 if chef['recommendations'][0]['payload']['SIMPLICITY_MODE'] == 'stability' else 0
         cls = analyst['recommendations'][0]['payload']['PROGRESS_CLASSIFICATION']
         stats['analyst_classifications'][cls] = stats['analyst_classifications'].get(cls, 0) + 1
-        if action in ('hold_progression', 'modify_both_light', 'modify_both_heavy'):
-            stats['blocked_progression_days'] += 1
+        if progression_attempted:
+            stats['progression_pressure_days'] += 1
+            stats['progression_attempted_days'] += 1
+        if progression_status == 'blocked':
+            stats['progression_blocked_days'] += 1
+        elif progression_status == 'permitted':
+            stats['progression_permitted_days'] += 1
         else:
-            stats['allowed_progression_days'] += 1
+            stats['progression_not_applicable_days'] += 1
 
     (OUT / f'{name}.json').write_text(json.dumps(day_traces, indent=2))
     return day_traces, stats

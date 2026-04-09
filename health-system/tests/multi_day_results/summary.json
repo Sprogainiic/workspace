@@ -14,8 +14,11 @@
       "unstable": 4,
       "insufficient_data": 2
     },
-    "blocked_progression_days": 4,
-    "allowed_progression_days": 3
+    "progression_pressure_days": 2,
+    "progression_attempted_days": 2,
+    "progression_blocked_days": 2,
+    "progression_permitted_days": 0,
+    "progression_not_applicable_days": 5
   },
   "decision_fatigue_nutrition_week": {
     "days": 7,
@@ -30,8 +33,11 @@
     "analyst_classifications": {
       "insufficient_data": 7
     },
-    "blocked_progression_days": 0,
-    "allowed_progression_days": 7
+    "progression_pressure_days": 0,
+    "progression_attempted_days": 0,
+    "progression_blocked_days": 0,
+    "progression_permitted_days": 0,
+    "progression_not_applicable_days": 7
   },
   "fatigue_escalation_week": {
     "days": 7,
@@ -47,8 +53,11 @@
       "insufficient_data": 3,
       "unstable": 4
     },
-    "blocked_progression_days": 5,
-    "allowed_progression_days": 2
+    "progression_pressure_days": 7,
+    "progression_attempted_days": 7,
+    "progression_blocked_days": 7,
+    "progression_permitted_days": 0,
+    "progression_not_applicable_days": 0
   },
   "stable_improvement_week": {
     "days": 7,
@@ -64,7 +73,10 @@
       "insufficient_data": 1,
       "improving": 6
     },
-    "blocked_progression_days": 0,
-    "allowed_progression_days": 7
+    "progression_pressure_days": 7,
+    "progression_attempted_days": 7,
+    "progression_blocked_days": 3,
+    "progression_permitted_days": 4,
+    "progression_not_applicable_days": 0
   }
 }

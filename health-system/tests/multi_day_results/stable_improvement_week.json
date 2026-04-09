@@ -184,6 +184,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "insufficient_data"
     },
@@ -191,6 +193,10 @@
       "progression_reentry_gate"
     ],
     "ADJUDICATION_ACTION": "monitor_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -392,6 +398,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "improving"
     },
@@ -399,6 +407,10 @@
       "progression_reentry_gate"
     ],
     "ADJUDICATION_ACTION": "monitor_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -600,6 +612,8 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": true,
+      "progression_status": "blocked",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "improving"
     },
@@ -607,6 +621,10 @@
       "progression_reentry_gate"
     ],
     "ADJUDICATION_ACTION": "monitor_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "blocked"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -808,11 +826,17 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": true,
+      "progression_attempted": true,
+      "progression_status": "permitted",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "improving"
     },
     "TRIGGERED_RULES": [],
     "ADJUDICATION_ACTION": "accept_all",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "permitted"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -1014,11 +1038,17 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": true,
+      "progression_attempted": true,
+      "progression_status": "permitted",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "improving"
     },
     "TRIGGERED_RULES": [],
     "ADJUDICATION_ACTION": "accept_all",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "permitted"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -1220,11 +1250,17 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": true,
+      "progression_attempted": true,
+      "progression_status": "permitted",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "improving"
     },
     "TRIGGERED_RULES": [],
     "ADJUDICATION_ACTION": "accept_all",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "permitted"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",
@@ -1426,11 +1462,17 @@
       "local_conflict": false,
       "friction_only": false,
       "progression_unlocked": true,
+      "progression_attempted": true,
+      "progression_status": "permitted",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "improving"
     },
     "TRIGGERED_RULES": [],
     "ADJUDICATION_ACTION": "accept_all",
+    "PROGRESSION_POSTURE": {
+      "attempted": true,
+      "status": "permitted"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "as proposed",

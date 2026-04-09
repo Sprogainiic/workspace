@@ -187,6 +187,8 @@
       "local_conflict": true,
       "friction_only": true,
       "progression_unlocked": false,
+      "progression_attempted": false,
+      "progression_status": "not_applicable",
       "behavior_summary": "inconsistent with low continuity",
       "analyst_classification": "insufficient_data"
     },
@@ -196,6 +198,10 @@
       "friction_reduction_only"
     ],
     "ADJUDICATION_ACTION": "friction_reduction_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": false,
+      "status": "not_applicable"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
@@ -400,6 +406,8 @@
       "local_conflict": true,
       "friction_only": true,
       "progression_unlocked": false,
+      "progression_attempted": false,
+      "progression_status": "not_applicable",
       "behavior_summary": "inconsistent with low continuity",
       "analyst_classification": "insufficient_data"
     },
@@ -409,6 +417,10 @@
       "friction_reduction_only"
     ],
     "ADJUDICATION_ACTION": "friction_reduction_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": false,
+      "status": "not_applicable"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
@@ -613,6 +625,8 @@
       "local_conflict": true,
       "friction_only": true,
       "progression_unlocked": false,
+      "progression_attempted": false,
+      "progression_status": "not_applicable",
       "behavior_summary": "inconsistent with low continuity",
       "analyst_classification": "insufficient_data"
     },
@@ -622,6 +636,10 @@
       "friction_reduction_only"
     ],
     "ADJUDICATION_ACTION": "friction_reduction_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": false,
+      "status": "not_applicable"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
@@ -825,6 +843,8 @@
       "local_conflict": true,
       "friction_only": true,
       "progression_unlocked": false,
+      "progression_attempted": false,
+      "progression_status": "not_applicable",
       "behavior_summary": "inconsistent with low continuity",
       "analyst_classification": "insufficient_data"
     },
@@ -834,6 +854,10 @@
       "friction_reduction_only"
     ],
     "ADJUDICATION_ACTION": "friction_reduction_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": false,
+      "status": "not_applicable"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
@@ -1037,6 +1061,8 @@
       "local_conflict": true,
       "friction_only": true,
       "progression_unlocked": false,
+      "progression_attempted": false,
+      "progression_status": "not_applicable",
       "behavior_summary": "inconsistent with low continuity",
       "analyst_classification": "insufficient_data"
     },
@@ -1046,6 +1072,10 @@
       "friction_reduction_only"
     ],
     "ADJUDICATION_ACTION": "friction_reduction_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": false,
+      "status": "not_applicable"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
@@ -1249,6 +1279,8 @@
       "local_conflict": true,
       "friction_only": true,
       "progression_unlocked": false,
+      "progression_attempted": false,
+      "progression_status": "not_applicable",
       "behavior_summary": "inconsistent with low continuity",
       "analyst_classification": "insufficient_data"
     },
@@ -1258,6 +1290,10 @@
       "friction_reduction_only"
     ],
     "ADJUDICATION_ACTION": "friction_reduction_only",
+    "PROGRESSION_POSTURE": {
+      "attempted": false,
+      "status": "not_applicable"
+    },
     "FINAL_PLAN": {
       "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
@@ -1461,6 +1497,8 @@
       "local_conflict": true,
       "friction_only": false,
       "progression_unlocked": false,
+      "progression_attempted": false,
+      "progression_status": "not_applicable",
       "behavior_summary": "Stable and adherent",
       "analyst_classification": "insufficient_data"
     },
@@ -1468,6 +1506,10 @@
       "consistency_vs_fitness_progression_conflict"
     ],
     "ADJUDICATION_ACTION": "modify_fitness",
+    "PROGRESSION_POSTURE": {
+      "attempted": false,
+      "status": "not_applicable"
+    },
     "FINAL_PLAN": {
       "training": "minimum or simplified",
       "nutrition": "as proposed",

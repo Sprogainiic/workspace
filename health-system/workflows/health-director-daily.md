@@ -19,14 +19,23 @@
    - hunger
    - training load
 4. Run conflict resolution rules
-5. Decide one of:
-   - accept both
-   - modify fitness
-   - modify diet
-   - modify both
-   - reject one and request regeneration
-6. Generate one unified `TODAY_PLAN`
-7. Persist only the final canonical summary if appropriate
+5. Classify conflict context explicitly:
+   - behavior_state
+   - adherence
+   - fatigue
+   - motivation
+   - training_load
+   - nutrition_pressure
+6. Choose exactly one adjudication action:
+   - accept_all
+   - modify_fitness
+   - modify_diet
+   - modify_both
+   - reject_and_regenerate_fitness
+   - reject_and_regenerate_diet
+   - hold_progression
+7. Generate one unified `TODAY_PLAN`
+8. Persist only the final canonical summary if appropriate
 
 ## Evening run
 
@@ -63,8 +72,16 @@ Check explicitly:
 - hunger vs sustainability
 
 Use one outcome only:
-- accept both
-- modify fitness
-- modify diet
-- modify both
-- reject one and regenerate
+- accept_all
+- modify_fitness
+- modify_diet
+- modify_both
+- reject_and_regenerate_fitness
+- reject_and_regenerate_diet
+- hold_progression
+
+If adherence = low, behavior_state = drop_off, or fatigue = high, enter Stability Mode:
+- training = minimal or simplified
+- diet = simplified and non-restrictive
+- focus = continuity
+- progression paused

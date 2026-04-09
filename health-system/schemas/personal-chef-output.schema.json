@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/personal-chef-output.schema.json",
+  "title": "Personal Chef Output (content payload)",
+  "type": "object",
+  "required": [
+    "SIMPLICITY_MODE",
+    "MEAL_OPTIONS",
+    "FALLBACK_MEAL",
+    "CONSTRAINT_ALIGNMENT"
+  ],
+  "properties": {
+    "SIMPLICITY_MODE": {
+      "type": "string",
+      "enum": ["stability", "normal"]
+    },
+    "MEAL_OPTIONS": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "FALLBACK_MEAL": {
+      "type": "string",
+      "minLength": 3
+    },
+    "CONSTRAINT_ALIGNMENT": {
+      "type": "string",
+      "minLength": 10
+    }
+  },
+  "additionalProperties": false
+}

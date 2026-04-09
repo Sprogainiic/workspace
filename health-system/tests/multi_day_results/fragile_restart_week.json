@@ -1,0 +1,1464 @@
+[
+  {
+    "day": 1,
+    "INPUT_STATE": {
+      "day": 1,
+      "adherence": "high",
+      "fatigue": "low",
+      "motivation": "high",
+      "hunger": "low",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "behavior_state": "stable",
+      "friction_signals": [],
+      "analyst_state": "improving"
+    },
+    "FITNESS_OUTPUT": {
+      "summary": "Moderate steady session.",
+      "recommendations": [
+        {
+          "type": "today_session",
+          "payload": {
+            "today_session": {
+              "modality": "cycle",
+              "duration_min": 30,
+              "intensity": "easy",
+              "instructions": [
+                "Cycle 30 min steady"
+              ]
+            },
+            "minimum_version": {
+              "modality": "walk",
+              "duration_min": 10,
+              "instructions": [
+                "Walk 10 min"
+              ]
+            },
+            "progression_rule": "Add 5-10% only if stable",
+            "load_assessment": "medium"
+          }
+        }
+      ]
+    },
+    "FITNESS_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "DIET_OUTPUT": {
+      "summary": "Moderate structure with mild deficit.",
+      "recommendations": [
+        {
+          "type": "nutrition_targets",
+          "payload": {
+            "CALORIE_TARGET": {
+              "Range": "1800-2050 kcal",
+              "Deficit Strategy": "mild deficit"
+            },
+            "MACRO_GUIDANCE": {
+              "Protein Priority": "protein in each meal",
+              "Other Guidance": "fiber and repeatable meals"
+            },
+            "MEAL_CONSTRAINTS": [
+              "simple meals",
+              "repeatable meals"
+            ],
+            "FALLBACK_STRATEGY": "tuna salad, cottage cheese, rice + protein",
+            "ADJUSTMENT_RULES": [
+              "If adherence drops, simplify"
+            ],
+            "RISK_FLAGS": []
+          }
+        }
+      ]
+    },
+    "DIET_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "CONSISTENCY_OUTPUT": {
+      "summary": "Stable execution anchor.",
+      "recommendations": [
+        {
+          "type": "behavior_intervention",
+          "payload": {
+            "BEHAVIOR_STATE": {
+              "Summary": "Stable and adherent"
+            },
+            "PRIMARY_INTERVENTION": "Maintain current baseline",
+            "MINIMUM_ACTION": "20-minute session",
+            "FRICTION_REDUCTION": "Keep options small",
+            "REENTRY_STRATEGY": "Progress only after stable streak",
+            "ESCALATION_FLAGS": []
+          }
+        }
+      ]
+    },
+    "CONSISTENCY_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PROGRESS_ANALYST_OUTPUT": {
+      "summary": "Derived from simulated daily state.",
+      "recommendations": [
+        {
+          "type": "trend_analysis",
+          "payload": {
+            "TREND_SUMMARY": {
+              "Adherence": "stable",
+              "Fatigue": "low",
+              "Training": "regular",
+              "Nutrition": "stable",
+              "Weight": "directional signal possible"
+            },
+            "KEY_PATTERNS": [
+              "Stable adherence streak",
+              "Signal quality adequate"
+            ],
+            "RISK_SIGNALS": [
+              "Monitor for overconfidence"
+            ],
+            "PROGRESS_CLASSIFICATION": "improving",
+            "SYSTEM_IMPLICATIONS": [
+              "Progression confidence improves",
+              "Interpretation quality is higher"
+            ]
+          }
+        }
+      ]
+    },
+    "PROGRESS_ANALYST_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PERSONAL_CHEF_OUTPUT": {
+      "summary": "Meal execution simplified to match system state.",
+      "recommendations": [
+        {
+          "type": "meal_options",
+          "payload": {
+            "SIMPLICITY_MODE": "normal",
+            "MEAL_OPTIONS": [
+              "Cottage cheese + fruit",
+              "Tuna salad",
+              "Rice + chicken",
+              "Greek yogurt + berries"
+            ],
+            "FALLBACK_MEAL": "Tuna salad",
+            "CONSTRAINT_ALIGNMENT": "Meals remain simple, repeatable, and protein-first within Dietitian constraints."
+          }
+        }
+      ]
+    },
+    "PERSONAL_CHEF_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "HEALTH_DIRECTOR_CLASSIFICATION": {
+      "behavior_state": "stable",
+      "adherence": "high",
+      "fatigue": "low",
+      "motivation": "high",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "global_instability": false,
+      "local_conflict": false,
+      "behavior_summary": "Stable and adherent",
+      "analyst_classification": "improving"
+    },
+    "TRIGGERED_RULES": [],
+    "ADJUDICATION_ACTION": "accept_all",
+    "FINAL_PLAN": {
+      "training": "as proposed",
+      "nutrition": "as proposed",
+      "meals": "3-4 simple options",
+      "focus": "progression",
+      "stability_mode": false,
+      "anchor": "20-minute session"
+    },
+    "CROSS_AGENT_CONSISTENCY_CHECK": {
+      "fitness_vs_diet": true,
+      "chef_vs_dietitian": true,
+      "chef_vs_consistency": true,
+      "analyst_interpretation_only": true
+    },
+    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+  },
+  {
+    "day": 2,
+    "INPUT_STATE": {
+      "day": 2,
+      "adherence": "low",
+      "fatigue": "medium",
+      "motivation": "low",
+      "hunger": "medium",
+      "training_load": "medium",
+      "nutrition_pressure": "medium",
+      "behavior_state": "drop_off",
+      "friction_signals": [
+        "time",
+        "decision_fatigue"
+      ],
+      "analyst_state": "unstable"
+    },
+    "FITNESS_OUTPUT": {
+      "summary": "Simplified low-load session.",
+      "recommendations": [
+        {
+          "type": "today_session",
+          "payload": {
+            "today_session": {
+              "modality": "walk",
+              "duration_min": 20,
+              "intensity": "easy",
+              "instructions": [
+                "Walk 20 min"
+              ]
+            },
+            "minimum_version": {
+              "modality": "walk",
+              "duration_min": 10,
+              "instructions": [
+                "Walk 10 min"
+              ]
+            },
+            "load_assessment": "low"
+          }
+        }
+      ]
+    },
+    "FITNESS_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "DIET_OUTPUT": {
+      "summary": "Simplified eating structure with wider range.",
+      "recommendations": [
+        {
+          "type": "nutrition_targets",
+          "payload": {
+            "CALORIE_TARGET": {
+              "Range": "1900-2200 kcal",
+              "Deficit Strategy": "reduced or paused"
+            },
+            "MACRO_GUIDANCE": {
+              "Protein Priority": "protein each meal",
+              "Other Guidance": "fiber and repeatable meals"
+            },
+            "MEAL_CONSTRAINTS": [
+              "simple meals",
+              "repeatable meals"
+            ],
+            "FALLBACK_STRATEGY": "cottage cheese, tuna, rice + protein",
+            "ADJUSTMENT_RULES": [
+              "If fatigue rises, pause deficit"
+            ],
+            "RISK_FLAGS": []
+          }
+        }
+      ]
+    },
+    "DIET_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "CONSISTENCY_OUTPUT": {
+      "summary": "Behavior instability; reduce friction.",
+      "recommendations": [
+        {
+          "type": "behavior_intervention",
+          "payload": {
+            "BEHAVIOR_STATE": {
+              "Summary": "drop_off with low continuity"
+            },
+            "PRIMARY_INTERVENTION": "Reduce decision load and preserve continuity",
+            "MINIMUM_ACTION": "10-minute walk only",
+            "FRICTION_REDUCTION": "Remove extra decisions",
+            "REENTRY_STRATEGY": "Resume baseline after one low-friction day",
+            "ESCALATION_FLAGS": [
+              "decision_fatigue"
+            ]
+          }
+        }
+      ]
+    },
+    "CONSISTENCY_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PROGRESS_ANALYST_OUTPUT": {
+      "summary": "Derived from simulated daily state.",
+      "recommendations": [
+        {
+          "type": "trend_analysis",
+          "payload": {
+            "TREND_SUMMARY": {
+              "Adherence": "volatile",
+              "Fatigue": "medium",
+              "Training": "irregular",
+              "Nutrition": "mixed",
+              "Weight": "not decision-grade"
+            },
+            "KEY_PATTERNS": [
+              "Restart-cycle behavior",
+              "Low signal reliability"
+            ],
+            "RISK_SIGNALS": [
+              "False plateau risk"
+            ],
+            "PROGRESS_CLASSIFICATION": "unstable",
+            "SYSTEM_IMPLICATIONS": [
+              "Do not treat trend as decision-grade",
+              "Stabilization required before progression"
+            ]
+          }
+        }
+      ]
+    },
+    "PROGRESS_ANALYST_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PERSONAL_CHEF_OUTPUT": {
+      "summary": "Meal execution simplified to match system state.",
+      "recommendations": [
+        {
+          "type": "meal_options",
+          "payload": {
+            "SIMPLICITY_MODE": "stability",
+            "MEAL_OPTIONS": [
+              "Cottage cheese + fruit",
+              "Tuna salad",
+              "Rice + pre-cooked chicken"
+            ],
+            "FALLBACK_MEAL": "Cottage cheese only",
+            "CONSTRAINT_ALIGNMENT": "Meals remain simple, repeatable, and protein-first within Dietitian constraints."
+          }
+        }
+      ]
+    },
+    "PERSONAL_CHEF_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "HEALTH_DIRECTOR_CLASSIFICATION": {
+      "behavior_state": "drop_off",
+      "adherence": "low",
+      "fatigue": "medium",
+      "motivation": "low",
+      "training_load": "medium",
+      "nutrition_pressure": "medium",
+      "global_instability": true,
+      "local_conflict": true,
+      "behavior_summary": "drop_off with low continuity",
+      "analyst_classification": "unstable"
+    },
+    "TRIGGERED_RULES": [
+      "consistency_vs_fitness_progression_conflict",
+      "consistency_vs_diet_restriction_conflict",
+      "analyst_instability_reduces_progression_confidence",
+      "chef_execution_rules_stability_mode"
+    ],
+    "ADJUDICATION_ACTION": "hold_progression",
+    "FINAL_PLAN": {
+      "training": "minimum or simplified",
+      "nutrition": "simplified, non-restrictive",
+      "meals": "2-3 simple options, fallback first",
+      "focus": "continuity",
+      "stability_mode": true,
+      "anchor": "10-minute walk only"
+    },
+    "CROSS_AGENT_CONSISTENCY_CHECK": {
+      "fitness_vs_diet": true,
+      "chef_vs_dietitian": true,
+      "chef_vs_consistency": true,
+      "analyst_interpretation_only": true
+    },
+    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+  },
+  {
+    "day": 3,
+    "INPUT_STATE": {
+      "day": 3,
+      "adherence": "low",
+      "fatigue": "medium",
+      "motivation": "low",
+      "hunger": "medium",
+      "training_load": "medium",
+      "nutrition_pressure": "medium",
+      "behavior_state": "drop_off",
+      "friction_signals": [
+        "time",
+        "decision_fatigue"
+      ],
+      "analyst_state": "unstable"
+    },
+    "FITNESS_OUTPUT": {
+      "summary": "Simplified low-load session.",
+      "recommendations": [
+        {
+          "type": "today_session",
+          "payload": {
+            "today_session": {
+              "modality": "walk",
+              "duration_min": 20,
+              "intensity": "easy",
+              "instructions": [
+                "Walk 20 min"
+              ]
+            },
+            "minimum_version": {
+              "modality": "walk",
+              "duration_min": 10,
+              "instructions": [
+                "Walk 10 min"
+              ]
+            },
+            "load_assessment": "low"
+          }
+        }
+      ]
+    },
+    "FITNESS_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "DIET_OUTPUT": {
+      "summary": "Simplified eating structure with wider range.",
+      "recommendations": [
+        {
+          "type": "nutrition_targets",
+          "payload": {
+            "CALORIE_TARGET": {
+              "Range": "1900-2200 kcal",
+              "Deficit Strategy": "reduced or paused"
+            },
+            "MACRO_GUIDANCE": {
+              "Protein Priority": "protein each meal",
+              "Other Guidance": "fiber and repeatable meals"
+            },
+            "MEAL_CONSTRAINTS": [
+              "simple meals",
+              "repeatable meals"
+            ],
+            "FALLBACK_STRATEGY": "cottage cheese, tuna, rice + protein",
+            "ADJUSTMENT_RULES": [
+              "If fatigue rises, pause deficit"
+            ],
+            "RISK_FLAGS": []
+          }
+        }
+      ]
+    },
+    "DIET_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "CONSISTENCY_OUTPUT": {
+      "summary": "Behavior instability; reduce friction.",
+      "recommendations": [
+        {
+          "type": "behavior_intervention",
+          "payload": {
+            "BEHAVIOR_STATE": {
+              "Summary": "drop_off with low continuity"
+            },
+            "PRIMARY_INTERVENTION": "Reduce decision load and preserve continuity",
+            "MINIMUM_ACTION": "10-minute walk only",
+            "FRICTION_REDUCTION": "Remove extra decisions",
+            "REENTRY_STRATEGY": "Resume baseline after one low-friction day",
+            "ESCALATION_FLAGS": [
+              "decision_fatigue"
+            ]
+          }
+        }
+      ]
+    },
+    "CONSISTENCY_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PROGRESS_ANALYST_OUTPUT": {
+      "summary": "Derived from simulated daily state.",
+      "recommendations": [
+        {
+          "type": "trend_analysis",
+          "payload": {
+            "TREND_SUMMARY": {
+              "Adherence": "volatile",
+              "Fatigue": "medium",
+              "Training": "irregular",
+              "Nutrition": "mixed",
+              "Weight": "not decision-grade"
+            },
+            "KEY_PATTERNS": [
+              "Restart-cycle behavior",
+              "Low signal reliability"
+            ],
+            "RISK_SIGNALS": [
+              "False plateau risk"
+            ],
+            "PROGRESS_CLASSIFICATION": "unstable",
+            "SYSTEM_IMPLICATIONS": [
+              "Do not treat trend as decision-grade",
+              "Stabilization required before progression"
+            ]
+          }
+        }
+      ]
+    },
+    "PROGRESS_ANALYST_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PERSONAL_CHEF_OUTPUT": {
+      "summary": "Meal execution simplified to match system state.",
+      "recommendations": [
+        {
+          "type": "meal_options",
+          "payload": {
+            "SIMPLICITY_MODE": "stability",
+            "MEAL_OPTIONS": [
+              "Cottage cheese + fruit",
+              "Tuna salad",
+              "Rice + pre-cooked chicken"
+            ],
+            "FALLBACK_MEAL": "Cottage cheese only",
+            "CONSTRAINT_ALIGNMENT": "Meals remain simple, repeatable, and protein-first within Dietitian constraints."
+          }
+        }
+      ]
+    },
+    "PERSONAL_CHEF_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "HEALTH_DIRECTOR_CLASSIFICATION": {
+      "behavior_state": "drop_off",
+      "adherence": "low",
+      "fatigue": "medium",
+      "motivation": "low",
+      "training_load": "medium",
+      "nutrition_pressure": "medium",
+      "global_instability": true,
+      "local_conflict": true,
+      "behavior_summary": "drop_off with low continuity",
+      "analyst_classification": "unstable"
+    },
+    "TRIGGERED_RULES": [
+      "consistency_vs_fitness_progression_conflict",
+      "consistency_vs_diet_restriction_conflict",
+      "analyst_instability_reduces_progression_confidence",
+      "chef_execution_rules_stability_mode"
+    ],
+    "ADJUDICATION_ACTION": "hold_progression",
+    "FINAL_PLAN": {
+      "training": "minimum or simplified",
+      "nutrition": "simplified, non-restrictive",
+      "meals": "2-3 simple options, fallback first",
+      "focus": "continuity",
+      "stability_mode": true,
+      "anchor": "10-minute walk only"
+    },
+    "CROSS_AGENT_CONSISTENCY_CHECK": {
+      "fitness_vs_diet": true,
+      "chef_vs_dietitian": true,
+      "chef_vs_consistency": true,
+      "analyst_interpretation_only": true
+    },
+    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+  },
+  {
+    "day": 4,
+    "INPUT_STATE": {
+      "day": 4,
+      "adherence": "medium",
+      "fatigue": "low",
+      "motivation": "medium",
+      "hunger": "low",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "behavior_state": "restart_cycle",
+      "friction_signals": [
+        "decision_fatigue"
+      ],
+      "analyst_state": "unstable"
+    },
+    "FITNESS_OUTPUT": {
+      "summary": "Simplified low-load session.",
+      "recommendations": [
+        {
+          "type": "today_session",
+          "payload": {
+            "today_session": {
+              "modality": "walk",
+              "duration_min": 20,
+              "intensity": "easy",
+              "instructions": [
+                "Walk 20 min"
+              ]
+            },
+            "minimum_version": {
+              "modality": "walk",
+              "duration_min": 10,
+              "instructions": [
+                "Walk 10 min"
+              ]
+            },
+            "load_assessment": "low"
+          }
+        }
+      ]
+    },
+    "FITNESS_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "DIET_OUTPUT": {
+      "summary": "Simplified nutrition structure.",
+      "recommendations": [
+        {
+          "type": "nutrition_targets",
+          "payload": {
+            "CALORIE_TARGET": {
+              "Range": "1850-2100 kcal",
+              "Deficit Strategy": "mild deficit"
+            },
+            "MACRO_GUIDANCE": {
+              "Protein Priority": "protein each meal",
+              "Other Guidance": "keep meals repeatable"
+            },
+            "MEAL_CONSTRAINTS": [
+              "simple meals",
+              "repeatable meals"
+            ],
+            "FALLBACK_STRATEGY": "tuna, cottage cheese, rice + protein",
+            "ADJUSTMENT_RULES": [
+              "If fatigue worsens, widen calories"
+            ],
+            "RISK_FLAGS": []
+          }
+        }
+      ]
+    },
+    "DIET_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "CONSISTENCY_OUTPUT": {
+      "summary": "Behavior instability; reduce friction.",
+      "recommendations": [
+        {
+          "type": "behavior_intervention",
+          "payload": {
+            "BEHAVIOR_STATE": {
+              "Summary": "restart_cycle with low continuity"
+            },
+            "PRIMARY_INTERVENTION": "Reduce decision load and preserve continuity",
+            "MINIMUM_ACTION": "10-minute walk only",
+            "FRICTION_REDUCTION": "Remove extra decisions",
+            "REENTRY_STRATEGY": "Resume baseline after one low-friction day",
+            "ESCALATION_FLAGS": [
+              "decision_fatigue"
+            ]
+          }
+        }
+      ]
+    },
+    "CONSISTENCY_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PROGRESS_ANALYST_OUTPUT": {
+      "summary": "Derived from simulated daily state.",
+      "recommendations": [
+        {
+          "type": "trend_analysis",
+          "payload": {
+            "TREND_SUMMARY": {
+              "Adherence": "volatile",
+              "Fatigue": "low",
+              "Training": "irregular",
+              "Nutrition": "mixed",
+              "Weight": "not decision-grade"
+            },
+            "KEY_PATTERNS": [
+              "Restart-cycle behavior",
+              "Low signal reliability"
+            ],
+            "RISK_SIGNALS": [
+              "False plateau risk"
+            ],
+            "PROGRESS_CLASSIFICATION": "unstable",
+            "SYSTEM_IMPLICATIONS": [
+              "Do not treat trend as decision-grade",
+              "Stabilization required before progression"
+            ]
+          }
+        }
+      ]
+    },
+    "PROGRESS_ANALYST_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PERSONAL_CHEF_OUTPUT": {
+      "summary": "Meal execution simplified to match system state.",
+      "recommendations": [
+        {
+          "type": "meal_options",
+          "payload": {
+            "SIMPLICITY_MODE": "stability",
+            "MEAL_OPTIONS": [
+              "Cottage cheese + fruit",
+              "Tuna salad",
+              "Rice + pre-cooked chicken"
+            ],
+            "FALLBACK_MEAL": "Cottage cheese only",
+            "CONSTRAINT_ALIGNMENT": "Meals remain simple, repeatable, and protein-first within Dietitian constraints."
+          }
+        }
+      ]
+    },
+    "PERSONAL_CHEF_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "HEALTH_DIRECTOR_CLASSIFICATION": {
+      "behavior_state": "restart_cycle",
+      "adherence": "medium",
+      "fatigue": "low",
+      "motivation": "medium",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "global_instability": false,
+      "local_conflict": true,
+      "behavior_summary": "restart_cycle with low continuity",
+      "analyst_classification": "unstable"
+    },
+    "TRIGGERED_RULES": [
+      "consistency_vs_fitness_progression_conflict",
+      "analyst_instability_reduces_progression_confidence",
+      "chef_execution_rules_stability_mode"
+    ],
+    "ADJUDICATION_ACTION": "hold_progression",
+    "FINAL_PLAN": {
+      "training": "minimum or simplified",
+      "nutrition": "simplified, non-restrictive",
+      "meals": "2-3 simple options, fallback first",
+      "focus": "continuity",
+      "stability_mode": false,
+      "anchor": "10-minute walk only"
+    },
+    "CROSS_AGENT_CONSISTENCY_CHECK": {
+      "fitness_vs_diet": true,
+      "chef_vs_dietitian": true,
+      "chef_vs_consistency": true,
+      "analyst_interpretation_only": true
+    },
+    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+  },
+  {
+    "day": 5,
+    "INPUT_STATE": {
+      "day": 5,
+      "adherence": "medium",
+      "fatigue": "low",
+      "motivation": "medium",
+      "hunger": "low",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "behavior_state": "inconsistent",
+      "friction_signals": [
+        "time"
+      ],
+      "analyst_state": "unstable"
+    },
+    "FITNESS_OUTPUT": {
+      "summary": "Moderate steady session.",
+      "recommendations": [
+        {
+          "type": "today_session",
+          "payload": {
+            "today_session": {
+              "modality": "cycle",
+              "duration_min": 30,
+              "intensity": "easy",
+              "instructions": [
+                "Cycle 30 min steady"
+              ]
+            },
+            "minimum_version": {
+              "modality": "walk",
+              "duration_min": 10,
+              "instructions": [
+                "Walk 10 min"
+              ]
+            },
+            "progression_rule": "Add 5-10% only if stable",
+            "load_assessment": "medium"
+          }
+        }
+      ]
+    },
+    "FITNESS_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "DIET_OUTPUT": {
+      "summary": "Simplified nutrition structure.",
+      "recommendations": [
+        {
+          "type": "nutrition_targets",
+          "payload": {
+            "CALORIE_TARGET": {
+              "Range": "1850-2100 kcal",
+              "Deficit Strategy": "mild deficit"
+            },
+            "MACRO_GUIDANCE": {
+              "Protein Priority": "protein each meal",
+              "Other Guidance": "keep meals repeatable"
+            },
+            "MEAL_CONSTRAINTS": [
+              "simple meals",
+              "repeatable meals"
+            ],
+            "FALLBACK_STRATEGY": "tuna, cottage cheese, rice + protein",
+            "ADJUSTMENT_RULES": [
+              "If fatigue worsens, widen calories"
+            ],
+            "RISK_FLAGS": []
+          }
+        }
+      ]
+    },
+    "DIET_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "CONSISTENCY_OUTPUT": {
+      "summary": "Stable execution anchor.",
+      "recommendations": [
+        {
+          "type": "behavior_intervention",
+          "payload": {
+            "BEHAVIOR_STATE": {
+              "Summary": "Stable and adherent"
+            },
+            "PRIMARY_INTERVENTION": "Maintain current baseline",
+            "MINIMUM_ACTION": "20-minute session",
+            "FRICTION_REDUCTION": "Keep options small",
+            "REENTRY_STRATEGY": "Progress only after stable streak",
+            "ESCALATION_FLAGS": []
+          }
+        }
+      ]
+    },
+    "CONSISTENCY_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PROGRESS_ANALYST_OUTPUT": {
+      "summary": "Derived from simulated daily state.",
+      "recommendations": [
+        {
+          "type": "trend_analysis",
+          "payload": {
+            "TREND_SUMMARY": {
+              "Adherence": "medium",
+              "Fatigue": "low",
+              "Training": "mixed",
+              "Nutrition": "mixed",
+              "Weight": "unclear"
+            },
+            "KEY_PATTERNS": [
+              "Conditions are mixed",
+              "Trend is not sharp"
+            ],
+            "RISK_SIGNALS": [
+              "Plateau interpretation is fragile"
+            ],
+            "PROGRESS_CLASSIFICATION": "plateau",
+            "SYSTEM_IMPLICATIONS": [
+              "Treat as weak signal",
+              "Hold confidence moderate"
+            ]
+          }
+        }
+      ]
+    },
+    "PROGRESS_ANALYST_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PERSONAL_CHEF_OUTPUT": {
+      "summary": "Meal execution simplified to match system state.",
+      "recommendations": [
+        {
+          "type": "meal_options",
+          "payload": {
+            "SIMPLICITY_MODE": "normal",
+            "MEAL_OPTIONS": [
+              "Cottage cheese + fruit",
+              "Tuna salad",
+              "Rice + chicken",
+              "Greek yogurt + berries"
+            ],
+            "FALLBACK_MEAL": "Tuna salad",
+            "CONSTRAINT_ALIGNMENT": "Meals remain simple, repeatable, and protein-first within Dietitian constraints."
+          }
+        }
+      ]
+    },
+    "PERSONAL_CHEF_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "HEALTH_DIRECTOR_CLASSIFICATION": {
+      "behavior_state": "inconsistent",
+      "adherence": "medium",
+      "fatigue": "low",
+      "motivation": "medium",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "global_instability": false,
+      "local_conflict": true,
+      "behavior_summary": "Stable and adherent",
+      "analyst_classification": "plateau"
+    },
+    "TRIGGERED_RULES": [
+      "consistency_vs_fitness_progression_conflict"
+    ],
+    "ADJUDICATION_ACTION": "modify_both",
+    "FINAL_PLAN": {
+      "training": "minimum or simplified",
+      "nutrition": "simplified, non-restrictive",
+      "meals": "2-3 simple options, fallback first",
+      "focus": "continuity",
+      "stability_mode": false,
+      "anchor": "20-minute session"
+    },
+    "CROSS_AGENT_CONSISTENCY_CHECK": {
+      "fitness_vs_diet": true,
+      "chef_vs_dietitian": true,
+      "chef_vs_consistency": true,
+      "analyst_interpretation_only": true
+    },
+    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+  },
+  {
+    "day": 6,
+    "INPUT_STATE": {
+      "day": 6,
+      "adherence": "low",
+      "fatigue": "medium",
+      "motivation": "low",
+      "hunger": "medium",
+      "training_load": "medium",
+      "nutrition_pressure": "medium",
+      "behavior_state": "inconsistent",
+      "friction_signals": [
+        "time",
+        "decision_fatigue"
+      ],
+      "analyst_state": "unstable"
+    },
+    "FITNESS_OUTPUT": {
+      "summary": "Simplified low-load session.",
+      "recommendations": [
+        {
+          "type": "today_session",
+          "payload": {
+            "today_session": {
+              "modality": "walk",
+              "duration_min": 20,
+              "intensity": "easy",
+              "instructions": [
+                "Walk 20 min"
+              ]
+            },
+            "minimum_version": {
+              "modality": "walk",
+              "duration_min": 10,
+              "instructions": [
+                "Walk 10 min"
+              ]
+            },
+            "load_assessment": "low"
+          }
+        }
+      ]
+    },
+    "FITNESS_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "DIET_OUTPUT": {
+      "summary": "Simplified eating structure with wider range.",
+      "recommendations": [
+        {
+          "type": "nutrition_targets",
+          "payload": {
+            "CALORIE_TARGET": {
+              "Range": "1900-2200 kcal",
+              "Deficit Strategy": "reduced or paused"
+            },
+            "MACRO_GUIDANCE": {
+              "Protein Priority": "protein each meal",
+              "Other Guidance": "fiber and repeatable meals"
+            },
+            "MEAL_CONSTRAINTS": [
+              "simple meals",
+              "repeatable meals"
+            ],
+            "FALLBACK_STRATEGY": "cottage cheese, tuna, rice + protein",
+            "ADJUSTMENT_RULES": [
+              "If fatigue rises, pause deficit"
+            ],
+            "RISK_FLAGS": []
+          }
+        }
+      ]
+    },
+    "DIET_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "CONSISTENCY_OUTPUT": {
+      "summary": "Behavior instability; reduce friction.",
+      "recommendations": [
+        {
+          "type": "behavior_intervention",
+          "payload": {
+            "BEHAVIOR_STATE": {
+              "Summary": "inconsistent with low continuity"
+            },
+            "PRIMARY_INTERVENTION": "Reduce decision load and preserve continuity",
+            "MINIMUM_ACTION": "10-minute walk only",
+            "FRICTION_REDUCTION": "Remove extra decisions",
+            "REENTRY_STRATEGY": "Resume baseline after one low-friction day",
+            "ESCALATION_FLAGS": [
+              "decision_fatigue"
+            ]
+          }
+        }
+      ]
+    },
+    "CONSISTENCY_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PROGRESS_ANALYST_OUTPUT": {
+      "summary": "Derived from simulated daily state.",
+      "recommendations": [
+        {
+          "type": "trend_analysis",
+          "payload": {
+            "TREND_SUMMARY": {
+              "Adherence": "volatile",
+              "Fatigue": "medium",
+              "Training": "irregular",
+              "Nutrition": "mixed",
+              "Weight": "not decision-grade"
+            },
+            "KEY_PATTERNS": [
+              "Restart-cycle behavior",
+              "Low signal reliability"
+            ],
+            "RISK_SIGNALS": [
+              "False plateau risk"
+            ],
+            "PROGRESS_CLASSIFICATION": "unstable",
+            "SYSTEM_IMPLICATIONS": [
+              "Do not treat trend as decision-grade",
+              "Stabilization required before progression"
+            ]
+          }
+        }
+      ]
+    },
+    "PROGRESS_ANALYST_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PERSONAL_CHEF_OUTPUT": {
+      "summary": "Meal execution simplified to match system state.",
+      "recommendations": [
+        {
+          "type": "meal_options",
+          "payload": {
+            "SIMPLICITY_MODE": "stability",
+            "MEAL_OPTIONS": [
+              "Cottage cheese + fruit",
+              "Tuna salad",
+              "Rice + pre-cooked chicken"
+            ],
+            "FALLBACK_MEAL": "Cottage cheese only",
+            "CONSTRAINT_ALIGNMENT": "Meals remain simple, repeatable, and protein-first within Dietitian constraints."
+          }
+        }
+      ]
+    },
+    "PERSONAL_CHEF_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "HEALTH_DIRECTOR_CLASSIFICATION": {
+      "behavior_state": "inconsistent",
+      "adherence": "low",
+      "fatigue": "medium",
+      "motivation": "low",
+      "training_load": "medium",
+      "nutrition_pressure": "medium",
+      "global_instability": false,
+      "local_conflict": true,
+      "behavior_summary": "inconsistent with low continuity",
+      "analyst_classification": "unstable"
+    },
+    "TRIGGERED_RULES": [
+      "consistency_vs_fitness_progression_conflict",
+      "consistency_vs_diet_restriction_conflict",
+      "analyst_instability_reduces_progression_confidence",
+      "chef_execution_rules_stability_mode"
+    ],
+    "ADJUDICATION_ACTION": "hold_progression",
+    "FINAL_PLAN": {
+      "training": "minimum or simplified",
+      "nutrition": "simplified, non-restrictive",
+      "meals": "2-3 simple options, fallback first",
+      "focus": "continuity",
+      "stability_mode": false,
+      "anchor": "10-minute walk only"
+    },
+    "CROSS_AGENT_CONSISTENCY_CHECK": {
+      "fitness_vs_diet": true,
+      "chef_vs_dietitian": true,
+      "chef_vs_consistency": true,
+      "analyst_interpretation_only": true
+    },
+    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+  },
+  {
+    "day": 7,
+    "INPUT_STATE": {
+      "day": 7,
+      "adherence": "medium",
+      "fatigue": "low",
+      "motivation": "medium",
+      "hunger": "low",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "behavior_state": "stable",
+      "friction_signals": [],
+      "analyst_state": "improving"
+    },
+    "FITNESS_OUTPUT": {
+      "summary": "Moderate steady session.",
+      "recommendations": [
+        {
+          "type": "today_session",
+          "payload": {
+            "today_session": {
+              "modality": "cycle",
+              "duration_min": 30,
+              "intensity": "easy",
+              "instructions": [
+                "Cycle 30 min steady"
+              ]
+            },
+            "minimum_version": {
+              "modality": "walk",
+              "duration_min": 10,
+              "instructions": [
+                "Walk 10 min"
+              ]
+            },
+            "progression_rule": "Add 5-10% only if stable",
+            "load_assessment": "medium"
+          }
+        }
+      ]
+    },
+    "FITNESS_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "DIET_OUTPUT": {
+      "summary": "Moderate structure with mild deficit.",
+      "recommendations": [
+        {
+          "type": "nutrition_targets",
+          "payload": {
+            "CALORIE_TARGET": {
+              "Range": "1800-2050 kcal",
+              "Deficit Strategy": "mild deficit"
+            },
+            "MACRO_GUIDANCE": {
+              "Protein Priority": "protein in each meal",
+              "Other Guidance": "fiber and repeatable meals"
+            },
+            "MEAL_CONSTRAINTS": [
+              "simple meals",
+              "repeatable meals"
+            ],
+            "FALLBACK_STRATEGY": "tuna salad, cottage cheese, rice + protein",
+            "ADJUSTMENT_RULES": [
+              "If adherence drops, simplify"
+            ],
+            "RISK_FLAGS": []
+          }
+        }
+      ]
+    },
+    "DIET_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "CONSISTENCY_OUTPUT": {
+      "summary": "Stable execution anchor.",
+      "recommendations": [
+        {
+          "type": "behavior_intervention",
+          "payload": {
+            "BEHAVIOR_STATE": {
+              "Summary": "Stable and adherent"
+            },
+            "PRIMARY_INTERVENTION": "Maintain current baseline",
+            "MINIMUM_ACTION": "20-minute session",
+            "FRICTION_REDUCTION": "Keep options small",
+            "REENTRY_STRATEGY": "Progress only after stable streak",
+            "ESCALATION_FLAGS": []
+          }
+        }
+      ]
+    },
+    "CONSISTENCY_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PROGRESS_ANALYST_OUTPUT": {
+      "summary": "Derived from simulated daily state.",
+      "recommendations": [
+        {
+          "type": "trend_analysis",
+          "payload": {
+            "TREND_SUMMARY": {
+              "Adherence": "medium",
+              "Fatigue": "low",
+              "Training": "mixed",
+              "Nutrition": "mixed",
+              "Weight": "unclear"
+            },
+            "KEY_PATTERNS": [
+              "Conditions are mixed",
+              "Trend is not sharp"
+            ],
+            "RISK_SIGNALS": [
+              "Plateau interpretation is fragile"
+            ],
+            "PROGRESS_CLASSIFICATION": "plateau",
+            "SYSTEM_IMPLICATIONS": [
+              "Treat as weak signal",
+              "Hold confidence moderate"
+            ]
+          }
+        }
+      ]
+    },
+    "PROGRESS_ANALYST_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "PERSONAL_CHEF_OUTPUT": {
+      "summary": "Meal execution simplified to match system state.",
+      "recommendations": [
+        {
+          "type": "meal_options",
+          "payload": {
+            "SIMPLICITY_MODE": "normal",
+            "MEAL_OPTIONS": [
+              "Cottage cheese + fruit",
+              "Tuna salad",
+              "Rice + chicken",
+              "Greek yogurt + berries"
+            ],
+            "FALLBACK_MEAL": "Tuna salad",
+            "CONSTRAINT_ALIGNMENT": "Meals remain simple, repeatable, and protein-first within Dietitian constraints."
+          }
+        }
+      ]
+    },
+    "PERSONAL_CHEF_VALIDATION": {
+      "status": "pass",
+      "schema_errors": [],
+      "contract_violations": [],
+      "priority_conflicts": [],
+      "safe_to_ingest": true,
+      "recommended_action": "accept"
+    },
+    "HEALTH_DIRECTOR_CLASSIFICATION": {
+      "behavior_state": "stable",
+      "adherence": "medium",
+      "fatigue": "low",
+      "motivation": "medium",
+      "training_load": "low",
+      "nutrition_pressure": "low",
+      "global_instability": false,
+      "local_conflict": false,
+      "behavior_summary": "Stable and adherent",
+      "analyst_classification": "plateau"
+    },
+    "TRIGGERED_RULES": [],
+    "ADJUDICATION_ACTION": "modify_both",
+    "FINAL_PLAN": {
+      "training": "minimum or simplified",
+      "nutrition": "simplified, non-restrictive",
+      "meals": "3-4 simple options",
+      "focus": "continuity",
+      "stability_mode": false,
+      "anchor": "20-minute session"
+    },
+    "CROSS_AGENT_CONSISTENCY_CHECK": {
+      "fitness_vs_diet": true,
+      "chef_vs_dietitian": true,
+      "chef_vs_consistency": true,
+      "analyst_interpretation_only": true
+    },
+    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+  }
+]

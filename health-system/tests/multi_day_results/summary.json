@@ -1,0 +1,54 @@
+{
+  "fragile_restart_week": {
+    "days": 7,
+    "stability_mode_days": 2,
+    "hold_progression_days": 4,
+    "modify_both_days": 2,
+    "chef_stability_days": 4,
+    "analyst_classifications": {
+      "improving": 1,
+      "unstable": 4,
+      "plateau": 2
+    },
+    "blocked_progression_days": 6,
+    "allowed_progression_days": 1
+  },
+  "decision_fatigue_nutrition_week": {
+    "days": 7,
+    "stability_mode_days": 0,
+    "hold_progression_days": 0,
+    "modify_both_days": 7,
+    "chef_stability_days": 6,
+    "analyst_classifications": {
+      "plateau": 7
+    },
+    "blocked_progression_days": 7,
+    "allowed_progression_days": 0
+  },
+  "fatigue_escalation_week": {
+    "days": 7,
+    "stability_mode_days": 4,
+    "hold_progression_days": 0,
+    "modify_both_days": 7,
+    "chef_stability_days": 4,
+    "analyst_classifications": {
+      "plateau": 3,
+      "unstable": 4
+    },
+    "blocked_progression_days": 7,
+    "allowed_progression_days": 0
+  },
+  "stable_improvement_week": {
+    "days": 7,
+    "stability_mode_days": 0,
+    "hold_progression_days": 0,
+    "modify_both_days": 1,
+    "chef_stability_days": 0,
+    "analyst_classifications": {
+      "plateau": 1,
+      "improving": 6
+    },
+    "blocked_progression_days": 1,
+    "allowed_progression_days": 6
+  }
+}

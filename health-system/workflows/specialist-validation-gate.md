@@ -17,6 +17,10 @@
 - validate against specialist envelope schema
 - validate against specialist-specific schema
 
+Minimum set:
+- `schemas/specialist-output-envelope.schema.json`
+- specialist schema (e.g. `schemas/fitness-coach-output.schema.json`, `schemas/dietitian-specialist-output.schema.json`)
+
 ### Step 3: Contract validation
 - enforce specialist domain boundaries
 - enforce fallback logic

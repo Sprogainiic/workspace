@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/dietitian-output.schema.json",
+  "title": "Dietitian Output (content payload)",
+  "type": "object",
+  "required": [
+    "CALORIE_TARGET",
+    "MACRO_GUIDANCE",
+    "MEAL_CONSTRAINTS",
+    "FALLBACK_STRATEGY",
+    "ADJUSTMENT_RULES",
+    "RISK_FLAGS"
+  ],
+  "properties": {
+    "CALORIE_TARGET": {
+      "type": "object",
+      "required": ["Range", "Deficit Strategy"],
+      "properties": {
+        "Range": { "type": "string", "minLength": 3 },
+        "Deficit Strategy": { "type": "string", "minLength": 3 }
+      },
+      "additionalProperties": true
+    },
+    "MACRO_GUIDANCE": {
+      "type": "object",
+      "required": ["Protein Priority"],
+      "properties": {
+        "Protein Priority": { "type": "string", "minLength": 3 },
+        "Other Guidance": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "MEAL_CONSTRAINTS": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "FALLBACK_STRATEGY": { "type": "string", "minLength": 10 },
+    "ADJUSTMENT_RULES": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "RISK_FLAGS": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

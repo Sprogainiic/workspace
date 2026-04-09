@@ -9,14 +9,18 @@ Create a practical, adherence-first system where the **Health Director** is the 
 ## Initial components
 
 - `agents/health-director.md` — primary orchestrator definition
-- `schemas/` — structured output contracts
+- `agents/fitness-coach.md` — first subordinate specialist
+- `contracts/` — Health Director ↔ specialist interface definitions
+- `schemas/` — structured output templates
 - `health/` — canonical memory + inbox layout
-- `workflows/` — daily/weekly execution playbooks
+- `workflows/` — daily/weekly and integration playbooks
 - `prompts/` — task prompts for specialist agents
 
 ## Operating model
 
 - Health Director is the sole user-facing voice
+- Specialists are subordinate and contract-bound
 - Specialists write to scratch inboxes or return structured data
 - Health Director decides what becomes canonical memory
 - Adherence and safety always outrank optimization
+- No specialist is implemented without an explicit contract first

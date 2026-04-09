@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/progress-analyst-output.schema.json",
+  "title": "Progress Analyst Output (content payload)",
+  "type": "object",
+  "required": [
+    "TREND_SUMMARY",
+    "KEY_PATTERNS",
+    "RISK_SIGNALS",
+    "PROGRESS_CLASSIFICATION",
+    "SYSTEM_IMPLICATIONS"
+  ],
+  "properties": {
+    "TREND_SUMMARY": {
+      "type": "object",
+      "required": ["Adherence", "Fatigue", "Training", "Nutrition", "Weight"],
+      "properties": {
+        "Adherence": { "type": "string", "minLength": 3 },
+        "Fatigue": { "type": "string", "minLength": 3 },
+        "Training": { "type": "string", "minLength": 3 },
+        "Nutrition": { "type": "string", "minLength": 3 },
+        "Weight": { "type": "string", "minLength": 3 }
+      },
+      "additionalProperties": false
+    },
+    "KEY_PATTERNS": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "RISK_SIGNALS": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "PROGRESS_CLASSIFICATION": {
+      "type": "string",
+      "enum": ["improving", "plateau", "regressing", "unstable", "insufficient_data"]
+    },
+    "SYSTEM_IMPLICATIONS": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 3 }
+    }
+  },
+  "additionalProperties": false
+}

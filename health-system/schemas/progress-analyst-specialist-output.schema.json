@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/progress-analyst-specialist-output.schema.json",
+  "title": "Progress Analyst Specialist Output",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "specialist",
+    "request_id",
+    "status",
+    "summary",
+    "recommendations",
+    "risk_flags",
+    "fallback",
+    "modification_notes",
+    "confidence",
+    "handoff_note"
+  ],
+  "properties": {
+    "contract_version": { "type": "string", "const": "specialist_contract_v1" },
+    "specialist": { "type": "string", "const": "progress_analyst" },
+    "request_id": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["ok", "needs_clarification", "unsafe_to_recommend"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "recommendations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "rationale", "payload"],
+        "properties": {
+          "type": { "type": "string", "enum": ["trend_analysis", "risk_analysis", "pattern_analysis"] },
+          "rationale": { "type": "string", "minLength": 1 },
+          "payload": { "$ref": "progress-analyst-output.schema.json" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "risk_flags": { "type": "array", "items": { "type": "string" } },
+    "fallback": {
+      "oneOf": [
+        { "type": "object" },
+        { "type": "null" }
+      ]
+    },
+    "modification_notes": { "type": "array", "items": { "type": "string" } },
+    "confidence": { "type": "string", "enum": ["low", "medium", "high"] },
+    "handoff_note": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

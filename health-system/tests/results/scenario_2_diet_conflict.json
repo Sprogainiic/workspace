@@ -1,0 +1,133 @@
+{
+  "INPUT_STATE": {
+    "adherence": "low",
+    "behavior_state": "inconsistent",
+    "fatigue": "low",
+    "motivation": "low",
+    "training_load": "low",
+    "nutrition_pressure": "high"
+  },
+  "FITNESS_OUTPUT": {
+    "summary": "Simple low-load session proposed.",
+    "recommendations": [
+      {
+        "type": "today_session",
+        "payload": {
+          "today_session": {
+            "modality": "walk",
+            "duration_min": 20,
+            "intensity": "easy",
+            "instructions": [
+              "Walk 20 min"
+            ]
+          },
+          "minimum_version": {
+            "modality": "walk",
+            "duration_min": 10,
+            "instructions": [
+              "Walk 10 min"
+            ]
+          },
+          "load_assessment": "low"
+        }
+      }
+    ]
+  },
+  "FITNESS_VALIDATION": {
+    "status": "pass",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [],
+    "safe_to_ingest": true,
+    "recommended_action": "accept"
+  },
+  "DIET_OUTPUT": {
+    "summary": "Structured deficit with multiple rules.",
+    "recommendations": [
+      {
+        "type": "nutrition_targets",
+        "payload": {
+          "CALORIE_TARGET": {
+            "Range": "1750-1950 kcal",
+            "Deficit Strategy": "mild deficit"
+          },
+          "MACRO_GUIDANCE": {
+            "Protein Priority": "protein in each meal",
+            "Other Guidance": "fiber each meal"
+          },
+          "MEAL_CONSTRAINTS": [
+            "track all meals",
+            "protein each meal",
+            "fiber each meal",
+            "avoid snacks"
+          ],
+          "FALLBACK_STRATEGY": "simple protein + fruit meals",
+          "ADJUSTMENT_RULES": [
+            "If adherence drops, simplify"
+          ],
+          "RISK_FLAGS": []
+        }
+      }
+    ]
+  },
+  "DIET_VALIDATION": {
+    "status": "warn",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [
+      "diet_complexity_high_for_low_motivation"
+    ],
+    "safe_to_ingest": true,
+    "recommended_action": "accept_with_modification"
+  },
+  "CONSISTENCY_OUTPUT": {
+    "summary": "Decision fatigue detected.",
+    "recommendations": [
+      {
+        "type": "friction_reduction",
+        "payload": {
+          "BEHAVIOR_STATE": {
+            "Summary": "Inconsistent with high decision fatigue"
+          },
+          "PRIMARY_INTERVENTION": "Reduce decision load",
+          "MINIMUM_ACTION": "Follow one meal rule only today",
+          "FRICTION_REDUCTION": "Remove extra nutrition decisions",
+          "REENTRY_STRATEGY": "Return to baseline after 1 low-friction day",
+          "ESCALATION_FLAGS": [
+            "decision_fatigue"
+          ]
+        }
+      }
+    ]
+  },
+  "CONSISTENCY_VALIDATION": {
+    "status": "pass",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [],
+    "safe_to_ingest": true,
+    "recommended_action": "accept"
+  },
+  "HEALTH_DIRECTOR_CLASSIFICATION": {
+    "behavior_state": "inconsistent",
+    "adherence": "low",
+    "fatigue": "low",
+    "motivation": "low",
+    "training_load": "low",
+    "nutrition_pressure": "high",
+    "global_instability": false,
+    "local_conflict": true
+  },
+  "TRIGGERED_RULES": [
+    "consistency_vs_diet_restriction_conflict"
+  ],
+  "ADJUDICATION_ACTION": "modify_diet",
+  "FINAL_PLAN": {
+    "training": "as proposed",
+    "nutrition": "simplified, non-restrictive",
+    "focus": "continuity",
+    "stability_mode": false,
+    "anchor": "Follow one meal rule only today"
+  },
+  "REASONING": "Adherence continuity overrides optimization; use validated behavior anchor and separate local correction from system-wide stabilization."
+}

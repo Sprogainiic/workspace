@@ -1,0 +1,134 @@
+{
+  "INPUT_STATE": {
+    "adherence": "low",
+    "behavior_state": "drop_off",
+    "fatigue": "medium",
+    "motivation": "low",
+    "training_load": "medium",
+    "nutrition_pressure": "medium"
+  },
+  "FITNESS_OUTPUT": {
+    "summary": "Slight progression proposed based on previous baseline continuity assumption.",
+    "recommendations": [
+      {
+        "type": "today_session",
+        "payload": {
+          "today_session": {
+            "modality": "cycling",
+            "duration_min": 30,
+            "intensity": "moderate",
+            "instructions": [
+              "Ride 30 min steady"
+            ]
+          },
+          "minimum_version": {
+            "modality": "walk",
+            "duration_min": 10,
+            "instructions": [
+              "Walk 10 min"
+            ]
+          },
+          "progression_rule": "Increase duration by 10% next session",
+          "load_assessment": "medium"
+        }
+      }
+    ]
+  },
+  "FITNESS_VALIDATION": {
+    "status": "warn",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [
+      "progression_under_low_adherence"
+    ],
+    "safe_to_ingest": true,
+    "recommended_action": "accept_with_modification"
+  },
+  "DIET_OUTPUT": {
+    "summary": "Mild deficit with moderate structure.",
+    "recommendations": [
+      {
+        "type": "nutrition_targets",
+        "payload": {
+          "CALORIE_TARGET": {
+            "Range": "1800-2050 kcal",
+            "Deficit Strategy": "mild deficit"
+          },
+          "MACRO_GUIDANCE": {
+            "Protein Priority": "protein in each meal",
+            "Other Guidance": "keep meals simple"
+          },
+          "MEAL_CONSTRAINTS": [
+            "3 eating decisions max",
+            "protein first"
+          ],
+          "FALLBACK_STRATEGY": "cottage cheese, tuna salad, simple rice + protein",
+          "ADJUSTMENT_RULES": [
+            "If fatigue worsens, widen calories"
+          ],
+          "RISK_FLAGS": []
+        }
+      }
+    ]
+  },
+  "DIET_VALIDATION": {
+    "status": "pass",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [],
+    "safe_to_ingest": true,
+    "recommended_action": "accept"
+  },
+  "CONSISTENCY_OUTPUT": {
+    "summary": "Drop-off detected with overload risk.",
+    "recommendations": [
+      {
+        "type": "behavior_intervention",
+        "payload": {
+          "BEHAVIOR_STATE": {
+            "Summary": "Drop-off with low adherence and low motivation"
+          },
+          "PRIMARY_INTERVENTION": "Reduce expectations and preserve continuity",
+          "MINIMUM_ACTION": "10-minute walk only",
+          "FRICTION_REDUCTION": "Remove need to choose between full and partial workout",
+          "REENTRY_STRATEGY": "Resume baseline only after 2 consecutive days of minimum action",
+          "ESCALATION_FLAGS": [
+            "overload_risk",
+            "disengagement_risk"
+          ]
+        }
+      }
+    ]
+  },
+  "CONSISTENCY_VALIDATION": {
+    "status": "pass",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [],
+    "safe_to_ingest": true,
+    "recommended_action": "accept"
+  },
+  "HEALTH_DIRECTOR_CLASSIFICATION": {
+    "behavior_state": "drop_off",
+    "adherence": "low",
+    "fatigue": "medium",
+    "motivation": "low",
+    "training_load": "medium",
+    "nutrition_pressure": "medium",
+    "global_instability": true,
+    "local_conflict": true
+  },
+  "TRIGGERED_RULES": [
+    "consistency_vs_fitness_progression_conflict",
+    "consistency_vs_diet_restriction_conflict"
+  ],
+  "ADJUDICATION_ACTION": "modify_both",
+  "FINAL_PLAN": {
+    "training": "minimum or simplified",
+    "nutrition": "simplified, non-restrictive",
+    "focus": "continuity",
+    "stability_mode": true,
+    "anchor": "10-minute walk only"
+  },
+  "REASONING": "Adherence continuity overrides optimization; use validated behavior anchor and separate local correction from system-wide stabilization."
+}

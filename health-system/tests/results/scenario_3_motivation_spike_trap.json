@@ -1,0 +1,134 @@
+{
+  "INPUT_STATE": {
+    "adherence": "low",
+    "behavior_state": "restart_cycle",
+    "fatigue": "low",
+    "motivation": "high",
+    "training_load": "low",
+    "nutrition_pressure": "low"
+  },
+  "FITNESS_OUTPUT": {
+    "summary": "Expansion suggested due to current motivation bump.",
+    "recommendations": [
+      {
+        "type": "weekly_plan",
+        "payload": {
+          "weekly_structure": {
+            "formal_sessions_per_week": 3,
+            "session_types": [
+              "walk",
+              "cycle",
+              "walk+intervals"
+            ]
+          },
+          "minimum_version": {
+            "modality": "walk",
+            "duration_min": 10,
+            "instructions": [
+              "Walk 10 min"
+            ]
+          },
+          "progression_rule": "Add intervals this week",
+          "load_assessment": "medium"
+        }
+      }
+    ]
+  },
+  "FITNESS_VALIDATION": {
+    "status": "warn",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [
+      "motivation_spike_expansion_risk"
+    ],
+    "safe_to_ingest": true,
+    "recommended_action": "accept_with_modification"
+  },
+  "DIET_OUTPUT": {
+    "summary": "Stable moderate structure.",
+    "recommendations": [
+      {
+        "type": "nutrition_targets",
+        "payload": {
+          "CALORIE_TARGET": {
+            "Range": "1850-2100 kcal",
+            "Deficit Strategy": "mild deficit"
+          },
+          "MACRO_GUIDANCE": {
+            "Protein Priority": "protein each meal",
+            "Other Guidance": "keep meals repeatable"
+          },
+          "MEAL_CONSTRAINTS": [
+            "simple meals",
+            "repeatable meals"
+          ],
+          "FALLBACK_STRATEGY": "tuna, cottage cheese, rice + protein",
+          "ADJUSTMENT_RULES": [
+            "If hunger rises, widen calories"
+          ],
+          "RISK_FLAGS": []
+        }
+      }
+    ]
+  },
+  "DIET_VALIDATION": {
+    "status": "pass",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [],
+    "safe_to_ingest": true,
+    "recommended_action": "accept"
+  },
+  "CONSISTENCY_OUTPUT": {
+    "summary": "Restart cycle detected; controlled re-entry needed.",
+    "recommendations": [
+      {
+        "type": "reentry_plan",
+        "payload": {
+          "BEHAVIOR_STATE": {
+            "Summary": "Restart cycle after unstable adherence"
+          },
+          "PRIMARY_INTERVENTION": "Controlled re-entry only",
+          "MINIMUM_ACTION": "10-minute walk",
+          "FRICTION_REDUCTION": "Remove expectation of full restart",
+          "REENTRY_STRATEGY": "Stay at baseline until 2-3 completed days",
+          "ESCALATION_FLAGS": [
+            "restart_cycle_risk"
+          ]
+        }
+      }
+    ]
+  },
+  "CONSISTENCY_VALIDATION": {
+    "status": "pass",
+    "schema_errors": [],
+    "contract_violations": [],
+    "priority_conflicts": [],
+    "safe_to_ingest": true,
+    "recommended_action": "accept"
+  },
+  "HEALTH_DIRECTOR_CLASSIFICATION": {
+    "behavior_state": "restart_cycle",
+    "adherence": "low",
+    "fatigue": "low",
+    "motivation": "high",
+    "training_load": "low",
+    "nutrition_pressure": "low",
+    "global_instability": true,
+    "local_conflict": true
+  },
+  "TRIGGERED_RULES": [
+    "consistency_vs_fitness_progression_conflict",
+    "restart_cycle_handling",
+    "motivation_spike_trap"
+  ],
+  "ADJUDICATION_ACTION": "hold_progression",
+  "FINAL_PLAN": {
+    "training": "minimum or simplified",
+    "nutrition": "simplified, non-restrictive",
+    "focus": "continuity",
+    "stability_mode": true,
+    "anchor": "10-minute walk"
+  },
+  "REASONING": "Adherence continuity overrides optimization; use validated behavior anchor and separate local correction from system-wide stabilization."
+}

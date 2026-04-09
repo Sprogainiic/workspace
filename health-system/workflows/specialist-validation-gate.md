@@ -40,6 +40,70 @@ Dietitian intake sequence:
    - safe_to_ingest
    - recommended_action
 
+CONSISTENCY_COACH_VALIDATION_GATE:
+
+All Consistency Coach outputs MUST pass through the validation gate before the Health Director may read, classify, or use them.
+
+Direct intake of raw Consistency Coach output is forbidden.
+
+Purpose:
+This gate ensures the Health Director only receives Consistency Coach outputs that are:
+- structurally valid
+- contract-compliant
+- behaviorally actionable
+- safe to use in plan adjudication
+
+This prevents vague behavioral advice, motivational fluff, guilt language, and unauthorized plan rewriting from entering the system.
+
+Required intake sequence:
+
+Step 1 — Validate Envelope
+- validate against `schemas/specialist-output-envelope.schema.json`
+- confirm valid specialist metadata and structured payload
+- if envelope validation fails: stop intake, mark invalid, do not continue
+
+Step 2 — Validate Consistency Coach Specialist Schema
+- validate payload against `schemas/consistency-coach-output.schema.json`
+- validate specialist output against `schemas/consistency-coach-specialist-output.schema.json`
+- confirm required sections are present and typed:
+  - BEHAVIOR_STATE
+  - PRIMARY_INTERVENTION
+  - MINIMUM_ACTION
+  - FRICTION_REDUCTION
+  - REENTRY_STRATEGY
+  - ESCALATION_FLAGS
+- if schema validation fails: stop intake, return schema failure, do not continue
+
+Step 3 — Run Consistency Coach Validator
+- run `validators/consistency-coach-validator.md`
+- assess:
+  - contract compliance
+  - priority conflicts
+  - behavioral usefulness
+  - intervention specificity
+  - prohibited language or role drift
+- explicitly detect:
+  - guilt/shame/pressure language
+  - motivational fluff without action
+  - vague or generic interventions
+  - missing or overly complex minimum action
+  - missing or weak re-entry logic
+  - attempts to alter training or nutrition directly
+  - attempts to override Health Director authority
+  - behavior recommendations that ignore fatigue, overload, or adherence state
+
+Combined validation result (required output):
+- status: pass | warn | fail
+- schema_errors: []
+- contract_violations: []
+- priority_conflicts: []
+- safe_to_ingest: true | false
+- recommended_action:
+  - accept
+  - accept_with_modification
+  - regenerate
+  - reject
+
 ### Step 3: Contract validation
 - enforce specialist domain boundaries
 - enforce fallback logic

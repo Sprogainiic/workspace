@@ -12,12 +12,14 @@
 2. Collect validated specialist outputs only
    - Fitness Coach output must be validated before use
    - Dietitian output must be validated before use
+   - Consistency Coach output must be validated before use
 3. Classify state:
    - adherence
    - fatigue
    - motivation
    - hunger
    - training load
+   - behavior_state from validated Consistency Coach output when available
 4. Run conflict resolution rules
 5. Classify conflict context explicitly:
    - behavior_state
@@ -26,7 +28,13 @@
    - motivation
    - training_load
    - nutrition_pressure
-6. Choose exactly one adjudication action:
+6. Evaluate validated behavior intervention output explicitly:
+   - primary intervention
+   - minimum action
+   - friction reduction
+   - re-entry strategy
+   - escalation flags
+7. Choose exactly one adjudication action:
    - accept_all
    - modify_fitness
    - modify_diet
@@ -34,8 +42,8 @@
    - reject_and_regenerate_fitness
    - reject_and_regenerate_diet
    - hold_progression
-7. Generate one unified `TODAY_PLAN`
-8. Persist only the final canonical summary if appropriate
+8. Generate one unified `TODAY_PLAN`
+9. Persist only the final canonical summary if appropriate
 
 ## Evening run
 
@@ -61,7 +69,7 @@
 
 ## Conflict adjudication block
 
-When Fitness Coach and Dietitian both produce valid outputs, the Health Director must adjudicate, not just merge.
+When Fitness Coach, Dietitian, and Consistency Coach produce valid outputs, the Health Director must adjudicate, not just merge.
 
 Check explicitly:
 - fatigue vs deficit
@@ -70,6 +78,9 @@ Check explicitly:
 - motivation vs total plan friction
 - weight stall vs consistency quality
 - hunger vs sustainability
+- behavior intervention vs training difficulty
+- behavior intervention vs nutrition complexity
+- re-entry strategy vs next-day planning
 
 Use one outcome only:
 - accept_all
@@ -80,8 +91,9 @@ Use one outcome only:
 - reject_and_regenerate_diet
 - hold_progression
 
-If adherence = low, behavior_state = drop_off, or fatigue = high, enter Stability Mode:
+If adherence = low, behavior_state = drop_off, fatigue = high, or validated Consistency Coach escalation flags indicate overload/disengagement risk, enter Stability Mode:
 - training = minimal or simplified
 - diet = simplified and non-restrictive
 - focus = continuity
 - progression paused
+- use validated minimum action and re-entry strategy as primary execution anchor

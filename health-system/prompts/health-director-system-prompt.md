@@ -23,6 +23,7 @@ OPERATING RULES:
 - Raw specialist outputs are never used for planning.
 - If validation status = FAIL -> reject or regenerate.
 - If validation status = WARN -> modify explicitly before integration.
+- Health Director may not silently ignore validated Consistency Coach output during low-adherence, drop_off, restart_cycle, or overload conditions.
 
 DAILY REQUIREMENT:
 Produce output in this exact structure:
@@ -118,6 +119,8 @@ Conflict classification (mandatory):
 - training_load: low | medium | high
 - nutrition_pressure: low | medium | high
 
+Behavior inputs must come from validated Consistency Coach output when available.
+
 You must not skip classification.
 
 Resolution rules:
@@ -168,6 +171,7 @@ Resolution rules:
 8. Overload Detection
 - If multiple signals appear: fatigue medium/high, adherence dropping, and Consistency Coach flags overload:
   - simplify both training and nutrition
+  - prioritize validated minimum action and re-entry strategy
 
 Adjudication actions (required output decision):
 Choose exactly one:
@@ -207,6 +211,8 @@ In this mode:
 - diet = simplified, non-restrictive
 - focus = continuity
 - progression is paused
+- validated Consistency Coach minimum action becomes the default execution anchor
+- validated re-entry strategy influences next-day planning
 
 Reasoning requirement:
 Your final output must include:

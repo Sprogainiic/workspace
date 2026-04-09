@@ -82,15 +82,20 @@ def fitness_output(state):
         }
     return {
         'summary': 'Moderate steady session.',
-        'recommendations': [{'type': 'today_session', 'payload': {'today_session': {'modality': 'cycle', 'duration_min': 30, 'intensity': 'easy', 'instructions': ['Cycle 30 min steady']}, 'minimum_version': {'modality': 'walk', 'duration_min': 10, 'instructions': ['Walk 10 min']}, 'progression_rule': 'Add 5-10% only if stable', 'load_assessment': 'medium'}}]
+        'recommendations': [{'type': 'today_session', 'payload': {'today_session': {'modality': 'cycle', 'duration_min': 30, 'intensity': 'easy', 'instructions': ['Cycle 30 min steady']}, 'minimum_version': {'modality': 'walk', 'duration_min': 10, 'instructions': ['Walk 10 min']}, 'progression_rule': 'Add 5-10% only if stable for 3-4 days', 'load_assessment': 'medium'}}]
     }
 
 
 def diet_output(state):
-    if state.fatigue == 'high' or state.adherence == 'low':
+    if state.fatigue == 'high':
+        return {
+            'summary': 'Reduced or paused deficit for recovery.',
+            'recommendations': [{'type': 'nutrition_targets', 'payload': {'CALORIE_TARGET': {'Range': '1950-2250 kcal', 'Deficit Strategy': 'paused or minimal'}, 'MACRO_GUIDANCE': {'Protein Priority': 'protein each meal', 'Other Guidance': 'fiber and repeatable meals'}, 'MEAL_CONSTRAINTS': ['simple meals', 'repeatable meals'], 'FALLBACK_STRATEGY': 'cottage cheese, tuna, rice + protein', 'ADJUSTMENT_RULES': ['If fatigue remains high, keep deficit paused'], 'RISK_FLAGS': ['fatigue_recovery_priority']}}]
+        }
+    if state.adherence == 'low':
         return {
             'summary': 'Simplified eating structure with wider range.',
-            'recommendations': [{'type': 'nutrition_targets', 'payload': {'CALORIE_TARGET': {'Range': '1900-2200 kcal', 'Deficit Strategy': 'reduced or paused'}, 'MACRO_GUIDANCE': {'Protein Priority': 'protein each meal', 'Other Guidance': 'fiber and repeatable meals'}, 'MEAL_CONSTRAINTS': ['simple meals', 'repeatable meals'], 'FALLBACK_STRATEGY': 'cottage cheese, tuna, rice + protein', 'ADJUSTMENT_RULES': ['If fatigue rises, pause deficit'], 'RISK_FLAGS': []}}]
+            'recommendations': [{'type': 'nutrition_targets', 'payload': {'CALORIE_TARGET': {'Range': '1900-2200 kcal', 'Deficit Strategy': 'reduced'}, 'MACRO_GUIDANCE': {'Protein Priority': 'protein each meal', 'Other Guidance': 'fiber and repeatable meals'}, 'MEAL_CONSTRAINTS': ['simple meals', 'repeatable meals'], 'FALLBACK_STRATEGY': 'cottage cheese, tuna, rice + protein', 'ADJUSTMENT_RULES': ['If adherence improves, tighten slightly'], 'RISK_FLAGS': []}}]
         }
     if state.behavior_state == 'stable' and state.fatigue == 'low':
         return {
@@ -121,6 +126,7 @@ def consistency_output(state):
 
 
 def progress_output(state):
+    # tighter plateau validation: plateau only when adherence is not low, behavior is stable, and fatigue is not high
     if state.behavior_state in ('drop_off', 'restart_cycle') or state.adherence == 'low':
         cls = 'unstable'
         summary = {
@@ -133,6 +139,18 @@ def progress_output(state):
         patterns = ['Restart-cycle behavior', 'Low signal reliability']
         risks = ['False plateau risk']
         implications = ['Do not treat trend as decision-grade', 'Stabilization required before progression']
+    elif 'decision_fatigue' in state.friction_signals and state.adherence != 'high':
+        cls = 'insufficient_data'
+        summary = {
+            'Adherence': 'mixed',
+            'Fatigue': f'{state.fatigue}',
+            'Training': 'mixed',
+            'Nutrition': 'mixed',
+            'Weight': 'not decision-grade'
+        }
+        patterns = ['Execution friction reduces interpretability']
+        risks = ['Weak signal quality']
+        implications = ['Avoid strong trend claims', 'Use only as low-confidence context']
     elif state.fatigue == 'high':
         cls = 'unstable'
         summary = {
@@ -145,7 +163,7 @@ def progress_output(state):
         patterns = ['Rising fatigue trend', 'Overload risk']
         risks = ['Progress confidence reduced']
         implications = ['Lower confidence in progression', 'Simplify if fatigue persists']
-    elif state.adherence == 'high' and state.fatigue == 'low':
+    elif state.adherence == 'high' and state.fatigue == 'low' and state.behavior_state == 'stable':
         cls = 'improving'
         summary = {
             'Adherence': 'stable',
@@ -158,7 +176,7 @@ def progress_output(state):
         risks = ['Monitor for overconfidence']
         implications = ['Progression confidence improves', 'Interpretation quality is higher']
     else:
-        cls = 'plateau'
+        cls = 'insufficient_data'
         summary = {
             'Adherence': f'{state.adherence}',
             'Fatigue': f'{state.fatigue}',
@@ -166,8 +184,8 @@ def progress_output(state):
             'Nutrition': 'mixed',
             'Weight': 'unclear'
         }
-        patterns = ['Conditions are mixed', 'Trend is not sharp']
-        risks = ['Plateau interpretation is fragile']
+        patterns = ['Conditions are mixed', 'Trend confidence remains limited']
+        risks = ['False plateau classification risk']
         implications = ['Treat as weak signal', 'Hold confidence moderate']
     return {
         'summary': 'Derived from simulated daily state.',
@@ -191,29 +209,57 @@ def chef_output(state, diet_payload, consistency_payload):
     }
 
 
-def classify_and_adjudicate(state, consistency_payload, analyst_payload):
+def classify_and_adjudicate(state, consistency_payload, analyst_payload, stable_streak):
     behavior_summary = consistency_payload['BEHAVIOR_STATE']['Summary']
+    escalation_flags = set(consistency_payload['ESCALATION_FLAGS'])
+    analyst_class = analyst_payload['recommendations'][0]['payload']['PROGRESS_CLASSIFICATION']
+
     local_conflict = state.adherence == 'low' or state.behavior_state in ('inconsistent', 'drop_off', 'restart_cycle')
-    global_instability = state.fatigue == 'high' or state.behavior_state == 'drop_off' or (state.behavior_state == 'restart_cycle' and state.adherence == 'low')
-    if 'overload_risk' in consistency_payload['ESCALATION_FLAGS']:
-        global_instability = True
-    if state.behavior_state == 'restart_cycle' or state.adherence == 'low' and state.motivation == 'low':
+    friction_only = (
+        state.fatigue != 'high' and
+        state.training_load == 'low' and
+        state.behavior_state == 'inconsistent' and
+        'decision_fatigue' in state.friction_signals and
+        state.nutrition_pressure == 'high'
+    )
+    heavy_global_instability = (
+        state.fatigue == 'high' or
+        state.behavior_state == 'drop_off' or
+        (state.behavior_state == 'restart_cycle' and state.adherence == 'low') or
+        (state.adherence == 'low' and 'overload_risk' in escalation_flags and state.training_load != 'low' and state.nutrition_pressure != 'low')
+    )
+
+    # progression re-entry gating
+    progression_unlocked = stable_streak >= 3 and state.behavior_state == 'stable' and state.fatigue == 'low' and state.adherence == 'high'
+
+    if heavy_global_instability:
+        action = 'modify_both_heavy'
+    elif friction_only:
+        action = 'friction_reduction_only'
+    elif state.behavior_state == 'restart_cycle' or (state.adherence == 'low' and state.motivation == 'low'):
         action = 'hold_progression'
-    elif state.adherence == 'low' and state.fatigue != 'high':
-        action = 'modify_both' if state.nutrition_pressure != 'low' else 'modify_diet'
-    elif state.fatigue == 'high':
-        action = 'modify_both'
+    elif state.fatigue == 'medium' and state.training_load == 'medium':
+        action = 'modify_both_light'
+    elif progression_unlocked and analyst_class == 'improving':
+        action = 'accept_all'
+    elif state.behavior_state == 'stable' and state.fatigue == 'low' and state.adherence in ('medium', 'high'):
+        action = 'monitor_only'
+    elif state.adherence == 'low' and state.nutrition_pressure != 'low':
+        action = 'modify_diet'
+    elif local_conflict:
+        action = 'modify_fitness'
     else:
-        action = 'accept_all' if state.adherence == 'high' and state.fatigue == 'low' else 'modify_both'
+        action = 'monitor_only'
+
     final = {
-        'training': 'minimum or simplified' if action in ('modify_both', 'hold_progression') else 'as proposed',
-        'nutrition': 'simplified, non-restrictive' if action in ('modify_both', 'modify_diet', 'hold_progression') else 'as proposed',
-        'meals': '2-3 simple options, fallback first' if state.behavior_state != 'stable' else '3-4 simple options',
-        'focus': 'continuity' if not state.adherence == 'high' else 'progression',
-        'stability_mode': global_instability,
+        'training': 'minimum or simplified' if action in ('modify_both_heavy', 'modify_both_light', 'hold_progression', 'modify_fitness') else 'as proposed',
+        'nutrition': 'simplified, non-restrictive' if action in ('modify_both_heavy', 'modify_both_light', 'modify_diet', 'hold_progression', 'friction_reduction_only') else 'as proposed',
+        'meals': '2-3 simple options, fallback first' if action in ('modify_both_heavy', 'hold_progression', 'friction_reduction_only') or heavy_global_instability or state.behavior_state != 'stable' else '3-4 simple options',
+        'focus': 'continuity' if action != 'accept_all' else 'progression',
+        'stability_mode': heavy_global_instability,
         'anchor': consistency_payload['MINIMUM_ACTION']
     }
-    return behavior_summary, local_conflict, global_instability, action, final
+    return behavior_summary, local_conflict, heavy_global_instability, friction_only, progression_unlocked, action, final
 
 
 def run_scenario(name, states):
@@ -223,19 +269,29 @@ def run_scenario(name, states):
         'stability_mode_days': 0,
         'hold_progression_days': 0,
         'modify_both_days': 0,
+        'modify_both_light_days': 0,
+        'modify_both_heavy_days': 0,
+        'friction_reduction_only_days': 0,
+        'monitor_only_days': 0,
         'chef_stability_days': 0,
         'analyst_classifications': {},
         'blocked_progression_days': 0,
         'allowed_progression_days': 0
     }
 
+    stable_streak = 0
     for s in states:
+        if s.behavior_state == 'stable' and s.adherence == 'high' and s.fatigue == 'low':
+            stable_streak += 1
+        else:
+            stable_streak = 0
+
         fitness = fitness_output(s)
         diet = diet_output(s)
         consistency = consistency_output(s)
         analyst = progress_output(s)
         chef = chef_output(s, diet, consistency)
-        behavior_summary, local_conflict, global_instability, action, final = classify_and_adjudicate(s, consistency['recommendations'][0]['payload'], analyst)
+        behavior_summary, local_conflict, heavy_global_instability, friction_only, progression_unlocked, action, final = classify_and_adjudicate(s, consistency['recommendations'][0]['payload'], analyst, stable_streak)
 
         trace = {
             'day': s.day,
@@ -257,8 +313,10 @@ def run_scenario(name, states):
                 'motivation': s.motivation,
                 'training_load': s.training_load,
                 'nutrition_pressure': s.nutrition_pressure,
-                'global_instability': global_instability,
+                'global_instability': heavy_global_instability,
                 'local_conflict': local_conflict,
+                'friction_only': friction_only,
+                'progression_unlocked': progression_unlocked,
                 'behavior_summary': behavior_summary,
                 'analyst_classification': analyst['recommendations'][0]['payload']['PROGRESS_CLASSIFICATION']
             },
@@ -267,6 +325,8 @@ def run_scenario(name, states):
                 'consistency_vs_diet_restriction_conflict' if (s.adherence == 'low' and s.nutrition_pressure != 'low') else None,
                 'analyst_instability_reduces_progression_confidence' if analyst['recommendations'][0]['payload']['PROGRESS_CLASSIFICATION'] == 'unstable' else None,
                 'chef_execution_rules_stability_mode' if chef['recommendations'][0]['payload']['SIMPLICITY_MODE'] == 'stability' else None,
+                'friction_reduction_only' if friction_only else None,
+                'progression_reentry_gate' if not progression_unlocked and s.behavior_state == 'stable' and s.fatigue == 'low' else None,
             ] if r],
             'ADJUDICATION_ACTION': action,
             'FINAL_PLAN': final,
@@ -276,17 +336,21 @@ def run_scenario(name, states):
                 'chef_vs_consistency': True,
                 'analyst_interpretation_only': True
             },
-            'REASONING': 'Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers.'
+            'REASONING': 'Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly.'
         }
         day_traces.append(trace)
         stats['days'] += 1
         stats['stability_mode_days'] += 1 if final['stability_mode'] else 0
         stats['hold_progression_days'] += 1 if action == 'hold_progression' else 0
-        stats['modify_both_days'] += 1 if action == 'modify_both' else 0
+        stats['modify_both_days'] += 1 if action in ('modify_both_light', 'modify_both_heavy') else 0
+        stats['modify_both_light_days'] += 1 if action == 'modify_both_light' else 0
+        stats['modify_both_heavy_days'] += 1 if action == 'modify_both_heavy' else 0
+        stats['friction_reduction_only_days'] += 1 if action == 'friction_reduction_only' else 0
+        stats['monitor_only_days'] += 1 if action == 'monitor_only' else 0
         stats['chef_stability_days'] += 1 if chef['recommendations'][0]['payload']['SIMPLICITY_MODE'] == 'stability' else 0
         cls = analyst['recommendations'][0]['payload']['PROGRESS_CLASSIFICATION']
         stats['analyst_classifications'][cls] = stats['analyst_classifications'].get(cls, 0) + 1
-        if action in ('hold_progression', 'modify_both'):
+        if action in ('hold_progression', 'modify_both_light', 'modify_both_heavy'):
             stats['blocked_progression_days'] += 1
         else:
             stats['allowed_progression_days'] += 1

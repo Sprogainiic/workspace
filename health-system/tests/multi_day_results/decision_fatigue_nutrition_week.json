@@ -37,7 +37,7 @@
                 "Walk 10 min"
               ]
             },
-            "progression_rule": "Add 5-10% only if stable",
+            "progression_rule": "Add 5-10% only if stable for 3-4 days",
             "load_assessment": "medium"
           }
         }
@@ -121,23 +121,22 @@
           "type": "trend_analysis",
           "payload": {
             "TREND_SUMMARY": {
-              "Adherence": "medium",
+              "Adherence": "mixed",
               "Fatigue": "low",
               "Training": "mixed",
               "Nutrition": "mixed",
-              "Weight": "unclear"
+              "Weight": "not decision-grade"
             },
             "KEY_PATTERNS": [
-              "Conditions are mixed",
-              "Trend is not sharp"
+              "Execution friction reduces interpretability"
             ],
             "RISK_SIGNALS": [
-              "Plateau interpretation is fragile"
+              "Weak signal quality"
             ],
-            "PROGRESS_CLASSIFICATION": "plateau",
+            "PROGRESS_CLASSIFICATION": "insufficient_data",
             "SYSTEM_IMPLICATIONS": [
-              "Treat as weak signal",
-              "Hold confidence moderate"
+              "Avoid strong trend claims",
+              "Use only as low-confidence context"
             ]
           }
         }
@@ -186,16 +185,19 @@
       "nutrition_pressure": "high",
       "global_instability": false,
       "local_conflict": true,
+      "friction_only": true,
+      "progression_unlocked": false,
       "behavior_summary": "inconsistent with low continuity",
-      "analyst_classification": "plateau"
+      "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [
       "consistency_vs_fitness_progression_conflict",
-      "chef_execution_rules_stability_mode"
+      "chef_execution_rules_stability_mode",
+      "friction_reduction_only"
     ],
-    "ADJUDICATION_ACTION": "modify_both",
+    "ADJUDICATION_ACTION": "friction_reduction_only",
     "FINAL_PLAN": {
-      "training": "minimum or simplified",
+      "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
       "meals": "2-3 simple options, fallback first",
       "focus": "continuity",
@@ -208,7 +210,7 @@
       "chef_vs_consistency": true,
       "analyst_interpretation_only": true
     },
-    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+    "REASONING": "Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly."
   },
   {
     "day": 2,
@@ -248,7 +250,7 @@
                 "Walk 10 min"
               ]
             },
-            "progression_rule": "Add 5-10% only if stable",
+            "progression_rule": "Add 5-10% only if stable for 3-4 days",
             "load_assessment": "medium"
           }
         }
@@ -332,23 +334,22 @@
           "type": "trend_analysis",
           "payload": {
             "TREND_SUMMARY": {
-              "Adherence": "medium",
+              "Adherence": "mixed",
               "Fatigue": "low",
               "Training": "mixed",
               "Nutrition": "mixed",
-              "Weight": "unclear"
+              "Weight": "not decision-grade"
             },
             "KEY_PATTERNS": [
-              "Conditions are mixed",
-              "Trend is not sharp"
+              "Execution friction reduces interpretability"
             ],
             "RISK_SIGNALS": [
-              "Plateau interpretation is fragile"
+              "Weak signal quality"
             ],
-            "PROGRESS_CLASSIFICATION": "plateau",
+            "PROGRESS_CLASSIFICATION": "insufficient_data",
             "SYSTEM_IMPLICATIONS": [
-              "Treat as weak signal",
-              "Hold confidence moderate"
+              "Avoid strong trend claims",
+              "Use only as low-confidence context"
             ]
           }
         }
@@ -397,16 +398,19 @@
       "nutrition_pressure": "high",
       "global_instability": false,
       "local_conflict": true,
+      "friction_only": true,
+      "progression_unlocked": false,
       "behavior_summary": "inconsistent with low continuity",
-      "analyst_classification": "plateau"
+      "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [
       "consistency_vs_fitness_progression_conflict",
-      "chef_execution_rules_stability_mode"
+      "chef_execution_rules_stability_mode",
+      "friction_reduction_only"
     ],
-    "ADJUDICATION_ACTION": "modify_both",
+    "ADJUDICATION_ACTION": "friction_reduction_only",
     "FINAL_PLAN": {
-      "training": "minimum or simplified",
+      "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
       "meals": "2-3 simple options, fallback first",
       "focus": "continuity",
@@ -419,7 +423,7 @@
       "chef_vs_consistency": true,
       "analyst_interpretation_only": true
     },
-    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+    "REASONING": "Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly."
   },
   {
     "day": 3,
@@ -459,7 +463,7 @@
                 "Walk 10 min"
               ]
             },
-            "progression_rule": "Add 5-10% only if stable",
+            "progression_rule": "Add 5-10% only if stable for 3-4 days",
             "load_assessment": "medium"
           }
         }
@@ -543,23 +547,22 @@
           "type": "trend_analysis",
           "payload": {
             "TREND_SUMMARY": {
-              "Adherence": "medium",
+              "Adherence": "mixed",
               "Fatigue": "low",
               "Training": "mixed",
               "Nutrition": "mixed",
-              "Weight": "unclear"
+              "Weight": "not decision-grade"
             },
             "KEY_PATTERNS": [
-              "Conditions are mixed",
-              "Trend is not sharp"
+              "Execution friction reduces interpretability"
             ],
             "RISK_SIGNALS": [
-              "Plateau interpretation is fragile"
+              "Weak signal quality"
             ],
-            "PROGRESS_CLASSIFICATION": "plateau",
+            "PROGRESS_CLASSIFICATION": "insufficient_data",
             "SYSTEM_IMPLICATIONS": [
-              "Treat as weak signal",
-              "Hold confidence moderate"
+              "Avoid strong trend claims",
+              "Use only as low-confidence context"
             ]
           }
         }
@@ -608,16 +611,19 @@
       "nutrition_pressure": "high",
       "global_instability": false,
       "local_conflict": true,
+      "friction_only": true,
+      "progression_unlocked": false,
       "behavior_summary": "inconsistent with low continuity",
-      "analyst_classification": "plateau"
+      "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [
       "consistency_vs_fitness_progression_conflict",
-      "chef_execution_rules_stability_mode"
+      "chef_execution_rules_stability_mode",
+      "friction_reduction_only"
     ],
-    "ADJUDICATION_ACTION": "modify_both",
+    "ADJUDICATION_ACTION": "friction_reduction_only",
     "FINAL_PLAN": {
-      "training": "minimum or simplified",
+      "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
       "meals": "2-3 simple options, fallback first",
       "focus": "continuity",
@@ -630,7 +636,7 @@
       "chef_vs_consistency": true,
       "analyst_interpretation_only": true
     },
-    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+    "REASONING": "Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly."
   },
   {
     "day": 4,
@@ -669,7 +675,7 @@
                 "Walk 10 min"
               ]
             },
-            "progression_rule": "Add 5-10% only if stable",
+            "progression_rule": "Add 5-10% only if stable for 3-4 days",
             "load_assessment": "medium"
           }
         }
@@ -753,23 +759,22 @@
           "type": "trend_analysis",
           "payload": {
             "TREND_SUMMARY": {
-              "Adherence": "medium",
+              "Adherence": "mixed",
               "Fatigue": "low",
               "Training": "mixed",
               "Nutrition": "mixed",
-              "Weight": "unclear"
+              "Weight": "not decision-grade"
             },
             "KEY_PATTERNS": [
-              "Conditions are mixed",
-              "Trend is not sharp"
+              "Execution friction reduces interpretability"
             ],
             "RISK_SIGNALS": [
-              "Plateau interpretation is fragile"
+              "Weak signal quality"
             ],
-            "PROGRESS_CLASSIFICATION": "plateau",
+            "PROGRESS_CLASSIFICATION": "insufficient_data",
             "SYSTEM_IMPLICATIONS": [
-              "Treat as weak signal",
-              "Hold confidence moderate"
+              "Avoid strong trend claims",
+              "Use only as low-confidence context"
             ]
           }
         }
@@ -818,16 +823,19 @@
       "nutrition_pressure": "high",
       "global_instability": false,
       "local_conflict": true,
+      "friction_only": true,
+      "progression_unlocked": false,
       "behavior_summary": "inconsistent with low continuity",
-      "analyst_classification": "plateau"
+      "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [
       "consistency_vs_fitness_progression_conflict",
-      "chef_execution_rules_stability_mode"
+      "chef_execution_rules_stability_mode",
+      "friction_reduction_only"
     ],
-    "ADJUDICATION_ACTION": "modify_both",
+    "ADJUDICATION_ACTION": "friction_reduction_only",
     "FINAL_PLAN": {
-      "training": "minimum or simplified",
+      "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
       "meals": "2-3 simple options, fallback first",
       "focus": "continuity",
@@ -840,7 +848,7 @@
       "chef_vs_consistency": true,
       "analyst_interpretation_only": true
     },
-    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+    "REASONING": "Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly."
   },
   {
     "day": 5,
@@ -879,7 +887,7 @@
                 "Walk 10 min"
               ]
             },
-            "progression_rule": "Add 5-10% only if stable",
+            "progression_rule": "Add 5-10% only if stable for 3-4 days",
             "load_assessment": "medium"
           }
         }
@@ -963,23 +971,22 @@
           "type": "trend_analysis",
           "payload": {
             "TREND_SUMMARY": {
-              "Adherence": "medium",
+              "Adherence": "mixed",
               "Fatigue": "low",
               "Training": "mixed",
               "Nutrition": "mixed",
-              "Weight": "unclear"
+              "Weight": "not decision-grade"
             },
             "KEY_PATTERNS": [
-              "Conditions are mixed",
-              "Trend is not sharp"
+              "Execution friction reduces interpretability"
             ],
             "RISK_SIGNALS": [
-              "Plateau interpretation is fragile"
+              "Weak signal quality"
             ],
-            "PROGRESS_CLASSIFICATION": "plateau",
+            "PROGRESS_CLASSIFICATION": "insufficient_data",
             "SYSTEM_IMPLICATIONS": [
-              "Treat as weak signal",
-              "Hold confidence moderate"
+              "Avoid strong trend claims",
+              "Use only as low-confidence context"
             ]
           }
         }
@@ -1028,16 +1035,19 @@
       "nutrition_pressure": "high",
       "global_instability": false,
       "local_conflict": true,
+      "friction_only": true,
+      "progression_unlocked": false,
       "behavior_summary": "inconsistent with low continuity",
-      "analyst_classification": "plateau"
+      "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [
       "consistency_vs_fitness_progression_conflict",
-      "chef_execution_rules_stability_mode"
+      "chef_execution_rules_stability_mode",
+      "friction_reduction_only"
     ],
-    "ADJUDICATION_ACTION": "modify_both",
+    "ADJUDICATION_ACTION": "friction_reduction_only",
     "FINAL_PLAN": {
-      "training": "minimum or simplified",
+      "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
       "meals": "2-3 simple options, fallback first",
       "focus": "continuity",
@@ -1050,7 +1060,7 @@
       "chef_vs_consistency": true,
       "analyst_interpretation_only": true
     },
-    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+    "REASONING": "Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly."
   },
   {
     "day": 6,
@@ -1089,7 +1099,7 @@
                 "Walk 10 min"
               ]
             },
-            "progression_rule": "Add 5-10% only if stable",
+            "progression_rule": "Add 5-10% only if stable for 3-4 days",
             "load_assessment": "medium"
           }
         }
@@ -1173,23 +1183,22 @@
           "type": "trend_analysis",
           "payload": {
             "TREND_SUMMARY": {
-              "Adherence": "medium",
+              "Adherence": "mixed",
               "Fatigue": "low",
               "Training": "mixed",
               "Nutrition": "mixed",
-              "Weight": "unclear"
+              "Weight": "not decision-grade"
             },
             "KEY_PATTERNS": [
-              "Conditions are mixed",
-              "Trend is not sharp"
+              "Execution friction reduces interpretability"
             ],
             "RISK_SIGNALS": [
-              "Plateau interpretation is fragile"
+              "Weak signal quality"
             ],
-            "PROGRESS_CLASSIFICATION": "plateau",
+            "PROGRESS_CLASSIFICATION": "insufficient_data",
             "SYSTEM_IMPLICATIONS": [
-              "Treat as weak signal",
-              "Hold confidence moderate"
+              "Avoid strong trend claims",
+              "Use only as low-confidence context"
             ]
           }
         }
@@ -1238,16 +1247,19 @@
       "nutrition_pressure": "high",
       "global_instability": false,
       "local_conflict": true,
+      "friction_only": true,
+      "progression_unlocked": false,
       "behavior_summary": "inconsistent with low continuity",
-      "analyst_classification": "plateau"
+      "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [
       "consistency_vs_fitness_progression_conflict",
-      "chef_execution_rules_stability_mode"
+      "chef_execution_rules_stability_mode",
+      "friction_reduction_only"
     ],
-    "ADJUDICATION_ACTION": "modify_both",
+    "ADJUDICATION_ACTION": "friction_reduction_only",
     "FINAL_PLAN": {
-      "training": "minimum or simplified",
+      "training": "as proposed",
       "nutrition": "simplified, non-restrictive",
       "meals": "2-3 simple options, fallback first",
       "focus": "continuity",
@@ -1260,7 +1272,7 @@
       "chef_vs_consistency": true,
       "analyst_interpretation_only": true
     },
-    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+    "REASONING": "Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly."
   },
   {
     "day": 7,
@@ -1299,7 +1311,7 @@
                 "Walk 10 min"
               ]
             },
-            "progression_rule": "Add 5-10% only if stable",
+            "progression_rule": "Add 5-10% only if stable for 3-4 days",
             "load_assessment": "medium"
           }
         }
@@ -1389,12 +1401,12 @@
             },
             "KEY_PATTERNS": [
               "Conditions are mixed",
-              "Trend is not sharp"
+              "Trend confidence remains limited"
             ],
             "RISK_SIGNALS": [
-              "Plateau interpretation is fragile"
+              "False plateau classification risk"
             ],
-            "PROGRESS_CLASSIFICATION": "plateau",
+            "PROGRESS_CLASSIFICATION": "insufficient_data",
             "SYSTEM_IMPLICATIONS": [
               "Treat as weak signal",
               "Hold confidence moderate"
@@ -1447,16 +1459,18 @@
       "nutrition_pressure": "high",
       "global_instability": false,
       "local_conflict": true,
+      "friction_only": false,
+      "progression_unlocked": false,
       "behavior_summary": "Stable and adherent",
-      "analyst_classification": "plateau"
+      "analyst_classification": "insufficient_data"
     },
     "TRIGGERED_RULES": [
       "consistency_vs_fitness_progression_conflict"
     ],
-    "ADJUDICATION_ACTION": "modify_both",
+    "ADJUDICATION_ACTION": "modify_fitness",
     "FINAL_PLAN": {
       "training": "minimum or simplified",
-      "nutrition": "simplified, non-restrictive",
+      "nutrition": "as proposed",
       "meals": "2-3 simple options, fallback first",
       "focus": "continuity",
       "stability_mode": false,
@@ -1468,6 +1482,6 @@
       "chef_vs_consistency": true,
       "analyst_interpretation_only": true
     },
-    "REASONING": "Adherence continuity and behavior friction override optimization; simplification cascades across all execution layers."
+    "REASONING": "Adherence continuity and behavior friction override optimization; local friction, global instability, and progression confidence are separated explicitly."
   }
 ]

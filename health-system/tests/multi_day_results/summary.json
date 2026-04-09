@@ -2,53 +2,69 @@
   "fragile_restart_week": {
     "days": 7,
     "stability_mode_days": 2,
-    "hold_progression_days": 4,
+    "hold_progression_days": 2,
     "modify_both_days": 2,
+    "modify_both_light_days": 0,
+    "modify_both_heavy_days": 2,
+    "friction_reduction_only_days": 0,
+    "monitor_only_days": 2,
     "chef_stability_days": 4,
     "analyst_classifications": {
       "improving": 1,
       "unstable": 4,
-      "plateau": 2
+      "insufficient_data": 2
     },
-    "blocked_progression_days": 6,
-    "allowed_progression_days": 1
+    "blocked_progression_days": 4,
+    "allowed_progression_days": 3
   },
   "decision_fatigue_nutrition_week": {
     "days": 7,
     "stability_mode_days": 0,
     "hold_progression_days": 0,
-    "modify_both_days": 7,
+    "modify_both_days": 0,
+    "modify_both_light_days": 0,
+    "modify_both_heavy_days": 0,
+    "friction_reduction_only_days": 6,
+    "monitor_only_days": 0,
     "chef_stability_days": 6,
     "analyst_classifications": {
-      "plateau": 7
+      "insufficient_data": 7
     },
-    "blocked_progression_days": 7,
-    "allowed_progression_days": 0
+    "blocked_progression_days": 0,
+    "allowed_progression_days": 7
   },
   "fatigue_escalation_week": {
     "days": 7,
     "stability_mode_days": 4,
     "hold_progression_days": 0,
-    "modify_both_days": 7,
+    "modify_both_days": 5,
+    "modify_both_light_days": 1,
+    "modify_both_heavy_days": 4,
+    "friction_reduction_only_days": 0,
+    "monitor_only_days": 2,
     "chef_stability_days": 4,
     "analyst_classifications": {
-      "plateau": 3,
+      "insufficient_data": 3,
       "unstable": 4
     },
-    "blocked_progression_days": 7,
-    "allowed_progression_days": 0
+    "blocked_progression_days": 5,
+    "allowed_progression_days": 2
   },
   "stable_improvement_week": {
     "days": 7,
     "stability_mode_days": 0,
     "hold_progression_days": 0,
-    "modify_both_days": 1,
+    "modify_both_days": 0,
+    "modify_both_light_days": 0,
+    "modify_both_heavy_days": 0,
+    "friction_reduction_only_days": 0,
+    "monitor_only_days": 3,
     "chef_stability_days": 0,
     "analyst_classifications": {
-      "plateau": 1,
+      "insufficient_data": 1,
       "improving": 6
     },
-    "blocked_progression_days": 1,
-    "allowed_progression_days": 6
+    "blocked_progression_days": 0,
+    "allowed_progression_days": 7
   }
 }

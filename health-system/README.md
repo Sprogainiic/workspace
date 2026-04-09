@@ -16,13 +16,18 @@ Create a practical, adherence-first system where the **Health Director** is the 
 - `health/` — canonical memory + inbox layout
 - `workflows/` — daily/weekly and integration playbooks
 - `prompts/` — task prompts for specialist agents
+- `prompts/chat-gateway-system-prompt.md` — single-chat orchestration layer
+- `workflows/chat-gateway-flow.md` — top-level interaction routing
+- `contracts/chat-gateway-contract.md` — interface boundary for user-facing chat
 
 ## Operating model
 
-- Health Director is the sole user-facing voice
+- Chat Gateway is the live chat interface layer
+- Health Director remains the sole decision authority and final planner
 - Specialists are subordinate and contract-bound
 - Specialists write to scratch inboxes or return structured data
 - Health Director decides what becomes canonical memory
 - Adherence and safety always outrank optimization
 - No specialist is implemented without an explicit contract first
 - No specialist output reaches Health Director without passing validation
+- Chat Gateway never bypasses Health Director or validation

@@ -200,6 +200,84 @@ The Health Director must not:
 - warn -> ingest with warning log and possible modification
 - fail -> reject or regenerate
 
+PERSONAL_CHEF_VALIDATION_GATE:
+
+All Personal Chef outputs MUST pass through the validation gate before the Health Director may read, classify, or use them.
+
+Direct intake of raw Personal Chef output is forbidden.
+
+Purpose:
+This gate ensures the Health Director only receives Personal Chef outputs that are:
+- structurally valid
+- contract-compliant
+- low-friction and execution-oriented
+- safe to use in meal execution context
+
+This prevents recipe-style output, excessive choice, ignored friction signals, and unbounded complexity from entering the system.
+
+Required intake sequence:
+
+Step 1 — Validate Envelope
+- validate against `schemas/specialist-output-envelope.schema.json`
+- confirm valid specialist metadata and properly structured payload
+- if envelope validation fails: stop intake, mark invalid, do not continue
+
+Step 2 — Validate Personal Chef Specialist Schema
+- validate payload against `schemas/personal-chef-output.schema.json`
+- validate specialist output against `schemas/personal-chef-specialist-output.schema.json`
+- confirm required sections are present and typed:
+  - SIMPLICITY_MODE
+  - MEAL_OPTIONS
+  - FALLBACK_MEAL
+  - CONSTRAINT_ALIGNMENT
+- if schema validation fails: stop intake, return schema failure, do not continue
+
+Step 3 — Run Personal Chef Validator
+- run `validators/personal-chef-validator.md`
+- assess:
+  - contract compliance
+  - option count discipline
+  - fallback quality
+  - friction responsiveness
+  - prohibited recipe/planning drift
+  - mode alignment (stability vs normal)
+- explicitly detect:
+  - more than 4 options
+  - missing fallback
+  - recipe-style instructions
+  - ignored Stability Mode
+  - ignored friction signals
+  - chef inventing nutrition rules
+  - descriptive or persuasive language
+  - multi-step prep burden
+
+Combined validation result (required output):
+- status: pass | warn | fail
+- schema_errors: []
+- contract_violations: []
+- priority_conflicts: []
+- safe_to_ingest: true | false
+- recommended_action:
+  - accept
+  - accept_with_modification
+  - regenerate
+  - reject
+- validated_payload: {}
+- validation_notes: []
+
+Hard intake rule:
+The Health Director may consume only one of the following:
+- a validated pass payload
+- a validated warn payload with explicit modification note
+- a fail result that triggers regeneration or rejection
+
+The Health Director must not:
+- read raw Personal Chef output
+- infer meaning from failed chef output
+- merge partially invalid meal suggestions
+- silently downgrade failure to warning
+- treat recipe-like output as execution-ready
+
 ## Health Director requirement
 
 The Health Director must not directly trust specialist output.

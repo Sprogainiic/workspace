@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+import json
+from pathlib import Path
+
+out = Path('/home/sprogainiic/.openclaw/workspace/health-system/tests/e2e_trace_scenario_1.json')
+trace = {
+  'INPUT_STATE': {
+    'adherence': 'low-to-medium',
+    'behavior_state': 'inconsistent',
+    'fatigue': 'medium',
+    'motivation': 'low',
+    'training_load': 'medium',
+    'nutrition_pressure': 'medium',
+    'friction_signals': ['time', 'decision_fatigue'],
+    'analyst_state': 'unstable'
+  },
+  'FITNESS_OUTPUT': {
+    'summary': 'Simple low-load session proposed.',
+    'recommendations': [
+      {
+        'type': 'today_session',
+        'payload': {
+          'today_session': {'modality': 'walk', 'duration_min': 20, 'intensity': 'easy', 'instructions': ['Walk 20 min']},
+          'minimum_version': {'modality': 'walk', 'duration_min': 10, 'instructions': ['Walk 10 min']},
+          'load_assessment': 'low'
+        }
+      }
+    ]
+  },
+  'FITNESS_VALIDATION': {'status': 'pass', 'schema_errors': [], 'contract_violations': [], 'priority_conflicts': [], 'safe_to_ingest': True, 'recommended_action': 'accept'},
+  'DIET_OUTPUT': {
+    'summary': 'Mild deficit with simplified structure.',
+    'recommendations': [
+      {
+        'type': 'nutrition_targets',
+        'payload': {
+          'CALORIE_TARGET': {'Range': '1850-2100 kcal', 'Deficit Strategy': 'mild deficit'},
+          'MACRO_GUIDANCE': {'Protein Priority': 'protein in each meal', 'Other Guidance': 'keep meals repeatable'},
+          'MEAL_CONSTRAINTS': ['simple meals', 'repeatable meals'],
+          'FALLBACK_STRATEGY': 'tuna, cottage cheese, rice + protein',
+          'ADJUSTMENT_RULES': ['If fatigue worsens, widen calories'],
+          'RISK_FLAGS': []
+        }
+      }
+    ]
+  },
+  'DIET_VALIDATION': {'status': 'pass', 'schema_errors': [], 'contract_violations': [], 'priority_conflicts': [], 'safe_to_ingest': True, 'recommended_action': 'accept'},
+  'CONSISTENCY_OUTPUT': {
+    'summary': 'Inconsistent with decision fatigue and low adherence.',
+    'recommendations': [
+      {
+        'type': 'friction_reduction',
+        'payload': {
+          'BEHAVIOR_STATE': {'Summary': 'Inconsistent with decision fatigue'},
+          'PRIMARY_INTERVENTION': 'Reduce decision load',
+          'MINIMUM_ACTION': '10-minute walk only',
+          'FRICTION_REDUCTION': 'Remove extra nutrition decisions',
+          'REENTRY_STRATEGY': 'Return to baseline after 1 low-friction day',
+          'ESCALATION_FLAGS': ['decision_fatigue']
+        }
+      }
+    ]
+  },
+  'CONSISTENCY_VALIDATION': {'status': 'pass', 'schema_errors': [], 'contract_violations': [], 'priority_conflicts': [], 'safe_to_ingest': True, 'recommended_action': 'accept'},
+  'PROGRESS_ANALYST_OUTPUT': {
+    'summary': 'Behavior instability makes trend confidence low.',
+    'recommendations': [
+      {
+        'type': 'trend_analysis',
+        'payload': {
+          'TREND_SUMMARY': {
+            'Adherence': 'Mixed and recently unstable',
+            'Fatigue': 'Stable to medium',
+            'Training': 'Irregular',
+            'Nutrition': 'Mixed',
+            'Weight': 'Direction unclear'
+          },
+          'KEY_PATTERNS': ['Restart-cycle behavior reduces interpretability', 'Weight signal reliability is low'],
+          'RISK_SIGNALS': ['False plateau classification risk'],
+          'PROGRESS_CLASSIFICATION': 'unstable',
+          'SYSTEM_IMPLICATIONS': ['Current instability reduces confidence in progression decisions', 'Weight trend should not be treated as decision-grade']
+        }
+      }
+    ]
+  },
+  'PROGRESS_ANALYST_VALIDATION': {'status': 'pass', 'schema_errors': [], 'contract_violations': [], 'priority_conflicts': [], 'safe_to_ingest': True, 'recommended_action': 'accept'},
+  'PERSONAL_CHEF_OUTPUT': {
+    'summary': 'Stability-oriented meal execution.',
+    'recommendations': [
+      {
+        'type': 'meal_options',
+        'payload': {
+          'SIMPLICITY_MODE': 'stability',
+          'MEAL_OPTIONS': ['Cottage cheese + fruit', 'Tuna salad', 'Rice + pre-cooked chicken'],
+          'FALLBACK_MEAL': 'Cottage cheese only',
+          'CONSTRAINT_ALIGNMENT': 'All meals are simple, protein-based, repeatable, and low-prep.'
+        }
+      }
+    ]
+  },
+  'PERSONAL_CHEF_VALIDATION': {'status': 'pass', 'schema_errors': [], 'contract_violations': [], 'priority_conflicts': [], 'safe_to_ingest': True, 'recommended_action': 'accept'},
+  'HEALTH_DIRECTOR_CLASSIFICATION': {
+    'behavior_state': 'inconsistent',
+    'adherence': 'low-to-medium',
+    'fatigue': 'medium',
+    'motivation': 'low',
+    'training_load': 'medium',
+    'nutrition_pressure': 'medium',
+    'global_instability': False,
+    'local_conflict': True
+  },
+  'TRIGGERED_RULES': [
+    'consistency_vs_fitness_progression_conflict',
+    'consistency_vs_diet_restriction_conflict',
+    'analyst_instability_reduces_progression_confidence',
+    'chef_execution_rules_stability_mode'
+  ],
+  'ADJUDICATION_ACTION': 'modify_both',
+  'FINAL_PLAN': {
+    'training': 'minimum or simplified',
+    'nutrition': 'simplified, non-restrictive',
+    'meals': '2-3 simple options, fallback first',
+    'focus': 'continuity',
+    'stability_mode': False,
+    'anchor': '10-minute walk only'
+  },
+  'CROSS_AGENT_CONSISTENCY_CHECK': {
+    'fitness_vs_diet': True,
+    'chef_vs_dietitian': True,
+    'chef_vs_consistency': True,
+    'analyst_interpretation_only': True
+  },
+  'REASONING': 'Adherence continuity and behavior friction override optimization; simplify both execution domains and keep analyst output interpretive only.'
+}
+out.write_text(json.dumps(trace, indent=2))
+print(out)

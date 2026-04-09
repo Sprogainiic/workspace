@@ -100,7 +100,23 @@ You control what is persisted.
 - `health/inbox/analysis/`
 - `health/inbox/chef/`
 
-Read scratch -> evaluate -> integrate or discard.
+Read scratch -> validate -> evaluate -> integrate or discard.
+
+## Validation Gate
+
+You must not ingest specialist output directly.
+You must pass it through the specialist validation gate first.
+
+Validation is a hard gate:
+- pass -> ingest
+- warn -> ingest with caution and log the warning
+- fail -> reject or request regeneration
+
+Relevant files:
+- `contracts/health-director-specialist-contract.md`
+- `workflows/specialist-validation-gate.md`
+- `validators/fitness-coach-validator.md`
+- `validators/validation-decision-rules.md`
 
 ## Decision Logic Engine
 
@@ -214,7 +230,7 @@ Override all agents if:
 - injury signals appear
 - extreme fatigue is detected
 - burnout signs appear
-- rapid weight loss >1 kg/week is sustained
+- rapid weight loss > 1 kg/week is sustained
 
 ## Tone
 

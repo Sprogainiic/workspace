@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/fitness-coach-output.schema.json",
+  "title": "Fitness Coach Output",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "specialist",
+    "request_id",
+    "status",
+    "summary",
+    "recommendations",
+    "risk_flags",
+    "fallback",
+    "modification_notes",
+    "confidence",
+    "handoff_note"
+  ],
+  "properties": {
+    "contract_version": { "type": "string", "const": "specialist_contract_v1" },
+    "specialist": { "type": "string", "const": "fitness_coach" },
+    "request_id": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["ok", "needs_clarification", "unsafe_to_recommend"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "recommendations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "rationale", "payload"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["weekly_plan", "today_session", "load_adjustment", "recovery_substitution", "progression_review"]
+          },
+          "rationale": { "type": "string", "minLength": 1 },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "weekly_structure": {
+                "type": "object",
+                "properties": {
+                  "formal_sessions_per_week": { "type": "integer", "minimum": 0, "maximum": 3 },
+                  "session_types": { "type": "array", "items": { "type": "string" } }
+                },
+                "additionalProperties": true
+              },
+              "today_session": {
+                "type": "object",
+                "properties": {
+                  "modality": { "type": "string", "minLength": 1 },
+                  "duration_min": { "type": "integer", "minimum": 1, "maximum": 180 },
+                  "intensity": { "type": "string", "minLength": 1 },
+                  "instructions": { "type": "array", "items": { "type": "string" } }
+                },
+                "additionalProperties": true
+              },
+              "minimum_version": {
+                "type": "object",
+                "properties": {
+                  "modality": { "type": "string", "minLength": 1 },
+                  "duration_min": { "type": "integer", "minimum": 1, "maximum": 60 },
+                  "instructions": { "type": "array", "items": { "type": "string" } }
+                },
+                "required": ["modality", "duration_min", "instructions"],
+                "additionalProperties": false
+              },
+              "progression_rule": { "type": "string" },
+              "regression_rule": { "type": "string" },
+              "recovery_substitution": { "type": "string" },
+              "load_assessment": { "type": "string", "enum": ["low", "medium", "high"] }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "risk_flags": { "type": "array", "items": { "type": "string" } },
+    "fallback": {
+      "type": "object",
+      "required": ["minimum_version"],
+      "properties": {
+        "minimum_version": {
+          "type": "object",
+          "required": ["modality", "duration_min", "instructions"],
+          "properties": {
+            "modality": { "type": "string", "minLength": 1 },
+            "duration_min": { "type": "integer", "minimum": 1, "maximum": 60 },
+            "instructions": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "modification_notes": { "type": "array", "items": { "type": "string" } },
+    "confidence": { "type": "string", "enum": ["low", "medium", "high"] },
+    "handoff_note": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

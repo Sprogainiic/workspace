@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/specialist-output-envelope.schema.json",
+  "title": "Specialist Output Envelope",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "specialist",
+    "request_id",
+    "status",
+    "summary",
+    "recommendations",
+    "risk_flags",
+    "fallback",
+    "modification_notes",
+    "confidence",
+    "handoff_note"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "const": "specialist_contract_v1"
+    },
+    "specialist": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ok", "needs_clarification", "unsafe_to_recommend"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recommendations": {
+      "type": "array"
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "fallback": {
+      "oneOf": [
+        { "type": "object" },
+        { "type": "null" }
+      ]
+    },
+    "modification_notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "handoff_note": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

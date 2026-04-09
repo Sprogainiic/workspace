@@ -12,6 +12,7 @@ Create a practical, adherence-first system where the **Health Director** is the 
 - `agents/fitness-coach.md` — first subordinate specialist
 - `contracts/` — Health Director ↔ specialist interface definitions
 - `schemas/` — structured output templates
+- `validators/` — hard-gate validation rules
 - `health/` — canonical memory + inbox layout
 - `workflows/` — daily/weekly and integration playbooks
 - `prompts/` — task prompts for specialist agents
@@ -24,3 +25,4 @@ Create a practical, adherence-first system where the **Health Director** is the 
 - Health Director decides what becomes canonical memory
 - Adherence and safety always outrank optimization
 - No specialist is implemented without an explicit contract first
+- No specialist output reaches Health Director without passing validation

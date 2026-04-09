@@ -60,16 +60,23 @@
 
 ## Weekly run
 
-1. Request Progress Analyst summary
+1. Request validated Progress Analyst summary
 2. Review adherence over the last 7 days
 3. Review fatigue and weight trend
 4. Review nutrition/training compatibility
-5. Approve / reject progression
-6. Write weekly summary
+5. Review analyst interpretation:
+   - progress classification
+   - key patterns
+   - risk signals
+   - system implications
+6. Use analyst output to adjust confidence in progression or plateau interpretation
+7. Approve / reject progression
+8. Write weekly summary
 
 ## Conflict adjudication block
 
 When Fitness Coach, Dietitian, and Consistency Coach produce valid outputs, the Health Director must adjudicate, not just merge.
+Validated Progress Analyst output may influence interpretation confidence, but it may not directly prescribe action.
 
 Check explicitly:
 - fatigue vs deficit
@@ -81,6 +88,8 @@ Check explicitly:
 - behavior intervention vs training difficulty
 - behavior intervention vs nutrition complexity
 - re-entry strategy vs next-day planning
+- analyst classification vs progression confidence
+- analyst risk signals vs simplification/stabilization confidence
 
 Use one outcome only:
 - accept_all
@@ -97,3 +106,5 @@ If adherence = low, behavior_state = drop_off, fatigue = high, or validated Cons
 - focus = continuity
 - progression paused
 - use validated minimum action and re-entry strategy as primary execution anchor
+
+Validated Progress Analyst output may reinforce hold_progression or lower confidence in plateau/progress interpretation, but it does not directly trigger plan changes on its own.

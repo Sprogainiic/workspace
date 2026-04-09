@@ -104,6 +104,87 @@ Combined validation result (required output):
   - regenerate
   - reject
 
+PROGRESS_ANALYST_VALIDATION_GATE:
+
+All Progress Analyst outputs MUST pass through the validation gate before the Health Director may read, interpret, or use them.
+
+Direct intake of raw Progress Analyst output is forbidden.
+
+Purpose:
+This gate ensures the Health Director only receives Progress Analyst outputs that are:
+- structurally valid
+- contract-compliant
+- trend-based rather than snapshot-based
+- behavior-aware
+- safe to use in system interpretation
+
+This prevents noisy summaries, false trend claims, plan-prescribing drift, and overconfident analysis from entering the system.
+
+Required intake sequence:
+
+Step 1 — Validate Envelope
+- validate against `schemas/specialist-output-envelope.schema.json`
+- confirm valid specialist metadata and properly structured payload
+- if envelope validation fails: stop intake, mark invalid, do not continue
+
+Step 2 — Validate Progress Analyst Specialist Schema
+- validate payload against `schemas/progress-analyst-output.schema.json`
+- validate specialist output against `schemas/progress-analyst-specialist-output.schema.json`
+- confirm required sections are present and typed:
+  - TREND_SUMMARY
+  - KEY_PATTERNS
+  - RISK_SIGNALS
+  - PROGRESS_CLASSIFICATION
+  - SYSTEM_IMPLICATIONS
+- if schema validation fails: stop intake, return schema failure, do not continue
+
+Step 3 — Run Progress Analyst Validator
+- run `validators/progress-analyst-validator.md`
+- assess:
+  - contract compliance
+  - classification quality
+  - signal-vs-noise discipline
+  - behavior-first interpretation
+  - prohibited prescription drift
+  - unsupported certainty
+- explicitly detect:
+  - trend claims based on inadequate history
+  - plateau claims without sufficient adherence and duration
+  - progress claims unsupported by behavior stability
+  - regression claims based only on short-term fluctuation
+  - direct training or nutrition prescriptions
+  - user-facing language
+  - overconfident or overly precise interpretation
+  - failure to incorporate adherence instability into analysis
+  - emotional or motivational language
+
+Combined validation result (required output):
+- status: pass | warn | fail
+- schema_errors: []
+- contract_violations: []
+- priority_conflicts: []
+- safe_to_ingest: true | false
+- recommended_action:
+  - accept
+  - accept_with_modification
+  - regenerate
+  - reject
+- validated_payload: {}
+- validation_notes: []
+
+Hard intake rule:
+The Health Director may consume only one of the following:
+- a validated pass payload
+- a validated warn payload with explicit modification note
+- a fail result that triggers regeneration or rejection
+
+The Health Director must not:
+- read raw Progress Analyst output
+- infer meaning from failed analyst output
+- merge partially invalid analytical claims
+- silently downgrade failure to warning
+- treat weak trend claims as decision-grade truth
+
 ### Step 3: Contract validation
 - enforce specialist domain boundaries
 - enforce fallback logic

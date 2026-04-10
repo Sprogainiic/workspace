@@ -19,6 +19,7 @@ Create a practical, adherence-first system where the **Health Director** is the 
 - `prompts/chat-gateway-system-prompt.md` — single-chat orchestration layer
 - `workflows/chat-gateway-flow.md` — top-level interaction routing
 - `contracts/chat-gateway-contract.md` — interface boundary for user-facing chat
+- `tests/chat-gateway-scenarios.md` — messy real-world input cases for the chat interface
 
 ## Operating model
 
@@ -31,3 +32,4 @@ Create a practical, adherence-first system where the **Health Director** is the 
 - No specialist is implemented without an explicit contract first
 - No specialist output reaches Health Director without passing validation
 - Chat Gateway never bypasses Health Director or validation
+- Chat Gateway extraction should use confidence-aware structured memory updates when inputs are ambiguous

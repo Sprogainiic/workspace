@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclaw.local/health-system/schemas/conversation-memory-adapter-output.schema.json",
+  "title": "Conversation Memory Adapter Output",
+  "type": "object",
+  "required": [
+    "INTENTS",
+    "EXTRACTIONS",
+    "FIELD_CONFIDENCE",
+    "MEMORY_UPDATE_PROPOSALS",
+    "AMBIGUITIES",
+    "UNSAFE_TO_WRITE",
+    "FOLLOWUP_NEEDED",
+    "ROUTING_HINTS"
+  ],
+  "properties": {
+    "INTENTS": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "log_meal",
+          "log_workout",
+          "log_metric",
+          "status_update",
+          "emotional_signal",
+          "decision_request",
+          "feedback",
+          "pattern_signal",
+          "unclear"
+        ]
+      }
+    },
+    "EXTRACTIONS": {
+      "type": "object"
+    },
+    "FIELD_CONFIDENCE": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["high", "medium", "low", "unsupported"]
+      }
+    },
+    "MEMORY_UPDATE_PROPOSALS": {
+      "type": "array",
+      "items": {
+        "$ref": "memory-update-proposal.schema.json"
+      }
+    },
+    "AMBIGUITIES": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "UNSAFE_TO_WRITE": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "FOLLOWUP_NEEDED": {
+      "type": "string",
+      "enum": ["yes", "no"]
+    },
+    "ROUTING_HINTS": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Health Director",
+          "Fitness Coach",
+          "Dietitian",
+          "Personal Chef",
+          "Consistency Coach",
+          "No specialist needed"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

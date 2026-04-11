@@ -1,0 +1,52 @@
+{
+  "type": "object",
+  "required": [
+    "target_area",
+    "field",
+    "value",
+    "confidence",
+    "write_type",
+    "safe_to_write",
+    "rationale"
+  ],
+  "properties": {
+    "target_area": {
+      "type": "string",
+      "enum": [
+        "daily_logs",
+        "weekly_summary",
+        "metrics",
+        "transient_state",
+        "pattern_notes"
+      ]
+    },
+    "field": {
+      "type": "string",
+      "minLength": 1
+    },
+    "value": {},
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low", "unsupported"]
+    },
+    "write_type": {
+      "type": "string",
+      "enum": [
+        "canonical_append",
+        "canonical_update",
+        "transient_state",
+        "pattern_note",
+        "defer",
+        "reject"
+      ]
+    },
+    "safe_to_write": {
+      "type": "boolean"
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 3
+    }
+  },
+  "additionalProperties": false
+}

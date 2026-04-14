@@ -1,27 +1,26 @@
 # Chat -> Memory Flow
 
 User Message
--> Chat Gateway
--> Intent Classification (preliminary)
--> Conversation Memory Adapter
--> Adapter Validation Gate
+-> Chat Gateway classification
+-> Conversation Memory Adapter on current message only
+-> deterministic memory write guard
 
 If FAIL:
--> do not allow memory proposal ingestion
--> request regeneration or defer write
+-> reject write
+-> store no canonical change
+-> keep ambiguity note if useful
 
 If WARN:
--> send to Health Director with warnings
--> Health Director may approve only safe subset
+-> persist only safe structured event fields
+-> update snapshot conservatively
+-> keep ambiguity unresolved
 
 If PASS:
--> send memory update proposals to Health Director
+-> persist structured event
+-> update snapshot via `workflows/snapshot-update-flow.md`
 
-Health Director
--> approve / modify / reject proposals
--> write approved fields to canonical memory
--> keep uncertain fields as transient or deferred when appropriate
-
-Then:
--> route validated state to relevant specialists if needed
--> produce final user-facing response through Chat Gateway
+Rules:
+- raw chat is audit data, not default runtime context
+- structured events are the primary factual substrate
+- snapshot is updated from approved events, not directly from raw messages
+- low-confidence ambiguous input must not harden into canonical fact

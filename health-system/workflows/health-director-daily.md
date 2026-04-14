@@ -1,110 +1,48 @@
 # Health Director Daily Workflow
 
-## Morning run
+## Default runtime inputs
+1. current state snapshot
+2. latest daily summary
+3. validated specialist outputs for this cycle only
+4. latest weekly summary only when trend confidence matters
 
-1. Read canonical memory:
-   - latest daily logs
-   - adherence trend
-   - fatigue trend
-   - weight trend
-   - training load status
-   - hunger state if available
-2. Collect validated specialist outputs only
-   - Fitness Coach output must be validated before use
-   - Dietitian output must be validated before use
-   - Consistency Coach output must be validated before use
-3. Classify state:
-   - adherence
-   - fatigue
-   - motivation
-   - hunger
-   - training load
-   - behavior_state from validated Consistency Coach output when available
-4. Run conflict resolution rules
-5. Classify conflict context explicitly:
-   - behavior_state
-   - adherence
-   - fatigue
-   - motivation
-   - training_load
-   - nutrition_pressure
-6. Evaluate validated behavior intervention output explicitly:
-   - primary intervention
-   - minimum action
-   - friction reduction
-   - re-entry strategy
-   - escalation flags
-7. Choose exactly one adjudication action:
-   - accept_all
-   - modify_fitness
-   - modify_diet
-   - modify_both
-   - reject_and_regenerate_fitness
-   - reject_and_regenerate_diet
-   - hold_progression
-8. Generate one unified `TODAY_PLAN`
-9. Persist only the final canonical summary if appropriate
+Do not load broad daily log history by default.
+Do not load raw chat by default.
+
+## Morning run
+1. Load snapshot
+2. Check active risk flags, simplification level, and open ambiguities
+3. Decide whether any specialist is needed
+4. Build only the required briefs:
+   - training_brief
+   - nutrition_brief
+   - behavior_brief
+   - meal_execution_brief
+5. Validate specialist outputs deterministically
+6. Adjudicate conflicts
+7. Produce one unified `TODAY_PLAN`
 
 ## Evening run
-
-1. Capture what the user did
-2. Capture what the user ate
-3. Capture how the user felt
-4. Update canonical daily log
-5. Update metrics if needed:
-   - adherence
-   - fatigue
-   - training load
-   - weight
-6. Decide whether specialist refresh is needed tomorrow
+1. Persist approved structured events from the day
+2. Update snapshot
+3. Generate daily summary on schedule
+4. Mark any unresolved ambiguity explicitly
 
 ## Weekly run
+1. Load latest weekly summary package
+2. Request Progress Analyst only when trend interpretation is needed
+3. Use analyst output as interpretation support, not authority
+4. Adjust progression confidence or simplification posture if justified
 
-1. Request validated Progress Analyst summary
-2. Review adherence over the last 7 days
-3. Review fatigue and weight trend
-4. Review nutrition/training compatibility
-5. Review analyst interpretation:
-   - progress classification
-   - key patterns
-   - risk signals
-   - system implications
-6. Use analyst output to adjust confidence in progression or plateau interpretation
-7. Approve / reject progression
-8. Write weekly summary
+## Stability Mode
+Enter Stability Mode when snapshot indicates:
+- adherence low
+- behavior_state drop_off or restart_cycle
+- fatigue high
+- overload risk active
 
-## Conflict adjudication block
-
-When Fitness Coach, Dietitian, and Consistency Coach produce valid outputs, the Health Director must adjudicate, not just merge.
-Validated Progress Analyst output may influence interpretation confidence, but it may not directly prescribe action.
-
-Check explicitly:
-- fatigue vs deficit
-- adherence vs tightening
-- progression vs under-fueling risk
-- motivation vs total plan friction
-- weight stall vs consistency quality
-- hunger vs sustainability
-- behavior intervention vs training difficulty
-- behavior intervention vs nutrition complexity
-- re-entry strategy vs next-day planning
-- analyst classification vs progression confidence
-- analyst risk signals vs simplification/stabilization confidence
-
-Use one outcome only:
-- accept_all
-- modify_fitness
-- modify_diet
-- modify_both
-- reject_and_regenerate_fitness
-- reject_and_regenerate_diet
-- hold_progression
-
-If adherence = low, behavior_state = drop_off, fatigue = high, or validated Consistency Coach escalation flags indicate overload/disengagement risk, enter Stability Mode:
-- training = minimal or simplified
-- diet = simplified and non-restrictive
-- focus = continuity
-- progression paused
-- use validated minimum action and re-entry strategy as primary execution anchor
-
-Validated Progress Analyst output may reinforce hold_progression or lower confidence in plateau/progress interpretation, but it does not directly trigger plan changes on its own.
+In Stability Mode:
+- training simplified
+- nutrition simplified and non-restrictive
+- meal options reduced
+- continuity outranks progression

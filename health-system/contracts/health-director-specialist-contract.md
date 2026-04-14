@@ -2,52 +2,23 @@
 
 ## Purpose
 
-This contract defines the mandatory interface between the Health Director and all specialist agents.
+Define the compact interface between Health Director and specialists.
 
-## Specialist operating model
+## Core runtime rule
 
-Every specialist is:
-- subordinate
-- non-user-facing
-- advisory
-- constrained to its domain
+Specialists are called with narrow briefs, not open-ended history.
+Default specialist context comes from:
+- current state snapshot
+- latest relevant derived summary only if needed
+- one task-specific brief
 
-Every specialist must assume:
-- Health Director may modify or reject any output
-- output is intermediate system data, not final advice to the user
+## Allowed brief types
+- training_brief
+- nutrition_brief
+- behavior_brief
+- meal_execution_brief
 
-## Standard request envelope from Health Director
-
-```yaml
-request_id: string
-specialist: string
-request_type: string
-requested_at: ISO-8601 string
-user_state:
-  adherence: low|medium|high
-  fatigue: low|medium|high
-  motivation: low|medium|high
-  weight_trend: optional string
-  training_load: optional string
-  nutrition_state: optional string
-  notes: optional string
-constraints:
-  max_formal_sessions_per_week: 3
-  adherence_priority: true
-  safety_priority: true
-  keep_low_friction: true
-context:
-  latest_daily_log: optional string
-  latest_weekly_summary: optional string
-  relevant_history: optional string
-output_requirements:
-  format: specialist_contract_v1
-  include_fallback: true
-  include_risk_flags: true
-  include_confidence: true
-```
-
-## Standard specialist response envelope
+## Standard response envelope
 
 ```yaml
 contract_version: specialist_contract_v1
@@ -63,58 +34,17 @@ confidence: low|medium|high
 handoff_note: short string
 ```
 
-## Required semantics
-
-### status
-- `ok`: recommendation is usable
-- `needs_clarification`: missing key input, recommendation should be tentative
-- `unsafe_to_recommend`: specialist detected risk requiring override or escalation
-
-### recommendations
-A list of structured domain recommendations. Each specialist defines its own payload shape, but it must remain domain-bounded.
-
-### risk_flags
-List of short machine-readable or plain-text warnings, for example:
-- `overload_risk`
-- `fatigue_high`
-- `adherence_drop`
-- `injury_signal`
-
-### fallback
-A minimum viable option in the specialist's domain.
-
-### modification_notes
-Explicit notes for Health Director about where simplification, regression, or override may be appropriate.
-
-### confidence
-Must be conservative.
-
 ## Hard rules
+- specialist output is intermediate system data, not user-facing prose
+- specialists stay domain-bounded
+- validation is deterministic-first
+- Health Director ingests validated payloads only
+- raw specialist output must not bypass validation
 
-Specialists must not:
-- address the user directly
-- produce final day plans
-- refer to themselves as the final authority
-- prescribe outside their domain
-- hide uncertainty
+## Context minimization rule
+Do not include:
+- full raw chat history
+- broad daily log dumps
+- unrelated domain memory
 
-## Health Director rights
-
-Health Director may:
-- accept output unchanged
-- modify output partially
-- reject output fully
-- request regeneration with constraints
-- merge multiple specialist outputs into a unified plan
-
-## Validated intake requirement
-
-Health Director must ingest specialist output only through the validation gate.
-
-For Dietitian specifically:
-- validate envelope against `schemas/specialist-output-envelope.schema.json`
-- validate payload against `schemas/dietitian-specialist-output.schema.json`
-- run `validators/dietitian-validator.md`
-- use only the resulting validated intake record
-
-Raw Dietitian output must never be used directly for planning.
+Include only the smallest safe context package required for the task.

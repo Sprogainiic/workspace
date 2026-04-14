@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DailySummary",
+  "type": "object",
+  "required": ["date", "facts", "state_signals", "adherence_observations", "risk_flags", "derived_interpretation", "open_uncertainties"],
+  "properties": {
+    "date": {"type": "string"},
+    "facts": {"type": "object"},
+    "state_signals": {"type": "object"},
+    "adherence_observations": {"type": "object"},
+    "risk_flags": {"type": "array", "items": {"type": "string"}},
+    "derived_interpretation": {"type": "object"},
+    "open_uncertainties": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

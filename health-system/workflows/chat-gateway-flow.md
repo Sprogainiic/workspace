@@ -2,19 +2,25 @@
 
 User Message
 -> Chat Gateway
--> Intent Classification
--> Data Extraction
--> Conversation Memory Adapter
--> Adapter Validation Gate
--> Memory Update Proposal (via Health Director)
+-> Load current state snapshot only
+-> Route turn using `workflows/decision-routing-flow.md`
 
--> Determine needed specialists
--> Call specialist(s)
--> Validation Gate
+If mode = log_only | state_update_only:
+-> Conversation Memory Adapter on current message only
+-> deterministic memory write guard
+-> approved structured events
+-> snapshot update
+-> optional micro-response
 
--> Health Director:
- - approve / modify / reject memory proposals
- - resolve conflicts
- - produce final answer
+If mode = specialist_single | director_merge:
+-> build only required specialist briefs
+-> call only required specialists
+-> deterministic validation
+-> Health Director final decision
 
--> Return response to user
+If mode = weekly_analysis:
+-> load latest weekly summary before broader retrieval
+-> Progress Analyst only if needed
+-> Health Director final decision
+
+Raw chat excerpts are loaded only for ambiguity_review or contradiction resolution.

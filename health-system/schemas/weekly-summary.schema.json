@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WeeklySummary",
+  "type": "object",
+  "required": ["week_start", "week_end", "week_facts", "trend_signals", "interpretation", "confidence_notes", "risk_flags", "next_week_implications"],
+  "properties": {
+    "week_start": {"type": "string"},
+    "week_end": {"type": "string"},
+    "week_facts": {"type": "object"},
+    "trend_signals": {"type": "object"},
+    "interpretation": {"type": "object"},
+    "confidence_notes": {"type": "array", "items": {"type": "string"}},
+    "risk_flags": {"type": "array", "items": {"type": "string"}},
+    "next_week_implications": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

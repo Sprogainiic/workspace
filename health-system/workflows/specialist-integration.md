@@ -3,19 +3,20 @@
 ## Rule 1: contract before implementation
 
 Every specialist must have:
-1. a role definition
-2. a contract document
-3. a system prompt aligned to that contract
-4. a Health Director intake/merge path
+1. role definition
+2. contract
+3. compact system prompt
+4. schema
+5. deterministic validation path
+6. brief-based intake path
 
 ## Health Director merge flow
-
-1. Build request envelope
+1. Build narrow brief from snapshot
 2. Send to specialist
-3. Validate specialist response against contract
-4. Inspect:
+3. Validate output using schema + deterministic rules
+4. Inspect compact result:
    - status
-   - risk flags
+   - risk_flags
    - fallback
    - confidence
 5. Decide:
@@ -23,14 +24,9 @@ Every specialist must have:
    - modify
    - reject
    - regenerate with tighter constraints
-6. Merge into unified daily plan
-7. Persist only final canonical decision
+6. Merge into unified plan
 
-## Validation checklist
-
-Before accepting a specialist output, Health Director checks:
-- Is the output domain-bounded?
-- Does it include fallback?
-- Does it include risk flags?
-- Does it violate hierarchy or authority boundaries?
-- Is it simple enough for low-adherence conditions?
+## Hard rules
+- specialists do not receive open-ended memory blobs
+- specialists do not receive raw chat by default
+- specialist context should stay domain-bounded and compact

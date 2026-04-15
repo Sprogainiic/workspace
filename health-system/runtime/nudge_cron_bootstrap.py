@@ -57,7 +57,7 @@ def bootstrap_payload() -> Dict[str, object]:
     }
 
 
-def execute_slot(slot: str, channel: str, recipient: str, *, mode: str = "prod", fixture: Dict[str, Any] | None = None) -> Dict[str, Any]:
+def execute_slot(slot: str, channel: str, recipient: str, *, mode: str = "prod", fixture: Dict[str, Any] | None = None, session_sender=None) -> Dict[str, Any]:
     from .nudge_schedule import NUDGE_SLOTS
     from .state_loader import MissingRuntimeStateError, load_runtime_state
     from .chat_flow import evaluate_nudge_slot
@@ -83,6 +83,7 @@ def execute_slot(slot: str, channel: str, recipient: str, *, mode: str = "prod",
         sent_nudges_today=state.get("sent_nudges_today"),
         state_source=state.get("state_source", "persisted"),
         activity_source=state.get("activity_source", "missing"),
+        session_sender=session_sender,
     )
     return result
 

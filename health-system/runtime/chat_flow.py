@@ -12,6 +12,7 @@ from .nudge_selector import select_nudge
 from .nudge_log import log_nudge_decision
 from .advisor_runtime import run_proactive_turn
 from .outbound_transport import send_message
+from .config import OPENCLAW_HEALTH_SESSION_KEY
 
 
 def _route(message: str) -> Dict[str, Any]:
@@ -159,8 +160,12 @@ def evaluate_nudge_slot(
     state_source: str = "persisted",
     allow_test_fixture: bool = False,
     activity_source: str = "missing",
+    session_sender=None,
+    session_key: Optional[str] = None,
 ) -> Dict[str, Any]:
     activity_count = len(recent_user_activity or [])
+    transport_name = outbound_channel
+    effective_session_key = session_key or (OPENCLAW_HEALTH_SESSION_KEY if outbound_channel == "openclaw_session" else None)
     if (not allow_test_fixture) and (current_snapshot is None or todays_events is None or daily_summary is None or sent_nudges_today is None):
         log_entry = log_nudge_decision({
             "timestamp": now.isoformat(),
@@ -182,6 +187,10 @@ def evaluate_nudge_slot(
             "routing": [],
             "advisor_tokens_in": 0,
             "advisor_tokens_out": 0,
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": "missing_runtime_state",
         })
         return {
             "evaluated": True,
@@ -223,6 +232,10 @@ def evaluate_nudge_slot(
             "routing": [],
             "advisor_tokens_in": 0,
             "advisor_tokens_out": 0,
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": selection.get("skip_reason"),
         })
         return {
             "evaluated": True,
@@ -247,6 +260,7 @@ def evaluate_nudge_slot(
         "transport_target": {
             "channel": outbound_channel,
             "recipient_id": recipient_id,
+            "session_key": effective_session_key,
         },
     }
 
@@ -273,6 +287,10 @@ def evaluate_nudge_slot(
             "routing": [],
             "advisor_tokens_in": 0,
             "advisor_tokens_out": 0,
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": str(exc),
         })
         return {
             "evaluated": True,
@@ -283,11 +301,57 @@ def evaluate_nudge_slot(
             "details": str(exc),
         }
 
-    transport_result = send_message(
-        channel=outbound_channel,
-        recipient_id=recipient_id,
-        message_text=runtime_result["message_text"],
-    ) if runtime_result["approved"] else {"sent": False}
+    try:
+        transport_result = send_message(
+            channel=outbound_channel,
+            recipient_id=recipient_id,
+            message_text=runtime_result["message_text"],
+            session_key=effective_session_key,
+            target_type="channel",
+            metadata={
+                "mode": "proactive",
+                "slot": selection["slot"],
+                "nudge_type": selection["nudge_type"],
+                "domain": selection["domain"],
+            },
+            session_sender=session_sender,
+        ) if runtime_result["approved"] else {"sent": False, "delivery_status": "failed", "delivery_error": "not_approved"}
+    except Exception as exc:
+        log_entry = log_nudge_decision({
+            "timestamp": now.isoformat(),
+            "slot": selection["slot"],
+            "evaluated": True,
+            "send": False,
+            "skip_reason": "delivery_failure",
+            "nudge_type": selection["nudge_type"],
+            "domain": selection["domain"],
+            "tokens_in": runtime_result["tokens_in"],
+            "tokens_out": runtime_result["tokens_out"],
+            "message_intent": selection["message_intent"],
+            "fingerprint": selection["fingerprint"],
+            "message_fingerprint": None,
+            "runtime_mode": runtime_result["runtime_mode"],
+            "state_source": state_source,
+            "activity_source": activity_source,
+            "recent_user_activity_count": activity_count,
+            "routing": runtime_result.get("routing", []),
+            "advisor_tokens_in": runtime_result["tokens_in"],
+            "advisor_tokens_out": runtime_result["tokens_out"],
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": str(exc),
+        })
+        return {
+            "evaluated": True,
+            "selection": selection,
+            "advisor_runtime": runtime_result,
+            "log": log_entry,
+            "stopped": True,
+            "error": "delivery_failure",
+            "details": str(exc),
+        }
+
     log_entry = log_nudge_decision({
         "timestamp": now.isoformat(),
         "slot": selection["slot"],
@@ -308,6 +372,10 @@ def evaluate_nudge_slot(
         "routing": runtime_result.get("routing", []),
         "advisor_tokens_in": runtime_result["tokens_in"],
         "advisor_tokens_out": runtime_result["tokens_out"],
+        "transport": transport_name,
+        "session_key": effective_session_key,
+        "delivery_status": transport_result.get("delivery_status", "sent"),
+        "delivery_error": transport_result.get("delivery_error"),
     })
     return {
         "evaluated": True,

@@ -41,6 +41,7 @@ class NudgeCronCliTests(unittest.TestCase):
         self.assertEqual(payload["slot"], "lunch_check")
         self.assertEqual(payload["state_source"], "persisted")
         self.assertIn(payload["activity_source"], {"persisted", "missing"})
+        self.assertIn(payload.get("transport", "test"), {"test", "console", "openclaw_session", None})
         rows = read_nudge_log()
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["state_source"], "persisted")

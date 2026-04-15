@@ -30,6 +30,10 @@ def log_nudge_decision(entry: Dict[str, Any]) -> Dict[str, Any]:
         "routing": entry.get("routing", []),
         "advisor_tokens_in": int(entry.get("advisor_tokens_in", 0) or 0),
         "advisor_tokens_out": int(entry.get("advisor_tokens_out", 0) or 0),
+        "transport": entry.get("transport"),
+        "session_key": entry.get("session_key"),
+        "delivery_status": entry.get("delivery_status"),
+        "delivery_error": entry.get("delivery_error"),
     }
     with LOG.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")

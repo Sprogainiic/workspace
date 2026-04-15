@@ -63,7 +63,6 @@ class NudgeLogReplayTests(unittest.TestCase):
             },
             todays_events=[],
             daily_summary=None,
-            sent_nudges_today=None,
             recent_user_activity=[],
             current_slot="dinner_check",
             now=ts("2026-04-15T18:30:00+03:00"),

@@ -11,7 +11,7 @@ from .token_logger import log_token_usage
 from .nudge_selector import select_nudge
 from .nudge_log import log_nudge_decision
 from .nudge_state_loader import load_sent_nudges_today
-from .advisor_runtime import run_advisor_runtime
+from .advisor_runtime import run_proactive_turn
 from .outbound_transport import send_message
 
 
@@ -138,37 +138,32 @@ def memory_adapter(message: str, message_id: str, timestamp: str) -> Dict[str, A
 
 def _snapshot_subset_for_proactive(current_snapshot: Dict[str, Any]) -> Dict[str, Any]:
     state = current_snapshot.get("state", {}) if isinstance(current_snapshot, dict) else {}
-    subset = {
+    return {
         "fatigue": state.get("fatigue", {}).get("value"),
         "motivation": state.get("motivation", {}).get("value"),
         "behavior_state": state.get("behavior_state", {}).get("value"),
         "simplification_level": current_snapshot.get("simplification_level", "normal") if isinstance(current_snapshot, dict) else "normal",
     }
-    return subset
 
 
 def evaluate_nudge_slot(
     current_snapshot: Dict[str, Any],
     todays_events: List[Dict[str, Any]],
     daily_summary: Optional[Dict[str, Any]],
-    sent_nudges_today: Optional[List[Dict[str, Any]]],
     recent_user_activity: List[Dict[str, Any]],
     current_slot: str,
     now,
     policy_overrides: Optional[Dict[str, Any]] = None,
     outbound_channel: str = "test",
     recipient_id: str = "local-test-recipient",
+    _sent_state_loader=load_sent_nudges_today,
 ) -> Dict[str, Any]:
-    loaded_state = load_sent_nudges_today(now)
-    merged_sent_nudges_today = list(loaded_state["sent_nudges_today"])
-    if sent_nudges_today:
-        merged_sent_nudges_today.extend(sent_nudges_today)
-
+    loaded_state = _sent_state_loader(now)
     selection = select_nudge(
         current_snapshot=current_snapshot,
         todays_events=todays_events,
         daily_summary=daily_summary,
-        sent_nudges_today=merged_sent_nudges_today,
+        sent_nudges_today=loaded_state["sent_nudges_today"],
         recent_user_activity=recent_user_activity,
         current_slot=current_slot,
         now=now,
@@ -189,6 +184,7 @@ def evaluate_nudge_slot(
             "message_intent": None,
             "fingerprint": None,
             "message_fingerprint": None,
+            "runtime_mode": None,
         })
         return {
             "evaluated": True,
@@ -199,35 +195,36 @@ def evaluate_nudge_slot(
         }
 
     proactive_brief = selection["payload_brief"]
-    runtime_result = run_advisor_runtime(
-        {
-            "input": {
-                "mode": "proactive",
-                "brief": proactive_brief,
-                "snapshot_subset": _snapshot_subset_for_proactive(current_snapshot),
-                "routing_metadata": selection.get("route", {}),
-            }
-        }
-    )
-    approved = runtime_result["output"]["approved"]
+    proactive_payload = {
+        "mode": "proactive",
+        "brief": proactive_brief,
+        "snapshot_subset": _snapshot_subset_for_proactive(current_snapshot),
+        "routing_metadata": selection.get("route", {}),
+        "transport_target": {
+            "channel": outbound_channel,
+            "recipient_id": recipient_id,
+        },
+    }
+    runtime_result = run_proactive_turn(proactive_payload)
     transport_result = send_message(
         channel=outbound_channel,
         recipient_id=recipient_id,
-        message_text=runtime_result["output"]["message_text"],
-    ) if approved else {"sent": False}
+        message_text=runtime_result["message_text"],
+    ) if runtime_result["approved"] else {"sent": False}
     log_entry = log_nudge_decision({
         "timestamp": now.isoformat(),
         "slot": selection["slot"],
         "evaluated": True,
-        "send": bool(approved and transport_result.get("sent")),
-        "skip_reason": None if approved else "not_approved",
+        "send": bool(runtime_result["approved"] and transport_result.get("sent")),
+        "skip_reason": None if runtime_result["approved"] else "not_approved",
         "nudge_type": selection["nudge_type"],
         "domain": selection["domain"],
-        "tokens_in": runtime_result["output"]["tokens_in"],
-        "tokens_out": runtime_result["output"]["tokens_out"],
+        "tokens_in": runtime_result["tokens_in"],
+        "tokens_out": runtime_result["tokens_out"],
         "message_intent": selection["message_intent"],
         "fingerprint": selection["fingerprint"],
         "message_fingerprint": selection["fingerprint"],
+        "runtime_mode": runtime_result["runtime_mode"],
     })
     return {
         "evaluated": True,

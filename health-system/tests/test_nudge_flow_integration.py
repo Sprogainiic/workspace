@@ -44,7 +44,6 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
             current_snapshot=self.snapshot,
             todays_events=[],
             daily_summary=None,
-            sent_nudges_today=[],
             recent_user_activity=[{"timestamp": "2026-04-15T12:00:00+03:00", "text": "hey"}],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:20:00+03:00"),
@@ -65,7 +64,6 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
             current_snapshot=self.snapshot,
             todays_events=[],
             daily_summary=None,
-            sent_nudges_today=[],
             recent_user_activity=[],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:30:00+03:00"),
@@ -73,7 +71,7 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
         self.assertTrue(result["evaluated"])
         self.assertTrue(result["selection"]["send"])
         self.assertIn("advisor_runtime", result)
-        self.assertTrue(result["advisor_runtime"]["output"]["approved"])
+        self.assertTrue(result["advisor_runtime"]["approved"])
         self.assertTrue(result["transport_result"]["sent"])
         rows = read_nudge_log()
         self.assertEqual(len(rows), 1)
@@ -91,7 +89,6 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
             current_snapshot=self.snapshot,
             todays_events=[],
             daily_summary=None,
-            sent_nudges_today=[],
             recent_user_activity=[],
             current_slot="morning_plan_check",
             now=ts("2026-04-15T07:50:00+03:00"),
@@ -106,7 +103,6 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
             current_snapshot=self.snapshot,
             todays_events=[],
             daily_summary=None,
-            sent_nudges_today=[],
             recent_user_activity=[{"timestamp": "2026-04-15T15:10:00+03:00", "text": "I already ate"}],
             current_slot="afternoon_check",
             now=ts("2026-04-15T15:30:00+03:00"),

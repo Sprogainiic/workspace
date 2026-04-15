@@ -33,7 +33,6 @@ class ProactiveRuntimeBoundaryTests(unittest.TestCase):
             current_snapshot=self.snapshot,
             todays_events=[],
             daily_summary=None,
-            sent_nudges_today=None,
             recent_user_activity=[],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:30:00+03:00"),
@@ -43,8 +42,8 @@ class ProactiveRuntimeBoundaryTests(unittest.TestCase):
         self.assertTrue(result["evaluated"])
         self.assertTrue(result["selection"]["send"])
         self.assertIn("loaded_state", result)
-        self.assertEqual(result["advisor_runtime"]["input"]["input"]["mode"], "proactive")
-        self.assertTrue(result["advisor_runtime"]["output"]["approved"])
+        self.assertEqual(result["advisor_runtime"]["runtime_mode"], "stub")
+        self.assertTrue(result["advisor_runtime"]["approved"])
         self.assertEqual(result["transport_result"]["channel"], "test")
         self.assertEqual(result["transport_result"]["recipient_id"], "user-123")
         self.assertTrue(result["transport_result"]["sent"])
@@ -55,6 +54,7 @@ class ProactiveRuntimeBoundaryTests(unittest.TestCase):
         self.assertTrue(rows[0]["message_fingerprint"])
         self.assertGreater(rows[0]["tokens_in"], 0)
         self.assertGreater(rows[0]["tokens_out"], 0)
+        self.assertEqual(rows[0]["runtime_mode"], "stub")
 
 
 if __name__ == "__main__":

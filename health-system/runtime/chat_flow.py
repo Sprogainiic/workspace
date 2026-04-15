@@ -10,6 +10,9 @@ from .validator import validate_memory_adapter_output
 from .token_logger import log_token_usage
 from .nudge_selector import select_nudge
 from .nudge_log import log_nudge_decision
+from .nudge_state_loader import load_sent_nudges_today
+from .advisor_runtime import run_advisor_runtime
+from .outbound_transport import send_message
 
 
 def _route(message: str) -> Dict[str, Any]:
@@ -133,57 +136,39 @@ def memory_adapter(message: str, message_id: str, timestamp: str) -> Dict[str, A
     }
 
 
-def _generate_governed_message_from_brief(proactive_brief: Dict[str, Any]) -> Dict[str, Any]:
-    slot = proactive_brief["slot"]
-    nudge_type = proactive_brief["nudge_type"]
-    domain = proactive_brief["domain"]
-    missing_signals = proactive_brief.get("missing_signals", [])
-    state_flags = proactive_brief.get("state_flags", {})
-    simplification = state_flags.get("simplification_level", "normal")
-
-    prompt = f"[{slot}] {nudge_type} / {domain} | missing={', '.join(missing_signals) or 'none'} | simplification={simplification}"
-    tokens_in = max(1, (len(prompt) + 3) // 4)
-
-    if nudge_type == "reminder":
-        text = f"Quick check: any update on {missing_signals[0].replace('_', ' ')}?"
-    elif nudge_type == "coaching":
-        text = "Quick reset option: want the minimum version for this block so it still counts?"
-    else:
-        text = f"Quick check-in: any update on {missing_signals[0].replace('_', ' ')}?"
-
-    tokens_out = max(1, (len(text) + 3) // 4)
-    log_token_usage("health_director_proactive", tokens_in, tokens_out, ["proactive_brief"])
-    return {
-        "advisor_runtime": "current_governance_path",
-        "health_director_decision": {
-            "approved": True,
-            "tone": "short",
-            "message": text,
-        },
-        "chat_gateway": {
-            "send": True,
-            "message": text,
-        },
-        "tokens_in": tokens_in,
-        "tokens_out": tokens_out,
+def _snapshot_subset_for_proactive(current_snapshot: Dict[str, Any]) -> Dict[str, Any]:
+    state = current_snapshot.get("state", {}) if isinstance(current_snapshot, dict) else {}
+    subset = {
+        "fatigue": state.get("fatigue", {}).get("value"),
+        "motivation": state.get("motivation", {}).get("value"),
+        "behavior_state": state.get("behavior_state", {}).get("value"),
+        "simplification_level": current_snapshot.get("simplification_level", "normal") if isinstance(current_snapshot, dict) else "normal",
     }
+    return subset
 
 
 def evaluate_nudge_slot(
     current_snapshot: Dict[str, Any],
     todays_events: List[Dict[str, Any]],
     daily_summary: Optional[Dict[str, Any]],
-    sent_nudges_today: List[Dict[str, Any]],
+    sent_nudges_today: Optional[List[Dict[str, Any]]],
     recent_user_activity: List[Dict[str, Any]],
     current_slot: str,
     now,
     policy_overrides: Optional[Dict[str, Any]] = None,
+    outbound_channel: str = "test",
+    recipient_id: str = "local-test-recipient",
 ) -> Dict[str, Any]:
+    loaded_state = load_sent_nudges_today(now)
+    merged_sent_nudges_today = list(loaded_state["sent_nudges_today"])
+    if sent_nudges_today:
+        merged_sent_nudges_today.extend(sent_nudges_today)
+
     selection = select_nudge(
         current_snapshot=current_snapshot,
         todays_events=todays_events,
         daily_summary=daily_summary,
-        sent_nudges_today=sent_nudges_today,
+        sent_nudges_today=merged_sent_nudges_today,
         recent_user_activity=recent_user_activity,
         current_slot=current_slot,
         now=now,
@@ -203,30 +188,43 @@ def evaluate_nudge_slot(
             "tokens_out": 0,
             "message_intent": None,
             "fingerprint": None,
+            "message_fingerprint": None,
         })
         return {
             "evaluated": True,
             "selection": selection,
+            "loaded_state": loaded_state,
             "log": log_entry,
             "stopped": True,
         }
 
     proactive_brief = selection["payload_brief"]
-    governed = _generate_governed_message_from_brief(proactive_brief)
-    send_result = {
-        "sent": governed["chat_gateway"]["send"],
-        "message": governed["chat_gateway"]["message"],
-    }
+    runtime_result = run_advisor_runtime(
+        {
+            "input": {
+                "mode": "proactive",
+                "brief": proactive_brief,
+                "snapshot_subset": _snapshot_subset_for_proactive(current_snapshot),
+                "routing_metadata": selection.get("route", {}),
+            }
+        }
+    )
+    approved = runtime_result["output"]["approved"]
+    transport_result = send_message(
+        channel=outbound_channel,
+        recipient_id=recipient_id,
+        message_text=runtime_result["output"]["message_text"],
+    ) if approved else {"sent": False}
     log_entry = log_nudge_decision({
         "timestamp": now.isoformat(),
         "slot": selection["slot"],
         "evaluated": True,
-        "send": True,
-        "skip_reason": None,
+        "send": bool(approved and transport_result.get("sent")),
+        "skip_reason": None if approved else "not_approved",
         "nudge_type": selection["nudge_type"],
         "domain": selection["domain"],
-        "tokens_in": governed["tokens_in"],
-        "tokens_out": governed["tokens_out"],
+        "tokens_in": runtime_result["output"]["tokens_in"],
+        "tokens_out": runtime_result["output"]["tokens_out"],
         "message_intent": selection["message_intent"],
         "fingerprint": selection["fingerprint"],
         "message_fingerprint": selection["fingerprint"],
@@ -234,9 +232,10 @@ def evaluate_nudge_slot(
     return {
         "evaluated": True,
         "selection": selection,
+        "loaded_state": loaded_state,
         "proactive_brief": proactive_brief,
-        "advisor_runtime": governed,
-        "send_result": send_result,
+        "advisor_runtime": runtime_result,
+        "transport_result": transport_result,
         "log": log_entry,
     }
 

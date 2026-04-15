@@ -179,6 +179,9 @@ def evaluate_nudge_slot(
             "state_source": state_source,
             "activity_source": activity_source,
             "recent_user_activity_count": activity_count,
+            "routing": [],
+            "advisor_tokens_in": 0,
+            "advisor_tokens_out": 0,
         })
         return {
             "evaluated": True,
@@ -217,6 +220,9 @@ def evaluate_nudge_slot(
             "state_source": state_source,
             "activity_source": activity_source,
             "recent_user_activity_count": activity_count,
+            "routing": [],
+            "advisor_tokens_in": 0,
+            "advisor_tokens_out": 0,
         })
         return {
             "evaluated": True,
@@ -228,15 +234,55 @@ def evaluate_nudge_slot(
     proactive_brief = selection["payload_brief"]
     proactive_payload = {
         "mode": "proactive",
+        "slot": selection["slot"],
+        "nudge_type": selection["nudge_type"],
+        "domain": selection["domain"],
         "brief": proactive_brief,
         "snapshot_subset": _snapshot_subset_for_proactive(current_snapshot),
         "routing_metadata": selection.get("route", {}),
+        "activity_context": {
+            "recent_user_activity_count": activity_count,
+            "activity_source": activity_source,
+        },
         "transport_target": {
             "channel": outbound_channel,
             "recipient_id": recipient_id,
         },
     }
-    runtime_result = run_proactive_turn(proactive_payload)
+
+    try:
+        runtime_result = run_proactive_turn(proactive_payload)
+    except Exception as exc:
+        log_entry = log_nudge_decision({
+            "timestamp": now.isoformat(),
+            "slot": selection["slot"],
+            "evaluated": True,
+            "send": False,
+            "skip_reason": "advisor_runtime_failure",
+            "nudge_type": selection["nudge_type"],
+            "domain": selection["domain"],
+            "tokens_in": 0,
+            "tokens_out": 0,
+            "message_intent": selection["message_intent"],
+            "fingerprint": selection["fingerprint"],
+            "message_fingerprint": None,
+            "runtime_mode": None,
+            "state_source": state_source,
+            "activity_source": activity_source,
+            "recent_user_activity_count": activity_count,
+            "routing": [],
+            "advisor_tokens_in": 0,
+            "advisor_tokens_out": 0,
+        })
+        return {
+            "evaluated": True,
+            "selection": selection,
+            "log": log_entry,
+            "stopped": True,
+            "error": "advisor_runtime_failure",
+            "details": str(exc),
+        }
+
     transport_result = send_message(
         channel=outbound_channel,
         recipient_id=recipient_id,
@@ -259,6 +305,9 @@ def evaluate_nudge_slot(
         "state_source": state_source,
         "activity_source": activity_source,
         "recent_user_activity_count": activity_count,
+        "routing": runtime_result.get("routing", []),
+        "advisor_tokens_in": runtime_result["tokens_in"],
+        "advisor_tokens_out": runtime_result["tokens_out"],
     })
     return {
         "evaluated": True,

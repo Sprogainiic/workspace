@@ -51,7 +51,7 @@ class AdvisorRuntimeContractTests(unittest.TestCase):
             allow_test_fixture=True,
         )
         self.assertEqual(result["transport_result"]["message_text"], result["advisor_runtime"]["message_text"])
-        self.assertIn(result["advisor_runtime"]["runtime_mode"], {"stub", "orchestrated"})
+        self.assertEqual(result["advisor_runtime"]["runtime_mode"], "orchestrated")
         rows = read_nudge_log()
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["runtime_mode"], result["advisor_runtime"]["runtime_mode"])

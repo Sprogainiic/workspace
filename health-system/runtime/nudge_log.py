@@ -27,6 +27,9 @@ def log_nudge_decision(entry: Dict[str, Any]) -> Dict[str, Any]:
         "state_source": entry.get("state_source"),
         "activity_source": entry.get("activity_source"),
         "recent_user_activity_count": int(entry.get("recent_user_activity_count", 0) or 0),
+        "routing": entry.get("routing", []),
+        "advisor_tokens_in": int(entry.get("advisor_tokens_in", 0) or 0),
+        "advisor_tokens_out": int(entry.get("advisor_tokens_out", 0) or 0),
     }
     with LOG.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")

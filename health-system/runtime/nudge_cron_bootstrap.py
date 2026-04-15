@@ -28,7 +28,7 @@ def _cron_line(slot: str) -> str:
     from .nudge_schedule import get_slot_policy
     hh, mm = CRON_MAP[slot].split(":", 1)
     policy = get_slot_policy(slot)
-    return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode local_test --channel test --recipient local-test-recipient >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
+    return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient scheduled-health-session >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
 
 
 def bootstrap_schedule() -> List[Dict[str, str]]:
@@ -41,7 +41,7 @@ def bootstrap_schedule() -> List[Dict[str, str]]:
                 "slot": slot,
                 "local_time": CRON_MAP[slot],
                 "timezone": policy["local_timezone"],
-                "runner": f"/usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode local_test --channel test --recipient local-test-recipient",
+                "runner": f"/usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient scheduled-health-session",
                 "kind": "slot_evaluator",
             }
         )
@@ -105,9 +105,9 @@ def execute_slot(
 def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--slot", help="slot to evaluate")
-    parser.add_argument("--channel", default="test")
-    parser.add_argument("--recipient", default="local-test-recipient")
-    parser.add_argument("--exec-mode", choices=["local_test", "live_session"], default="local_test")
+    parser.add_argument("--channel", default="openclaw_session")
+    parser.add_argument("--recipient", default="scheduled-health-session")
+    parser.add_argument("--exec-mode", choices=["local_test", "live_session"], default="live_session")
     args = parser.parse_args(argv)
 
     if not args.slot:

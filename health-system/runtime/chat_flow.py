@@ -14,6 +14,7 @@ from .nudge_log import log_nudge_decision
 from .advisor_runtime import run_proactive_turn
 from .outbound_transport import send_message
 from .config import OPENCLAW_HEALTH_SESSION_KEY
+from .nudge_delivery_audit import log_delivery_audit
 
 
 def _route(message: str) -> Dict[str, Any]:
@@ -202,6 +203,22 @@ def evaluate_nudge_slot(
             "delivery_error": "missing_runtime_state",
             "launcher_mode": launcher_mode,
         })
+        log_delivery_audit({
+            "timestamp": now.isoformat(),
+            "slot": current_slot,
+            "send": False,
+            "skip_reason": "missing_runtime_state",
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": "missing_runtime_state",
+            "message_text": None,
+            "message_intent": None,
+            "fingerprint": None,
+            "launcher_mode": launcher_mode,
+            "state_source": state_source,
+            "activity_source": activity_source,
+        })
         return {
             "evaluated": True,
             "selection": {"send": False, "skip_reason": "missing_runtime_state"},
@@ -248,6 +265,22 @@ def evaluate_nudge_slot(
             "delivery_status": "failed",
             "delivery_error": selection.get("skip_reason"),
             "launcher_mode": launcher_mode,
+        })
+        log_delivery_audit({
+            "timestamp": now.isoformat(),
+            "slot": current_slot,
+            "send": False,
+            "skip_reason": selection.get("skip_reason"),
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": selection.get("skip_reason"),
+            "message_text": None,
+            "message_intent": None,
+            "fingerprint": None,
+            "launcher_mode": launcher_mode,
+            "state_source": state_source,
+            "activity_source": activity_source,
         })
         return {
             "evaluated": True,
@@ -306,6 +339,22 @@ def evaluate_nudge_slot(
             "delivery_error": str(exc),
             "launcher_mode": launcher_mode,
         })
+        log_delivery_audit({
+            "timestamp": now.isoformat(),
+            "slot": selection["slot"],
+            "send": False,
+            "skip_reason": "advisor_runtime_failure",
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": str(exc),
+            "message_text": None,
+            "message_intent": selection.get("message_intent"),
+            "fingerprint": selection.get("fingerprint"),
+            "launcher_mode": launcher_mode,
+            "state_source": state_source,
+            "activity_source": activity_source,
+        })
         return {
             "evaluated": True,
             "selection": selection,
@@ -358,6 +407,22 @@ def evaluate_nudge_slot(
             "delivery_error": str(exc),
             "launcher_mode": launcher_mode,
         })
+        log_delivery_audit({
+            "timestamp": now.isoformat(),
+            "slot": selection["slot"],
+            "send": False,
+            "skip_reason": "delivery_failure",
+            "transport": transport_name,
+            "session_key": effective_session_key,
+            "delivery_status": "failed",
+            "delivery_error": str(exc),
+            "message_text": runtime_result.get("message_text"),
+            "message_intent": selection.get("message_intent"),
+            "fingerprint": selection.get("fingerprint"),
+            "launcher_mode": launcher_mode,
+            "state_source": state_source,
+            "activity_source": activity_source,
+        })
         return {
             "evaluated": True,
             "selection": selection,
@@ -394,6 +459,22 @@ def evaluate_nudge_slot(
         "delivery_error": transport_result.get("delivery_error"),
         "launcher_mode": transport_result.get("launcher_mode", launcher_mode),
     })
+    audit_row = log_delivery_audit({
+        "timestamp": now.isoformat(),
+        "slot": selection["slot"],
+        "send": bool(runtime_result["approved"] and transport_result.get("sent")),
+        "skip_reason": None if runtime_result["approved"] else "not_approved",
+        "transport": transport_name,
+        "session_key": effective_session_key,
+        "delivery_status": transport_result.get("delivery_status", "sent"),
+        "delivery_error": transport_result.get("delivery_error"),
+        "message_text": runtime_result.get("message_text"),
+        "message_intent": selection.get("message_intent"),
+        "fingerprint": selection.get("fingerprint"),
+        "launcher_mode": transport_result.get("launcher_mode", launcher_mode),
+        "state_source": state_source,
+        "activity_source": activity_source,
+    })
     return {
         "evaluated": True,
         "selection": selection,
@@ -401,6 +482,7 @@ def evaluate_nudge_slot(
         "advisor_runtime": runtime_result,
         "transport_result": transport_result,
         "log": log_entry,
+        "delivery_audit": audit_row,
         "state_source": state_source,
     }
 

@@ -12,18 +12,20 @@ DATA = ROOT / "runtime" / "data"
 SNAPSHOT = DATA / "snapshots" / "current_state_snapshot.json"
 EVENTS = DATA / "events" / "events.jsonl"
 SUMMARY = DATA / "daily_summaries" / "latest.json"
+WEEKLY = DATA / "weekly_summaries" / "latest.json"
 LOG_PATH = DATA / "nudge_logs" / "nudge_log.jsonl"
 
 
 class NudgeBootstrapLiveModeTests(unittest.TestCase):
     def setUp(self):
-        for path in [SNAPSHOT, EVENTS, SUMMARY, LOG_PATH]:
+        for path in [SNAPSHOT, EVENTS, SUMMARY, WEEKLY, LOG_PATH]:
             path.parent.mkdir(parents=True, exist_ok=True)
             if path.exists():
                 path.unlink()
         SNAPSHOT.write_text(json.dumps({"state": {"fatigue": {"value": None}, "motivation": {"value": None}, "behavior_state": {"value": None}, "recent_misses": 0}, "simplification_level": "normal"}), encoding="utf-8")
         EVENTS.write_text(json.dumps({"timestamp": "2026-04-15T08:00:00+03:00", "event_type": "fatigue_report", "facts": {"fatigue": "low"}}) + "\n", encoding="utf-8")
         SUMMARY.write_text(json.dumps({"date": "2026-04-15", "facts": {"events_count": 1}}), encoding="utf-8")
+        WEEKLY.write_text(json.dumps({"week_end": "2026-04-15", "interpretation": {"summary": "Observed completion was mixed."}}), encoding="utf-8")
 
     def test_live_mode_uses_launcher_path_and_logs_openclaw_session(self):
         calls = []

@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "runtime" / "data"
+INBOUND_PATH = DATA / "inbound" / "discord_messages.jsonl"
 EVENTS_PATH = DATA / "events" / "events.jsonl"
 TURN_LOG_PATH = DATA / "turn_logs" / "reactive_turns.jsonl"
 CHAT_LOG_PATH = DATA / "raw_chat" / "recent.json"
@@ -48,9 +49,9 @@ def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict
     activity: List[Dict[str, Any]] = []
     found_source = False
 
-    if EVENTS_PATH.exists():
+    if INBOUND_PATH.exists():
         found_source = True
-        for row in _read_jsonl(EVENTS_PATH):
+        for row in _read_jsonl(INBOUND_PATH):
             ts_raw = row.get("timestamp")
             if not ts_raw:
                 continue
@@ -63,10 +64,16 @@ def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict
             activity.append(
                 {
                     "timestamp": ts_raw,
-                    "source": "event",
-                    "signal_type": EVENT_SIGNAL_MAP.get(row.get("event_type"), "other"),
+                    "source": "discord_inbound",
+                    "signal_type": "other",
+                    "discord_message_id": row.get("discord_message_id", ""),
                 }
             )
+        activity.sort(key=lambda row: row["timestamp"])
+        return {
+            "recent_user_activity": activity,
+            "activity_source": "persisted",
+        }
 
     if TURN_LOG_PATH.exists():
         found_source = True
@@ -85,6 +92,26 @@ def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict
                     "timestamp": ts_raw,
                     "source": "turn_log",
                     "signal_type": row.get("signal_type", "other"),
+                }
+            )
+
+    if EVENTS_PATH.exists():
+        found_source = True
+        for row in _read_jsonl(EVENTS_PATH):
+            ts_raw = row.get("timestamp")
+            if not ts_raw:
+                continue
+            try:
+                ts = _parse_ts(ts_raw)
+            except ValueError:
+                continue
+            if ts < cutoff:
+                continue
+            activity.append(
+                {
+                    "timestamp": ts_raw,
+                    "source": "event",
+                    "signal_type": EVENT_SIGNAL_MAP.get(row.get("event_type"), "other"),
                 }
             )
 

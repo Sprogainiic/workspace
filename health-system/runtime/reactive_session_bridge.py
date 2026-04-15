@@ -1,14 +1,23 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
 from .reactive_session_ingest import ingest_reactive_session_event
 
 ROOT = Path(__file__).resolve().parents[1]
-BRIDGE_LOG = ROOT / "runtime" / "data" / "ingest" / "reactive_bridge_log.jsonl"
-BRIDGE_LOG.parent.mkdir(parents=True, exist_ok=True)
+INGEST_DIR = ROOT / "runtime" / "data" / "ingest"
+INGEST_DIR.mkdir(parents=True, exist_ok=True)
+BRIDGE_LOG = INGEST_DIR / "reactive_bridge_log.jsonl"
+PRE_INGEST_LOG = INGEST_DIR / "reactive_bridge_pre_ingest.jsonl"
+
+
+def _append_jsonl(path: Path, row: Dict[str, Any]) -> Dict[str, Any]:
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return row
 
 
 def log_bridge_event(entry: Dict[str, Any]) -> Dict[str, Any]:
@@ -22,9 +31,17 @@ def log_bridge_event(entry: Dict[str, Any]) -> Dict[str, Any]:
         "runner_mode": entry.get("runner_mode"),
         "poll_iteration": entry.get("poll_iteration", 0),
     }
-    with BRIDGE_LOG.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(row, ensure_ascii=False) + "\n")
-    return row
+    return _append_jsonl(BRIDGE_LOG, row)
+
+
+def log_accepted_pre_ingest(session_key: str, discord_message_id: str, timestamp: str | None = None) -> Dict[str, Any]:
+    row = {
+        "timestamp": timestamp or datetime.now().astimezone().isoformat(),
+        "session_key": session_key,
+        "discord_message_id": discord_message_id,
+        "bridge_stage": "accepted_pre_ingest",
+    }
+    return _append_jsonl(PRE_INGEST_LOG, row)
 
 
 def read_bridge_log() -> List[Dict[str, Any]]:
@@ -68,6 +85,7 @@ def process_session_messages(session_key: str, messages: List[Dict[str, Any]]) -
             }))
             continue
 
+        log_accepted_pre_ingest(session_key, message_id, str(timestamp))
         ingest = ingest_reactive_session_event({
             "session_key": session_key,
             "event": {

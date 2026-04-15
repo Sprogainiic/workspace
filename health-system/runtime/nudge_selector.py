@@ -120,7 +120,7 @@ def select_nudge(
     defaults = SLOT_DEFAULTS[current_slot]
     nudge_type = _pick_nudge_type(current_slot, current_snapshot, todays_events)
     domain = defaults["domain"]
-    guard_skip = enforce_guardrails(now, domain, sent_nudges_today, recent_user_activity, merged_guard_policy)
+    guard_skip = enforce_guardrails(now, domain, sent_nudges_today, recent_user_activity, merged_guard_policy, slot=current_slot)
     if guard_skip:
         return {"send": False, "skip_reason": guard_skip}
 

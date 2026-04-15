@@ -13,12 +13,12 @@ TURN_LOG_PATH = DATA / "turn_logs" / "reactive_turns.jsonl"
 CHAT_LOG_PATH = DATA / "raw_chat" / "recent.json"
 
 EVENT_SIGNAL_MAP = {
-    "meal_logged": "meal_log",
-    "fatigue_report": "status_update",
-    "motivation_signal": "status_update",
-    "restart_signal": "decision_request",
-    "checkin_signal": "checkin_reply",
-    "workout_skipped": "status_update",
+    "meal_logged": ("meal_log", "nutrition"),
+    "fatigue_report": ("status_update", "training"),
+    "motivation_signal": ("status_update", "behavior"),
+    "restart_signal": ("decision_request", "behavior"),
+    "checkin_signal": ("checkin_reply", "wrap_up"),
+    "workout_skipped": ("status_update", "training"),
 }
 
 
@@ -44,6 +44,19 @@ def _read_json(path: Path) -> List[Dict[str, Any]]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _infer_inbound_signal_and_domain(text: str) -> tuple[str, str | None]:
+    lowered = text.lower()
+    if any(word in lowered for word in ["lunch", "dinner", "eat", "ate", "meal", "food"]):
+        return "meal_log", "nutrition"
+    if any(word in lowered for word in ["workout", "train", "training", "skipped workout", "tired", "fatigue"]):
+        return "status_update", "training"
+    if any(word in lowered for word in ["motivation", "stuck", "avoid", "shutdown"]):
+        return "status_update", "behavior"
+    if any(word in lowered for word in ["summary", "wrap up", "done today"]):
+        return "checkin_reply", "wrap_up"
+    return "other", None
+
+
 def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict[str, Any]:
     cutoff = now - timedelta(minutes=lookback_minutes)
     activity: List[Dict[str, Any]] = []
@@ -61,11 +74,13 @@ def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict
                 continue
             if ts < cutoff:
                 continue
+            signal_type, domain = _infer_inbound_signal_and_domain(row.get("message_text", ""))
             activity.append(
                 {
                     "timestamp": ts_raw,
                     "source": "discord_inbound",
-                    "signal_type": "other",
+                    "signal_type": signal_type,
+                    "domain": domain,
                     "discord_message_id": row.get("discord_message_id", ""),
                 }
             )
@@ -92,6 +107,7 @@ def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict
                     "timestamp": ts_raw,
                     "source": "turn_log",
                     "signal_type": row.get("signal_type", "other"),
+                    "domain": row.get("domain"),
                 }
             )
 
@@ -107,11 +123,13 @@ def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict
                 continue
             if ts < cutoff:
                 continue
+            signal_type, domain = EVENT_SIGNAL_MAP.get(row.get("event_type"), ("other", None))
             activity.append(
                 {
                     "timestamp": ts_raw,
                     "source": "event",
-                    "signal_type": EVENT_SIGNAL_MAP.get(row.get("event_type"), "other"),
+                    "signal_type": signal_type,
+                    "domain": domain,
                 }
             )
 
@@ -132,6 +150,7 @@ def load_recent_user_activity(now: datetime, lookback_minutes: int = 45) -> Dict
                     "timestamp": ts_raw,
                     "source": "chat",
                     "signal_type": row.get("signal_type", "other"),
+                    "domain": row.get("domain"),
                 }
             )
 

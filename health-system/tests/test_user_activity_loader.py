@@ -14,6 +14,7 @@ EVENTS = DATA / "events" / "events.jsonl"
 CHAT = DATA / "raw_chat" / "recent.json"
 TURNS = DATA / "turn_logs" / "reactive_turns.jsonl"
 LOG_PATH = DATA / "nudge_logs" / "nudge_log.jsonl"
+INBOUND = DATA / "inbound" / "discord_messages.jsonl"
 
 
 def ts(value: str) -> datetime:
@@ -22,7 +23,7 @@ def ts(value: str) -> datetime:
 
 class UserActivityLoaderTests(unittest.TestCase):
     def setUp(self):
-        for path in [EVENTS, CHAT, TURNS, LOG_PATH]:
+        for path in [EVENTS, CHAT, TURNS, LOG_PATH, INBOUND]:
             path.parent.mkdir(parents=True, exist_ok=True)
             if path.exists():
                 path.unlink()
@@ -36,18 +37,19 @@ class UserActivityLoaderTests(unittest.TestCase):
         self.assertEqual(result["activity_source"], "persisted")
         self.assertEqual(len(result["recent_user_activity"]), 1)
         self.assertEqual(result["recent_user_activity"][0]["signal_type"], "meal_log")
+        self.assertEqual(result["recent_user_activity"][0]["domain"], "nutrition")
 
     def test_no_activity_returns_explicit_missing_status(self):
         result = load_recent_user_activity(ts("2026-04-15T15:00:00+03:00"))
         self.assertEqual(result["activity_source"], "missing")
         self.assertEqual(result["recent_user_activity"], [])
 
-    def test_suppression_fires_when_recent_activity_exists(self):
+    def test_related_activity_suppression_fires(self):
         result = evaluate_nudge_slot(
             current_snapshot={"state": {"fatigue": {"value": None}, "motivation": {"value": None}, "behavior_state": {"value": None}, "recent_misses": 0}, "simplification_level": "normal"},
             todays_events=[],
             daily_summary={},
-            recent_user_activity=[{"timestamp": "2026-04-15T14:40:00+03:00", "source": "event", "signal_type": "meal_log"}],
+            recent_user_activity=[{"timestamp": "2026-04-15T14:40:00+03:00", "source": "event", "signal_type": "meal_log", "domain": "nutrition"}],
             current_slot="lunch_check",
             now=ts("2026-04-15T15:00:00+03:00"),
             sent_nudges_today=[],
@@ -58,18 +60,18 @@ class UserActivityLoaderTests(unittest.TestCase):
         self.assertFalse(result["selection"]["send"])
         self.assertEqual(result["selection"]["skip_reason"], "recent_user_activity")
 
-    def test_suppression_does_not_fire_when_recent_activity_absent(self):
+    def test_unrelated_activity_does_not_suppress(self):
         result = evaluate_nudge_slot(
             current_snapshot={"state": {"fatigue": {"value": None}, "motivation": {"value": None}, "behavior_state": {"value": None}, "recent_misses": 0}, "simplification_level": "normal"},
             todays_events=[],
             daily_summary={},
-            recent_user_activity=[],
+            recent_user_activity=[{"timestamp": "2026-04-15T14:40:00+03:00", "source": "event", "signal_type": "status_update", "domain": "training"}],
             current_slot="lunch_check",
             now=ts("2026-04-15T15:00:00+03:00"),
             sent_nudges_today=[],
             state_source="test_fixture",
             allow_test_fixture=True,
-            activity_source="missing",
+            activity_source="persisted",
         )
         self.assertTrue(result["selection"]["send"])
 

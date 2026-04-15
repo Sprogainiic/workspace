@@ -6,6 +6,7 @@ from pathlib import Path
 from runtime.reactive_session_bridge import process_session_messages, read_bridge_log
 
 BRIDGE_LOG = Path(__file__).resolve().parents[1] / "runtime" / "data" / "ingest" / "reactive_bridge_log.jsonl"
+PRE_INGEST_LOG = Path(__file__).resolve().parents[1] / "runtime" / "data" / "ingest" / "reactive_bridge_pre_ingest.jsonl"
 INGEST_LOG = Path(__file__).resolve().parents[1] / "runtime" / "data" / "ingest" / "reactive_ingest_log.jsonl"
 SEEN = Path(__file__).resolve().parents[1] / "runtime" / "data" / "ingest" / "reactive_seen.json"
 INBOUND = Path(__file__).resolve().parents[1] / "runtime" / "data" / "inbound" / "discord_messages.jsonl"
@@ -14,7 +15,7 @@ EVENTS = Path(__file__).resolve().parents[1] / "runtime" / "data" / "events" / "
 
 class ReactiveSessionBridgeTests(unittest.TestCase):
     def setUp(self):
-        for path in [BRIDGE_LOG, INGEST_LOG, SEEN, INBOUND, EVENTS]:
+        for path in [BRIDGE_LOG, PRE_INGEST_LOG, INGEST_LOG, SEEN, INBOUND, EVENTS]:
             path.parent.mkdir(parents=True, exist_ok=True)
             if path.exists():
                 path.unlink()
@@ -69,6 +70,18 @@ class ReactiveSessionBridgeTests(unittest.TestCase):
         }])
         rows = read_bridge_log()
         self.assertEqual(rows[0]["bridge_status"], "accepted")
+        self.assertTrue(PRE_INGEST_LOG.exists())
+
+    def test_pre_ingest_log_written_before_ingest_outcome(self):
+        process_session_messages("agent:health:discord:channel:1491124367638401024", [{
+            "role": "user",
+            "timestamp": "2026-04-15T10:30:00+03:00",
+            "content": [{"type": "text", "text": "I am tired and skipped workout"}],
+            "__openclaw": {"id": "m2"},
+            "senderLabel": "user1",
+        }])
+        rows = [line for line in PRE_INGEST_LOG.read_text(encoding="utf-8").splitlines() if line.strip()]
+        self.assertTrue(any('"bridge_stage": "accepted_pre_ingest"' in line for line in rows))
 
 
 if __name__ == "__main__":

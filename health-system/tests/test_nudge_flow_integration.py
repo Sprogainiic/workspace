@@ -44,12 +44,13 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
             current_snapshot=self.snapshot,
             todays_events=[],
             daily_summary={},
-            recent_user_activity=[{"timestamp": "2026-04-15T12:00:00+03:00", "text": "hey"}],
+            recent_user_activity=[{"timestamp": "2026-04-15T12:00:00+03:00", "source": "chat", "signal_type": "checkin_reply"}],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:20:00+03:00"),
             sent_nudges_today=[],
             state_source="test_fixture",
             allow_test_fixture=True,
+            activity_source="persisted",
         )
         self.assertTrue(result["evaluated"])
         self.assertTrue(result["stopped"])
@@ -61,6 +62,8 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
         self.assertEqual(rows[0]["skip_reason"], "recent_user_activity")
         self.assertEqual(rows[0]["tokens_in"], 0)
         self.assertEqual(rows[0]["tokens_out"], 0)
+        self.assertEqual(rows[0]["activity_source"], "persisted")
+        self.assertEqual(rows[0]["recent_user_activity_count"], 1)
 
     def test_send_path_reaches_advisor_runtime_and_logs(self):
         result = evaluate_nudge_slot(
@@ -73,6 +76,7 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
             sent_nudges_today=[],
             state_source="test_fixture",
             allow_test_fixture=True,
+            activity_source="missing",
         )
         self.assertTrue(result["evaluated"])
         self.assertTrue(result["selection"]["send"])
@@ -89,6 +93,8 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
         self.assertTrue(rows[0]["message_fingerprint"])
         self.assertGreater(rows[0]["tokens_in"], 0)
         self.assertGreater(rows[0]["tokens_out"], 0)
+        self.assertEqual(rows[0]["activity_source"], "missing")
+        self.assertEqual(rows[0]["recent_user_activity_count"], 0)
 
     def test_quiet_hours_block_end_to_end(self):
         result = evaluate_nudge_slot(

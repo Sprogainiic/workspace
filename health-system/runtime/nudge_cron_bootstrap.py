@@ -75,13 +75,14 @@ def execute_slot(slot: str, channel: str, recipient: str, *, mode: str = "prod",
         current_snapshot=state.get("snapshot"),
         todays_events=state.get("today_events"),
         daily_summary=state.get("daily_summary"),
-        recent_user_activity=[],
+        recent_user_activity=state.get("recent_user_activity", []),
         current_slot=slot,
         now=now,
         outbound_channel=channel,
         recipient_id=recipient,
         sent_nudges_today=state.get("sent_nudges_today"),
         state_source=state.get("state_source", "persisted"),
+        activity_source=state.get("activity_source", "missing"),
     )
     return result
 
@@ -114,6 +115,8 @@ def main(argv: List[str] | None = None) -> int:
         "skip_reason": result["selection"].get("skip_reason"),
         "runtime_mode": result.get("log", {}).get("runtime_mode"),
         "state_source": result.get("log", {}).get("state_source"),
+        "activity_source": result.get("log", {}).get("activity_source"),
+        "recent_user_activity_count": result.get("log", {}).get("recent_user_activity_count", 0),
     }))
     return 0
 

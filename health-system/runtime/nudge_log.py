@@ -25,6 +25,8 @@ def log_nudge_decision(entry: Dict[str, Any]) -> Dict[str, Any]:
         "message_fingerprint": entry.get("message_fingerprint"),
         "runtime_mode": entry.get("runtime_mode"),
         "state_source": entry.get("state_source"),
+        "activity_source": entry.get("activity_source"),
+        "recent_user_activity_count": int(entry.get("recent_user_activity_count", 0) or 0),
     }
     with LOG.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")

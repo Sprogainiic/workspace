@@ -40,9 +40,11 @@ class NudgeCronCliTests(unittest.TestCase):
         payload = json.loads(proc.stdout)
         self.assertEqual(payload["slot"], "lunch_check")
         self.assertEqual(payload["state_source"], "persisted")
+        self.assertIn(payload["activity_source"], {"persisted", "missing"})
         rows = read_nudge_log()
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["state_source"], "persisted")
+        self.assertIn(rows[0]["activity_source"], {"persisted", "missing"})
 
     def test_valid_slot_with_missing_state_fails_cleanly(self):
         proc = subprocess.run(

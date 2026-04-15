@@ -10,6 +10,8 @@ from runtime.state_loader import MissingRuntimeStateError, load_runtime_state
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "runtime" / "data"
+CHAT = DATA / "raw_chat" / "recent.json"
+TURN_LOG = DATA / "turn_logs" / "reactive_turns.jsonl"
 SNAPSHOT = DATA / "snapshots" / "current_state_snapshot.json"
 EVENTS = DATA / "events" / "events.jsonl"
 SUMMARY = DATA / "daily_summaries" / "latest.json"
@@ -26,7 +28,7 @@ class NudgeStateLoaderTests(unittest.TestCase):
         EVENTS.parent.mkdir(parents=True, exist_ok=True)
         SUMMARY.parent.mkdir(parents=True, exist_ok=True)
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        for path in [SNAPSHOT, EVENTS, SUMMARY, LOG_PATH]:
+        for path in [SNAPSHOT, EVENTS, SUMMARY, LOG_PATH, CHAT, TURN_LOG]:
             if path.exists():
                 path.unlink()
 
@@ -55,12 +57,19 @@ class NudgeStateLoaderTests(unittest.TestCase):
             "message_fingerprint": "fp1",
         })
 
+        CHAT.parent.mkdir(parents=True, exist_ok=True)
+        CHAT.write_text(json.dumps([
+            {"timestamp": "2026-04-15T14:40:00+03:00", "signal_type": "checkin_reply"}
+        ]), encoding="utf-8")
+
         state = load_runtime_state(ts("2026-04-15T15:00:00+03:00"))
         self.assertEqual(state["state_source"], "persisted")
         self.assertEqual(state["snapshot"]["state"]["fatigue"]["value"], "low")
         self.assertEqual(len(state["today_events"]), 1)
         self.assertEqual(state["daily_summary"]["date"], "2026-04-15")
         self.assertEqual(len(state["sent_nudges_today"]), 1)
+        self.assertEqual(state["activity_source"], "persisted")
+        self.assertEqual(len(state["recent_user_activity"]), 1)
 
     def test_missing_state_handled_cleanly(self):
         with self.assertRaises(MissingRuntimeStateError):
@@ -72,10 +81,13 @@ class NudgeStateLoaderTests(unittest.TestCase):
             "today_events": [{"timestamp": "2026-04-15T09:00:00+03:00", "event_type": "fatigue_report"}],
             "daily_summary": {"date": "2026-04-15"},
             "sent_nudges_today": [{"slot": "lunch_check"}],
+            "recent_user_activity": [{"timestamp": "2026-04-15T14:40:00+03:00", "source": "chat", "signal_type": "checkin_reply"}],
+            "activity_source": "persisted",
         }
         state = load_runtime_state(ts("2026-04-15T15:00:00+03:00"), allow_test_fixture=True, fixture=fixture)
         self.assertEqual(state["state_source"], "test_fixture")
         self.assertEqual(state["snapshot"]["state"]["fatigue"]["value"], "medium")
+        self.assertEqual(state["activity_source"], "persisted")
 
 
 if __name__ == "__main__":

@@ -158,7 +158,9 @@ def evaluate_nudge_slot(
     sent_nudges_today: Optional[List[Dict[str, Any]]] = None,
     state_source: str = "persisted",
     allow_test_fixture: bool = False,
+    activity_source: str = "missing",
 ) -> Dict[str, Any]:
+    activity_count = len(recent_user_activity or [])
     if (not allow_test_fixture) and (current_snapshot is None or todays_events is None or daily_summary is None or sent_nudges_today is None):
         log_entry = log_nudge_decision({
             "timestamp": now.isoformat(),
@@ -175,6 +177,8 @@ def evaluate_nudge_slot(
             "message_fingerprint": None,
             "runtime_mode": None,
             "state_source": state_source,
+            "activity_source": activity_source,
+            "recent_user_activity_count": activity_count,
         })
         return {
             "evaluated": True,
@@ -211,6 +215,8 @@ def evaluate_nudge_slot(
             "message_fingerprint": None,
             "runtime_mode": None,
             "state_source": state_source,
+            "activity_source": activity_source,
+            "recent_user_activity_count": activity_count,
         })
         return {
             "evaluated": True,
@@ -251,6 +257,8 @@ def evaluate_nudge_slot(
         "message_fingerprint": selection["fingerprint"],
         "runtime_mode": runtime_result["runtime_mode"],
         "state_source": state_source,
+        "activity_source": activity_source,
+        "recent_user_activity_count": activity_count,
     })
     return {
         "evaluated": True,

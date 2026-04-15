@@ -10,7 +10,6 @@ from .validator import validate_memory_adapter_output
 from .token_logger import log_token_usage
 from .nudge_selector import select_nudge
 from .nudge_log import log_nudge_decision
-from .nudge_state_loader import load_sent_nudges_today
 from .advisor_runtime import run_proactive_turn
 from .outbound_transport import send_message
 
@@ -156,14 +155,40 @@ def evaluate_nudge_slot(
     policy_overrides: Optional[Dict[str, Any]] = None,
     outbound_channel: str = "test",
     recipient_id: str = "local-test-recipient",
-    _sent_state_loader=load_sent_nudges_today,
+    sent_nudges_today: Optional[List[Dict[str, Any]]] = None,
+    state_source: str = "persisted",
+    allow_test_fixture: bool = False,
 ) -> Dict[str, Any]:
-    loaded_state = _sent_state_loader(now)
+    if (not allow_test_fixture) and (current_snapshot is None or todays_events is None or daily_summary is None or sent_nudges_today is None):
+        log_entry = log_nudge_decision({
+            "timestamp": now.isoformat(),
+            "slot": current_slot,
+            "evaluated": True,
+            "send": False,
+            "skip_reason": "missing_runtime_state",
+            "nudge_type": None,
+            "domain": None,
+            "tokens_in": 0,
+            "tokens_out": 0,
+            "message_intent": None,
+            "fingerprint": None,
+            "message_fingerprint": None,
+            "runtime_mode": None,
+            "state_source": state_source,
+        })
+        return {
+            "evaluated": True,
+            "selection": {"send": False, "skip_reason": "missing_runtime_state"},
+            "log": log_entry,
+            "stopped": True,
+            "error": "missing_runtime_state",
+        }
+
     selection = select_nudge(
         current_snapshot=current_snapshot,
         todays_events=todays_events,
         daily_summary=daily_summary,
-        sent_nudges_today=loaded_state["sent_nudges_today"],
+        sent_nudges_today=sent_nudges_today,
         recent_user_activity=recent_user_activity,
         current_slot=current_slot,
         now=now,
@@ -185,11 +210,11 @@ def evaluate_nudge_slot(
             "fingerprint": None,
             "message_fingerprint": None,
             "runtime_mode": None,
+            "state_source": state_source,
         })
         return {
             "evaluated": True,
             "selection": selection,
-            "loaded_state": loaded_state,
             "log": log_entry,
             "stopped": True,
         }
@@ -225,15 +250,16 @@ def evaluate_nudge_slot(
         "fingerprint": selection["fingerprint"],
         "message_fingerprint": selection["fingerprint"],
         "runtime_mode": runtime_result["runtime_mode"],
+        "state_source": state_source,
     })
     return {
         "evaluated": True,
         "selection": selection,
-        "loaded_state": loaded_state,
         "proactive_brief": proactive_brief,
         "advisor_runtime": runtime_result,
         "transport_result": transport_result,
         "log": log_entry,
+        "state_source": state_source,
     }
 
 

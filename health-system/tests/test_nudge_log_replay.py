@@ -62,18 +62,21 @@ class NudgeLogReplayTests(unittest.TestCase):
                 "simplification_level": "normal",
             },
             todays_events=[],
-            daily_summary=None,
+            daily_summary={},
             recent_user_activity=[],
             current_slot="dinner_check",
             now=ts("2026-04-15T18:30:00+03:00"),
+            sent_nudges_today=loaded["sent_nudges_today"],
+            state_source="test_fixture",
+            allow_test_fixture=True,
         )
         self.assertFalse(result["selection"]["send"])
         self.assertEqual(result["selection"]["skip_reason"], "spam_guard")
-        self.assertEqual(len(result["loaded_state"]["sent_nudges_today"]), 2)
         rows = read_nudge_log()
         self.assertEqual(len(rows), 3)
         self.assertFalse(rows[-1]["send"])
         self.assertEqual(rows[-1]["skip_reason"], "spam_guard")
+        self.assertEqual(rows[-1]["state_source"], "test_fixture")
 
 
 if __name__ == "__main__":

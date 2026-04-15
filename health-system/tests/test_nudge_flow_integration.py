@@ -43,10 +43,13 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
         result = evaluate_nudge_slot(
             current_snapshot=self.snapshot,
             todays_events=[],
-            daily_summary=None,
+            daily_summary={},
             recent_user_activity=[{"timestamp": "2026-04-15T12:00:00+03:00", "text": "hey"}],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:20:00+03:00"),
+            sent_nudges_today=[],
+            state_source="test_fixture",
+            allow_test_fixture=True,
         )
         self.assertTrue(result["evaluated"])
         self.assertTrue(result["stopped"])
@@ -63,10 +66,13 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
         result = evaluate_nudge_slot(
             current_snapshot=self.snapshot,
             todays_events=[],
-            daily_summary=None,
+            daily_summary={},
             recent_user_activity=[],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:30:00+03:00"),
+            sent_nudges_today=[],
+            state_source="test_fixture",
+            allow_test_fixture=True,
         )
         self.assertTrue(result["evaluated"])
         self.assertTrue(result["selection"]["send"])
@@ -88,10 +94,13 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
         result = evaluate_nudge_slot(
             current_snapshot=self.snapshot,
             todays_events=[],
-            daily_summary=None,
+            daily_summary={},
             recent_user_activity=[],
             current_slot="morning_plan_check",
             now=ts("2026-04-15T07:50:00+03:00"),
+            sent_nudges_today=[],
+            state_source="test_fixture",
+            allow_test_fixture=True,
         )
         self.assertEqual(result["selection"], {"send": False, "skip_reason": "quiet_hours"})
         rows = read_nudge_log()
@@ -102,10 +111,13 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
         result = evaluate_nudge_slot(
             current_snapshot=self.snapshot,
             todays_events=[],
-            daily_summary=None,
+            daily_summary={},
             recent_user_activity=[{"timestamp": "2026-04-15T15:10:00+03:00", "text": "I already ate"}],
             current_slot="afternoon_check",
             now=ts("2026-04-15T15:30:00+03:00"),
+            sent_nudges_today=[],
+            state_source="test_fixture",
+            allow_test_fixture=True,
         )
         self.assertFalse(result["selection"]["send"])
         self.assertEqual(result["selection"]["skip_reason"], "recent_user_activity")

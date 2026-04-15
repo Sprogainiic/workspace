@@ -40,12 +40,15 @@ class AdvisorRuntimeContractTests(unittest.TestCase):
         result = evaluate_nudge_slot(
             current_snapshot=self.snapshot,
             todays_events=[],
-            daily_summary=None,
+            daily_summary={},
             recent_user_activity=[],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:30:00+03:00"),
             outbound_channel="test",
             recipient_id="user-123",
+            sent_nudges_today=[],
+            state_source="test_fixture",
+            allow_test_fixture=True,
         )
         self.assertEqual(result["transport_result"]["message_text"], result["advisor_runtime"]["message_text"])
         self.assertIn(result["advisor_runtime"]["runtime_mode"], {"stub", "orchestrated"})

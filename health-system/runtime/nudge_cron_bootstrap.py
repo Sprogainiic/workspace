@@ -7,9 +7,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .chat_flow import evaluate_nudge_slot
-from .nudge_schedule import NUDGE_SLOTS, get_slot_policy
-
 CRON_MAP = {
     "morning_plan_check": "08:05",
     "late_morning_check": "10:30",
@@ -28,12 +25,14 @@ def local_cron_map() -> Dict[str, str]:
 
 
 def _cron_line(slot: str) -> str:
+    from .nudge_schedule import get_slot_policy
     hh, mm = CRON_MAP[slot].split(":", 1)
     policy = get_slot_policy(slot)
     return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --channel test --recipient local-test-recipient >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
 
 
 def bootstrap_schedule() -> List[Dict[str, str]]:
+    from .nudge_schedule import NUDGE_SLOTS, get_slot_policy
     jobs: List[Dict[str, str]] = []
     for slot in NUDGE_SLOTS:
         policy = get_slot_policy(slot)
@@ -50,6 +49,7 @@ def bootstrap_schedule() -> List[Dict[str, str]]:
 
 
 def bootstrap_payload() -> Dict[str, object]:
+    from .nudge_schedule import NUDGE_SLOTS
     return {
         "cron_map": local_cron_map(),
         "cron_lines": [_cron_line(slot) for slot in NUDGE_SLOTS],
@@ -57,35 +57,33 @@ def bootstrap_payload() -> Dict[str, object]:
     }
 
 
-def _default_snapshot() -> Dict[str, Any]:
-    return {
-        "state": {
-            "fatigue": {"value": None},
-            "motivation": {"value": None},
-            "behavior_state": {"value": None},
-            "recent_misses": 0,
-        },
-        "simplification_level": "normal",
-    }
+def execute_slot(slot: str, channel: str, recipient: str, *, mode: str = "prod", fixture: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    from .nudge_schedule import NUDGE_SLOTS
+    from .state_loader import MissingRuntimeStateError, load_runtime_state
+    from .chat_flow import evaluate_nudge_slot
 
-
-def execute_slot(slot: str, channel: str, recipient: str) -> Dict[str, Any]:
     if slot not in NUDGE_SLOTS:
         raise ValueError(f"Invalid slot: {slot}")
-    policy = get_slot_policy(slot)
-    local_time = CRON_MAP[slot]
-    today = datetime.now().astimezone().date().isoformat()
-    now = datetime.fromisoformat(f"{today}T{local_time}:00+03:00")
-    return evaluate_nudge_slot(
-        current_snapshot=_default_snapshot(),
-        todays_events=[],
-        daily_summary=None,
+
+    now = datetime.now().astimezone()
+    try:
+        state = load_runtime_state(now, allow_test_fixture=(mode == "test"), fixture=fixture)
+    except MissingRuntimeStateError:
+        return {"error": "missing_runtime_state", "slot": slot}
+
+    result = evaluate_nudge_slot(
+        current_snapshot=state.get("snapshot"),
+        todays_events=state.get("today_events"),
+        daily_summary=state.get("daily_summary"),
         recent_user_activity=[],
         current_slot=slot,
         now=now,
         outbound_channel=channel,
         recipient_id=recipient,
+        sent_nudges_today=state.get("sent_nudges_today"),
+        state_source=state.get("state_source", "persisted"),
     )
+    return result
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -93,6 +91,7 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument("--slot", help="slot to evaluate")
     parser.add_argument("--channel", default="test")
     parser.add_argument("--recipient", default="local-test-recipient")
+    parser.add_argument("--mode", choices=["prod", "test"], default="prod")
     args = parser.parse_args(argv)
 
     if not args.slot:
@@ -100,9 +99,13 @@ def main(argv: List[str] | None = None) -> int:
         return 0
 
     try:
-        result = execute_slot(args.slot, args.channel, args.recipient)
+        result = execute_slot(args.slot, args.channel, args.recipient, mode=args.mode)
     except Exception as exc:
         print(json.dumps({"error": str(exc), "slot": args.slot}))
+        return 1
+
+    if result.get("error") == "missing_runtime_state":
+        print(json.dumps(result))
         return 1
 
     print(json.dumps({
@@ -110,6 +113,7 @@ def main(argv: List[str] | None = None) -> int:
         "send": result["selection"].get("send", False),
         "skip_reason": result["selection"].get("skip_reason"),
         "runtime_mode": result.get("log", {}).get("runtime_mode"),
+        "state_source": result.get("log", {}).get("state_source"),
     }))
     return 0
 

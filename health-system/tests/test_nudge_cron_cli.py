@@ -8,29 +8,56 @@ from pathlib import Path
 from runtime.nudge_log import read_nudge_log
 
 ROOT = Path(__file__).resolve().parents[1]
-LOG_PATH = ROOT / "runtime" / "data" / "nudge_logs" / "nudge_log.jsonl"
+DATA = ROOT / "runtime" / "data"
+LOG_PATH = DATA / "nudge_logs" / "nudge_log.jsonl"
+SNAPSHOT = DATA / "snapshots" / "current_state_snapshot.json"
+EVENTS = DATA / "events" / "events.jsonl"
+SUMMARY = DATA / "daily_summaries" / "latest.json"
 
 
 class NudgeCronCliTests(unittest.TestCase):
     def setUp(self):
-        if LOG_PATH.exists():
-            LOG_PATH.unlink()
+        for path in [LOG_PATH, SNAPSHOT, EVENTS, SUMMARY]:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.exists():
+                path.unlink()
 
-    def test_valid_slot_executes_and_logs_send_or_skip(self):
+    def _write_persisted_state(self):
+        SNAPSHOT.write_text(json.dumps({"state": {"fatigue": {"value": "low"}}, "simplification_level": "normal"}), encoding="utf-8")
+        EVENTS.write_text(json.dumps({"timestamp": "2026-04-15T08:00:00+03:00", "event_type": "fatigue_report", "facts": {"fatigue": "low"}}) + "\n", encoding="utf-8")
+        SUMMARY.write_text(json.dumps({"date": "2026-04-15", "facts": {"events_count": 1}}), encoding="utf-8")
+
+    def test_valid_slot_with_persisted_state_executes_and_logs(self):
+        self._write_persisted_state()
         proc = subprocess.run(
             ["python3", "-m", "runtime.nudge_cron_bootstrap", "--slot", "lunch_check", "--channel", "test", "--recipient", "user_1"],
             cwd=ROOT,
             capture_output=True,
             text=True,
         )
-        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        self.assertNotIn("RuntimeWarning", proc.stderr)
         payload = json.loads(proc.stdout)
         self.assertEqual(payload["slot"], "lunch_check")
+        self.assertEqual(payload["state_source"], "persisted")
         rows = read_nudge_log()
         self.assertEqual(len(rows), 1)
-        self.assertIn(rows[0]["send"], {True, False})
+        self.assertEqual(rows[0]["state_source"], "persisted")
+
+    def test_valid_slot_with_missing_state_fails_cleanly(self):
+        proc = subprocess.run(
+            ["python3", "-m", "runtime.nudge_cron_bootstrap", "--slot", "lunch_check", "--channel", "test", "--recipient", "user_1"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertNotIn("RuntimeWarning", proc.stderr)
+        payload = json.loads(proc.stdout)
+        self.assertEqual(payload["error"], "missing_runtime_state")
 
     def test_invalid_slot_fails_nonzero(self):
+        self._write_persisted_state()
         proc = subprocess.run(
             ["python3", "-m", "runtime.nudge_cron_bootstrap", "--slot", "bad_slot", "--channel", "test", "--recipient", "user_1"],
             cwd=ROOT,
@@ -38,29 +65,20 @@ class NudgeCronCliTests(unittest.TestCase):
             text=True,
         )
         self.assertNotEqual(proc.returncode, 0)
+        self.assertNotIn("RuntimeWarning", proc.stderr)
         payload = json.loads(proc.stdout)
         self.assertIn("error", payload)
 
-    def test_skip_path_logs(self):
-        proc = subprocess.run(
-            ["python3", "-m", "runtime.nudge_cron_bootstrap", "--slot", "morning_plan_check", "--channel", "test", "--recipient", "user_1"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-        )
-        self.assertEqual(proc.returncode, 0)
-        rows = read_nudge_log()
-        self.assertEqual(len(rows), 1)
-        self.assertTrue(rows[0]["evaluated"])
-
     def test_console_transport_executes(self):
+        self._write_persisted_state()
         proc = subprocess.run(
             ["python3", "-m", "runtime.nudge_cron_bootstrap", "--slot", "lunch_check", "--channel", "console", "--recipient", "user_1"],
             cwd=ROOT,
             capture_output=True,
             text=True,
         )
-        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        self.assertNotIn("RuntimeWarning", proc.stderr)
         rows = read_nudge_log()
         self.assertEqual(len(rows), 1)
 

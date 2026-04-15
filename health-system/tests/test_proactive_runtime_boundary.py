@@ -32,16 +32,19 @@ class ProactiveRuntimeBoundaryTests(unittest.TestCase):
         result = evaluate_nudge_slot(
             current_snapshot=self.snapshot,
             todays_events=[],
-            daily_summary=None,
+            daily_summary={},
             recent_user_activity=[],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:30:00+03:00"),
             outbound_channel="test",
             recipient_id="user-123",
+            sent_nudges_today=[],
+            state_source="test_fixture",
+            allow_test_fixture=True,
         )
         self.assertTrue(result["evaluated"])
         self.assertTrue(result["selection"]["send"])
-        self.assertIn("loaded_state", result)
+        self.assertEqual(result["state_source"], "test_fixture")
         self.assertEqual(result["advisor_runtime"]["runtime_mode"], "stub")
         self.assertTrue(result["advisor_runtime"]["approved"])
         self.assertEqual(result["transport_result"]["channel"], "test")

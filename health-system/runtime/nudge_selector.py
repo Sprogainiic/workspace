@@ -86,10 +86,16 @@ def _pick_nudge_type(slot: str, snapshot: Dict[str, Any], today_events: List[Dic
 
 def _state_flags(snapshot: Dict[str, Any]) -> Dict[str, Any]:
     state = snapshot.get("state", {}) if isinstance(snapshot, dict) else {}
+    tone = snapshot.get("tone_adaptation", {}) if isinstance(snapshot, dict) else {}
+    outcomes = snapshot.get("outcome_tracking", {}) if isinstance(snapshot, dict) else {}
     return {
         "fatigue": state.get("fatigue", {}).get("value"),
         "motivation": state.get("motivation", {}).get("value"),
         "simplification_level": snapshot.get("simplification_level", "normal") if isinstance(snapshot, dict) else "normal",
+        "suggested_style": tone.get("suggested_style"),
+        "tone_evidence": tone.get("evidence", []),
+        "completion_score_rolling": outcomes.get("completion_score_rolling"),
+        "last_outcome_label": outcomes.get("last_outcome_label"),
     }
 
 
@@ -124,13 +130,22 @@ def select_nudge(
     if guard_skip:
         return {"send": False, "skip_reason": guard_skip}
 
+    state_flags = _state_flags(current_snapshot)
+    send_style = "short"
+    if state_flags.get("suggested_style") == "gentle_low_pressure":
+        send_style = "gentle"
+    elif state_flags.get("suggested_style") == "direct_encouraging":
+        send_style = "direct"
+    elif state_flags.get("suggested_style") == "reset_oriented":
+        send_style = "reset"
+
     payload_brief = {
         "slot": current_slot,
         "nudge_type": nudge_type,
         "domain": domain,
         "missing_signals": defaults["missing_signals"],
-        "state_flags": _state_flags(current_snapshot),
-        "send_style": "short",
+        "state_flags": state_flags,
+        "send_style": send_style,
     }
     ok, fingerprint = content_guard_decision(current_slot, domain, nudge_type, payload_brief, sent_nudges_today)
     if not ok:

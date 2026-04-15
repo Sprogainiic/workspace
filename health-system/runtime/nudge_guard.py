@@ -74,7 +74,10 @@ def _activity_relevant_to_slot(activity: Dict[str, Any], slot: str, domain: str)
     relevant_signals: Set[str] = SLOT_RELEVANT_SIGNALS.get(slot, set()) | DOMAIN_SIGNAL_MAP.get(domain, set())
     if activity_domain and activity_domain == domain:
         return True
-    return signal in relevant_signals
+    if signal in relevant_signals:
+        return True
+    text = str(activity.get("text", "")).strip()
+    return bool(text)
 
 
 def check_recent_user_activity(now: datetime, recent_user_activity: List[Dict[str, Any]], policy: Dict[str, Any], slot: str, domain: str) -> Optional[str]:

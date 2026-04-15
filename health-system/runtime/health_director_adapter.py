@@ -28,13 +28,36 @@ def _render_message(slot: str, nudge_type: str, domain: str, brief: Dict[str, An
     target = missing[0].replace("_", " ") if missing else "how things are going"
     motivation = snapshot_subset.get("motivation")
     fatigue = snapshot_subset.get("fatigue")
+    send_style = brief.get("send_style", "short")
+    state_flags = brief.get("state_flags", {})
+    last_outcome = state_flags.get("last_outcome_label")
 
     if domain == "nutrition":
+        if send_style == "gentle":
+            return f"Low-pressure nutrition check: any update on {target}?"
+        if send_style == "direct":
+            return f"Quick nutrition update: did {target.replace(' status', '')} happen?"
         return f"Quick nutrition check: any update on {target}?"
     if domain == "training" and (nudge_type == "coaching" or fatigue == "high" or motivation == "low"):
+        if send_style == "gentle":
+            return "Gentle reset: want the smallest doable version for today?"
+        if send_style == "reset":
+            return "Reset check: want to call today a restart and pick the minimum viable training win?"
         return "Quick reset: want the minimum version for today so the streak stays alive?"
     if domain == "wrap_up":
+        if send_style == "gentle":
+            return "Gentle wrap-up: what actually got done today, even if it was small?"
+        if send_style == "direct":
+            return "Quick wrap-up: what got done today?"
+        if last_outcome:
+            return f"Quick wrap-up: what was the actual outcome today after {last_outcome.replace('_', ' ')}?"
         return "Quick wrap-up: what got done today, even if it was the minimum?"
+    if send_style == "gentle":
+        return f"Low-pressure check-in: any update on {target}?"
+    if send_style == "direct":
+        return f"Quick update: did {target.replace(' status', '')} happen?"
+    if send_style == "reset":
+        return f"Reset check: where does {target} stand now?"
     return f"Quick check-in: any update on {target}?"
 
 

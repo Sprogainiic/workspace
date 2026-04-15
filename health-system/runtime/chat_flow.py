@@ -6,6 +6,7 @@ from .context_loader import load_context
 from .event_store import store_events
 from .snapshot_updater import update_snapshot
 from .daily_summary import generate_daily_summary
+from .weekly_summary import generate_weekly_summary
 from .validator import validate_memory_adapter_output
 from .token_logger import log_token_usage
 from .nudge_selector import select_nudge
@@ -45,11 +46,11 @@ def memory_adapter(message: str, message_id: str, timestamp: str) -> Dict[str, A
             extractions["foods"] = ["tuna salad", "bread"] if "bread" in m else ["tuna salad"]
             extractions["protein_present"] = True
             conf["foods"] = "medium"
-            proposals.append({"field": "meal_logged", "value": True, "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_meal", "event_type": "meal_logged", "timestamp": timestamp, "source_message_id": message_id})
+            proposals.append({"field": "meal_logged", "value": True, "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_meal", "event_type": "meal_logged", "timestamp": timestamp, "source_message_id": message_id, "outcome_label": "meal_logged", "outcome_score": 1.0})
         elif "pasta" in m:
             extractions["foods"] = ["pasta"]
             conf["foods"] = "medium"
-            proposals.append({"field": "meal_logged", "value": True, "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_meal", "event_type": "meal_logged", "timestamp": timestamp, "source_message_id": message_id})
+            proposals.append({"field": "meal_logged", "value": True, "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_meal", "event_type": "meal_logged", "timestamp": timestamp, "source_message_id": message_id, "outcome_label": "meal_logged", "outcome_score": 1.0})
         elif "bad" in m:
             extractions["meal_quality_self_report"] = "poor"
             conf["meal_quality_self_report"] = "low"
@@ -69,7 +70,13 @@ def memory_adapter(message: str, message_id: str, timestamp: str) -> Dict[str, A
         intents.append("log_workout")
         extractions["workout_completed"] = False
         conf["workout_completed"] = "medium"
-        proposals.append({"field": "workout_completed", "value": False, "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_workout", "event_type": "workout_skipped", "timestamp": timestamp, "source_message_id": message_id})
+        proposals.append({"field": "workout_completed", "value": False, "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_workout", "event_type": "workout_skipped", "timestamp": timestamp, "source_message_id": message_id, "outcome_label": "workout_skipped", "outcome_score": 0.0})
+
+    if any(x in m for x in ["did the workout", "workout done", "trained", "session done", "got it done", "finished the workout"]):
+        intents.append("log_workout")
+        extractions["workout_completed"] = True
+        conf["workout_completed"] = "medium"
+        proposals.append({"field": "workout_completed", "value": True, "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_workout_done", "event_type": "workout_completed", "timestamp": timestamp, "source_message_id": message_id, "outcome_label": "workout_completed", "outcome_score": 1.0})
 
     if any(x in m for x in ["maybe i'll train later", "should i still train", "minimum"]):
         intents.append("decision_request")
@@ -100,7 +107,7 @@ def memory_adapter(message: str, message_id: str, timestamp: str) -> Dict[str, A
         extractions["recovery_intent"] = True
         extractions["behavior_state"] = "restart_cycle"
         conf["behavior_state"] = "medium"
-        proposals.append({"field": "behavior_state", "value": "restart_cycle", "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_restart", "event_type": "restart_signal", "timestamp": timestamp, "source_message_id": message_id})
+        proposals.append({"field": "behavior_state", "value": "restart_cycle", "confidence": "medium", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_restart", "event_type": "restart_signal", "timestamp": timestamp, "source_message_id": message_id, "outcome_label": "restart_intent", "outcome_score": 0.4})
 
     if "can\'t be bothered to cook" in m or "can't be bothered to cook" in m:
         intents.append("decision_request")
@@ -419,6 +426,7 @@ def run_chat_turn(message: str, message_id: str, timestamp: str) -> Dict[str, An
     snapshot = update_snapshot(event_result["appended"])
     context = load_context(decision_complexity="medium" if "what should i eat" in message.lower() else "low", unresolved=False, still_unresolved=False)
     daily = generate_daily_summary(event_result["appended"], snapshot)
+    weekly = generate_weekly_summary(__import__("datetime").datetime.fromisoformat(timestamp.replace("Z", "+00:00")))
     log_token_usage("health_director", 180, 90, context["layers_used"])
     return {
         "validation": validation,
@@ -426,5 +434,6 @@ def run_chat_turn(message: str, message_id: str, timestamp: str) -> Dict[str, An
         "snapshot": snapshot,
         "context": context,
         "daily_summary": daily,
+        "weekly_summary": weekly,
         "routing": adapter["ROUTING_HINTS"],
     }

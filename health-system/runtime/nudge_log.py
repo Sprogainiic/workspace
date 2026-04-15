@@ -13,14 +13,16 @@ def log_nudge_decision(entry: Dict[str, Any]) -> Dict[str, Any]:
     row = {
         "timestamp": entry.get("timestamp", ""),
         "slot": entry.get("slot", ""),
+        "evaluated": bool(entry.get("evaluated", True)),
         "send": bool(entry.get("send", False)),
         "skip_reason": entry.get("skip_reason"),
-        "nudge_type": entry.get("nudge_type", ""),
-        "domain": entry.get("domain", ""),
+        "nudge_type": entry.get("nudge_type"),
+        "domain": entry.get("domain"),
         "tokens_in": int(entry.get("tokens_in", 0) or 0),
         "tokens_out": int(entry.get("tokens_out", 0) or 0),
         "message_intent": entry.get("message_intent"),
         "fingerprint": entry.get("fingerprint"),
+        "message_fingerprint": entry.get("message_fingerprint"),
     }
     with LOG.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")

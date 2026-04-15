@@ -19,6 +19,8 @@ def log_bridge_event(entry: Dict[str, Any]) -> Dict[str, Any]:
         "origin": entry.get("origin", "system"),
         "bridge_status": entry.get("bridge_status", "failed"),
         "bridge_reason": entry.get("bridge_reason", ""),
+        "runner_mode": entry.get("runner_mode"),
+        "poll_iteration": entry.get("poll_iteration", 0),
     }
     with BRIDGE_LOG.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")

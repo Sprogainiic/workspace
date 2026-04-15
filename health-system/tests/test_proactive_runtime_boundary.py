@@ -33,6 +33,7 @@ class ProactiveRuntimeBoundaryTests(unittest.TestCase):
             current_snapshot=self.snapshot,
             todays_events=[],
             daily_summary={},
+            weekly_summary={},
             recent_user_activity=[],
             current_slot="lunch_check",
             now=ts("2026-04-15T12:30:00+03:00"),

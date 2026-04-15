@@ -31,6 +31,8 @@ def _render_message(slot: str, nudge_type: str, domain: str, brief: Dict[str, An
     send_style = brief.get("send_style", "short")
     state_flags = brief.get("state_flags", {})
     last_outcome = state_flags.get("last_outcome_label")
+    weekly_reflection = brief.get("weekly_reflection", {})
+    reflection_summary = weekly_reflection.get("summary")
 
     if domain == "nutrition":
         if send_style == "gentle":
@@ -49,6 +51,8 @@ def _render_message(slot: str, nudge_type: str, domain: str, brief: Dict[str, An
             return "Gentle wrap-up: what actually got done today, even if it was small?"
         if send_style == "direct":
             return "Quick wrap-up: what got done today?"
+        if send_style == "reset" and reflection_summary:
+            return "Reset wrap-up: what was today's actual outcome, so we can break the restart loop cleanly?"
         if last_outcome:
             return f"Quick wrap-up: what was the actual outcome today after {last_outcome.replace('_', ' ')}?"
         return "Quick wrap-up: what got done today, even if it was the minimum?"
@@ -57,6 +61,8 @@ def _render_message(slot: str, nudge_type: str, domain: str, brief: Dict[str, An
     if send_style == "direct":
         return f"Quick update: did {target.replace(' status', '')} happen?"
     if send_style == "reset":
+        if reflection_summary:
+            return f"Reset check: where does {target} stand now, and is this another restart-loop day or a clean reset?"
         return f"Reset check: where does {target} stand now?"
     return f"Quick check-in: any update on {target}?"
 

@@ -157,6 +157,7 @@ def evaluate_nudge_slot(
     current_snapshot: Dict[str, Any],
     todays_events: List[Dict[str, Any]],
     daily_summary: Optional[Dict[str, Any]],
+    weekly_summary: Optional[Dict[str, Any]],
     recent_user_activity: List[Dict[str, Any]],
     current_slot: str,
     now,
@@ -174,7 +175,7 @@ def evaluate_nudge_slot(
     activity_count = len(recent_user_activity or [])
     transport_name = outbound_channel
     effective_session_key = session_key or (OPENCLAW_HEALTH_SESSION_KEY if outbound_channel == "openclaw_session" else None)
-    if (not allow_test_fixture) and (current_snapshot is None or todays_events is None or daily_summary is None or sent_nudges_today is None):
+    if (not allow_test_fixture) and (current_snapshot is None or todays_events is None or daily_summary is None or weekly_summary is None or sent_nudges_today is None):
         log_entry = log_nudge_decision({
             "timestamp": now.isoformat(),
             "slot": current_slot,
@@ -213,6 +214,7 @@ def evaluate_nudge_slot(
         current_snapshot=current_snapshot,
         todays_events=todays_events,
         daily_summary=daily_summary,
+        weekly_summary=weekly_summary,
         sent_nudges_today=sent_nudges_today,
         recent_user_activity=recent_user_activity,
         current_slot=current_slot,
@@ -267,6 +269,7 @@ def evaluate_nudge_slot(
             "recent_user_activity_count": activity_count,
             "activity_source": activity_source,
         },
+        "weekly_context": weekly_summary or {},
         "transport_target": {
             "channel": outbound_channel,
             "recipient_id": recipient_id,

@@ -23,6 +23,26 @@ def ts(value: str) -> datetime:
 
 
 class NudgeRuntimeTests(unittest.TestCase):
+    def test_weekly_reflection_can_shift_send_style_to_reset(self):
+        snapshot = {
+            "state": {
+                "fatigue": {"value": "medium"},
+                "motivation": {"value": "low"},
+                "behavior_state": {"value": "fragile"},
+                "recent_misses": 1,
+            },
+            "simplification_level": "normal",
+        }
+        weekly = {
+            "interpretation": {"summary": "Most common behavior pattern this week: restart_cycle."},
+            "next_week_implications": ["Bias toward simpler restarts and lower-friction recovery after misses."],
+            "risk_flags": [],
+        }
+        result = select_nudge(snapshot, [], None, weekly, [], [], "afternoon_check", ts("2026-04-15T15:40:00+03:00"))
+        self.assertTrue(result["send"])
+        self.assertEqual(result["payload_brief"]["send_style"], "reset")
+        self.assertEqual(result["payload_brief"]["weekly_reflection"]["summary"], weekly["interpretation"]["summary"])
+
     def test_cron_specs_cover_all_slots(self):
         specs = cron_specs()
         self.assertEqual(len(specs), len(NUDGE_SLOTS))
@@ -46,7 +66,7 @@ class NudgeRuntimeTests(unittest.TestCase):
             ("evening_wrap_up", ts("2026-04-15T20:05:00+03:00")),
         ]
         for slot, now in cases:
-            result = select_nudge(snapshot, events, daily_summary, sent, recent, slot, now)
+            result = select_nudge(snapshot, events, daily_summary, None, sent, recent, slot, now)
             planned.append(result)
             if result["send"]:
                 sent.append({
@@ -67,14 +87,14 @@ class NudgeRuntimeTests(unittest.TestCase):
             {"timestamp": "2026-04-15T08:10:00+03:00", "event_type": "fatigue_report", "facts": {"fatigue": "medium"}},
             {"timestamp": "2026-04-15T12:00:00+03:00", "event_type": "meal_logged", "facts": {"logged": True, "meal": "lunch"}},
         ]
-        morning = select_nudge(BASE_SNAPSHOT, events, None, [], [], "morning_plan_check", ts("2026-04-15T08:20:00+03:00"))
-        lunch = select_nudge(BASE_SNAPSHOT, events, None, [], [], "lunch_check", ts("2026-04-15T12:20:00+03:00"))
+        morning = select_nudge(BASE_SNAPSHOT, events, None, None, [], [], "morning_plan_check", ts("2026-04-15T08:20:00+03:00"))
+        lunch = select_nudge(BASE_SNAPSHOT, events, None, None, [], [], "lunch_check", ts("2026-04-15T12:20:00+03:00"))
         self.assertEqual(morning, {"send": False, "skip_reason": "already_reported"})
         self.assertEqual(lunch, {"send": False, "skip_reason": "already_reported"})
 
     def test_frequent_user_messages_suppress_proactive_nudges(self):
         recent = [{"timestamp": "2026-04-15T12:00:00+03:00", "text": "just checking in again"}]
-        result = select_nudge(BASE_SNAPSHOT, [], None, [], recent, "lunch_check", ts("2026-04-15T12:20:00+03:00"))
+        result = select_nudge(BASE_SNAPSHOT, [], None, None, [], recent, "lunch_check", ts("2026-04-15T12:20:00+03:00"))
         self.assertEqual(result, {"send": False, "skip_reason": "recent_user_activity"})
 
     def test_low_motivation_afternoon_allows_coaching(self):
@@ -87,7 +107,7 @@ class NudgeRuntimeTests(unittest.TestCase):
             },
             "simplification_level": "normal",
         }
-        result = select_nudge(snapshot, [], None, [], [], "afternoon_check", ts("2026-04-15T15:40:00+03:00"))
+        result = select_nudge(snapshot, [], None, None, [], [], "afternoon_check", ts("2026-04-15T15:40:00+03:00"))
         self.assertTrue(result["send"])
         self.assertEqual(result["nudge_type"], "coaching")
         self.assertEqual(result["domain"], "training")
@@ -96,7 +116,7 @@ class NudgeRuntimeTests(unittest.TestCase):
         events = [
             {"timestamp": "2026-04-15T19:50:00+03:00", "event_type": "day_summary", "facts": {"summary": "done"}},
         ]
-        result = select_nudge(BASE_SNAPSHOT, events, None, [], [], "evening_wrap_up", ts("2026-04-15T20:05:00+03:00"))
+        result = select_nudge(BASE_SNAPSHOT, events, None, None, [], [], "evening_wrap_up", ts("2026-04-15T20:05:00+03:00"))
         self.assertEqual(result, {"send": False, "skip_reason": "already_reported"})
 
 

@@ -12,9 +12,11 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "runtime" / "data"
 CHAT = DATA / "raw_chat" / "recent.json"
 TURN_LOG = DATA / "turn_logs" / "reactive_turns.jsonl"
+INBOUND = DATA / "inbound" / "discord_messages.jsonl"
 SNAPSHOT = DATA / "snapshots" / "current_state_snapshot.json"
 EVENTS = DATA / "events" / "events.jsonl"
 SUMMARY = DATA / "daily_summaries" / "latest.json"
+WEEKLY = DATA / "weekly_summaries" / "latest.json"
 LOG_PATH = DATA / "nudge_logs" / "nudge_log.jsonl"
 
 
@@ -27,8 +29,10 @@ class NudgeStateLoaderTests(unittest.TestCase):
         SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
         EVENTS.parent.mkdir(parents=True, exist_ok=True)
         SUMMARY.parent.mkdir(parents=True, exist_ok=True)
+        WEEKLY.parent.mkdir(parents=True, exist_ok=True)
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        for path in [SNAPSHOT, EVENTS, SUMMARY, LOG_PATH, CHAT, TURN_LOG]:
+        INBOUND.parent.mkdir(parents=True, exist_ok=True)
+        for path in [SNAPSHOT, EVENTS, SUMMARY, WEEKLY, LOG_PATH, CHAT, TURN_LOG, INBOUND]:
             if path.exists():
                 path.unlink()
 
@@ -42,6 +46,7 @@ class NudgeStateLoaderTests(unittest.TestCase):
             encoding="utf-8",
         )
         SUMMARY.write_text(json.dumps({"date": "2026-04-15", "facts": {"events_count": 1}}), encoding="utf-8")
+        WEEKLY.write_text(json.dumps({"week_end": "2026-04-15", "interpretation": {"summary": "Observed completion was mixed."}}), encoding="utf-8")
         log_nudge_decision({
             "timestamp": "2026-04-15T12:30:00+03:00",
             "slot": "lunch_check",
@@ -57,16 +62,18 @@ class NudgeStateLoaderTests(unittest.TestCase):
             "message_fingerprint": "fp1",
         })
 
-        CHAT.parent.mkdir(parents=True, exist_ok=True)
-        CHAT.write_text(json.dumps([
-            {"timestamp": "2026-04-15T14:40:00+03:00", "signal_type": "checkin_reply"}
-        ]), encoding="utf-8")
+        INBOUND.parent.mkdir(parents=True, exist_ok=True)
+        INBOUND.write_text(
+            json.dumps({"timestamp": "2026-04-15T14:40:00+03:00", "message_text": "done for today", "discord_message_id": "m1"}) + "\n",
+            encoding="utf-8",
+        )
 
         state = load_runtime_state(ts("2026-04-15T15:00:00+03:00"))
         self.assertEqual(state["state_source"], "persisted")
         self.assertEqual(state["snapshot"]["state"]["fatigue"]["value"], "low")
         self.assertEqual(len(state["today_events"]), 1)
         self.assertEqual(state["daily_summary"]["date"], "2026-04-15")
+        self.assertEqual(state["weekly_summary"]["week_end"], "2026-04-15")
         self.assertEqual(len(state["sent_nudges_today"]), 1)
         self.assertEqual(state["activity_source"], "persisted")
         self.assertEqual(len(state["recent_user_activity"]), 1)
@@ -80,6 +87,7 @@ class NudgeStateLoaderTests(unittest.TestCase):
             "snapshot": {"state": {"fatigue": {"value": "medium"}}},
             "today_events": [{"timestamp": "2026-04-15T09:00:00+03:00", "event_type": "fatigue_report"}],
             "daily_summary": {"date": "2026-04-15"},
+            "weekly_summary": {"week_end": "2026-04-15"},
             "sent_nudges_today": [{"slot": "lunch_check"}],
             "recent_user_activity": [{"timestamp": "2026-04-15T14:40:00+03:00", "source": "chat", "signal_type": "checkin_reply"}],
             "activity_source": "persisted",

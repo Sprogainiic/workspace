@@ -103,6 +103,7 @@ def select_nudge(
     current_snapshot: Dict[str, Any],
     todays_events: List[Dict[str, Any]],
     daily_summary: Optional[Dict[str, Any]],
+    weekly_summary: Optional[Dict[str, Any]],
     sent_nudges_today: List[Dict[str, Any]],
     recent_user_activity: List[Dict[str, Any]],
     current_slot: str,
@@ -131,6 +132,7 @@ def select_nudge(
         return {"send": False, "skip_reason": guard_skip}
 
     state_flags = _state_flags(current_snapshot)
+    weekly_reflection = weekly_summary or {}
     send_style = "short"
     if state_flags.get("suggested_style") == "gentle_low_pressure":
         send_style = "gentle"
@@ -139,6 +141,15 @@ def select_nudge(
     elif state_flags.get("suggested_style") == "reset_oriented":
         send_style = "reset"
 
+    reflection_summary = ((weekly_reflection.get("interpretation", {}) or {}).get("summary")) if isinstance(weekly_reflection, dict) else None
+    next_week_implications = weekly_reflection.get("next_week_implications", []) if isinstance(weekly_reflection, dict) else []
+
+    if domain in {"training", "behavior", "wrap_up"} and reflection_summary and "low confidence" not in reflection_summary.lower():
+        if "restart" in reflection_summary.lower() or any("restart" in str(x).lower() for x in next_week_implications):
+            send_style = "reset"
+        elif any("smaller" in str(x).lower() or "shorter" in str(x).lower() for x in next_week_implications):
+            send_style = "gentle"
+
     payload_brief = {
         "slot": current_slot,
         "nudge_type": nudge_type,
@@ -146,6 +157,11 @@ def select_nudge(
         "missing_signals": defaults["missing_signals"],
         "state_flags": state_flags,
         "send_style": send_style,
+        "weekly_reflection": {
+            "summary": reflection_summary,
+            "next_week_implications": next_week_implications[:3],
+            "risk_flags": weekly_reflection.get("risk_flags", []) if isinstance(weekly_reflection, dict) else [],
+        },
     }
     ok, fingerprint = content_guard_decision(current_slot, domain, nudge_type, payload_brief, sent_nudges_today)
     if not ok:

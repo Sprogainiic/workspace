@@ -13,6 +13,7 @@ DATA = ROOT / "runtime" / "data"
 SNAPSHOT_PATH = DATA / "snapshots" / "current_state_snapshot.json"
 EVENTS_PATH = DATA / "events" / "events.jsonl"
 DAILY_SUMMARY_PATH = DATA / "daily_summaries" / "latest.json"
+WEEKLY_SUMMARY_PATH = DATA / "weekly_summaries" / "latest.json"
 
 
 class MissingRuntimeStateError(RuntimeError):
@@ -43,6 +44,7 @@ def load_runtime_state(now: datetime, *, allow_test_fixture: bool = False, fixtu
             "snapshot": fixture.get("snapshot", {}),
             "today_events": fixture.get("today_events", []),
             "daily_summary": fixture.get("daily_summary", {}),
+            "weekly_summary": fixture.get("weekly_summary", {}),
             "sent_nudges_today": fixture.get("sent_nudges_today", []),
             "recent_user_activity": fixture.get("recent_user_activity", []),
             "activity_source": fixture.get("activity_source", "missing"),
@@ -72,12 +74,14 @@ def load_runtime_state(now: datetime, *, allow_test_fixture: bool = False, fixtu
             today_events.append(row)
 
     daily_summary = _read_json(DAILY_SUMMARY_PATH) if DAILY_SUMMARY_PATH.exists() else {}
+    weekly_summary = _read_json(WEEKLY_SUMMARY_PATH) if WEEKLY_SUMMARY_PATH.exists() else {}
     sent_nudges_today = load_sent_nudges_today(now).get("sent_nudges_today", [])
     activity = load_recent_user_activity(now)
     return {
         "snapshot": snapshot,
         "today_events": today_events,
         "daily_summary": daily_summary,
+        "weekly_summary": weekly_summary,
         "sent_nudges_today": sent_nudges_today,
         "recent_user_activity": activity["recent_user_activity"],
         "activity_source": activity["activity_source"],

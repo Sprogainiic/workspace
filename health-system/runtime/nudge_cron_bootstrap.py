@@ -87,6 +87,7 @@ def execute_slot(
         current_snapshot=state.get("snapshot"),
         todays_events=state.get("today_events"),
         daily_summary=state.get("daily_summary"),
+        weekly_summary=state.get("weekly_summary"),
         recent_user_activity=state.get("recent_user_activity", []),
         current_slot=slot,
         now=now,

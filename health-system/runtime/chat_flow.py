@@ -8,6 +8,7 @@ from .snapshot_updater import update_snapshot
 from .daily_summary import generate_daily_summary
 from .weekly_summary import generate_weekly_summary
 from .validator import validate_memory_adapter_output
+from .specialist_intake import build_combined_intro_questionnaire, render_combined_intro_questionnaire, parse_intake_answers, build_followup_questions
 from .token_logger import log_token_usage
 from .nudge_selector import select_nudge
 from .nudge_log import log_nudge_decision
@@ -20,6 +21,8 @@ from .nudge_delivery_verify import verify_message_in_session_history
 
 def _route(message: str) -> Dict[str, Any]:
     m = message.lower()
+    if "introduce myself to all specialists" in m or "specialist intake" in m or "intake mode" in m:
+        return {"mode": "specialist_intake", "decision_complexity": "medium", "unresolved": False, "still_unresolved": False}
     if "lol" in m and len(m.split()) <= 2:
         return {"mode": "log_only", "decision_complexity": "low", "unresolved": False, "still_unresolved": False}
     if any(x in m for x in ["what should i eat", "what should i eat tonight", "can't be bothered to cook"]):
@@ -499,6 +502,35 @@ def evaluate_nudge_slot(
 
 
 def run_chat_turn(message: str, message_id: str, timestamp: str) -> Dict[str, Any]:
+    route = _route(message)
+    if route["mode"] == "specialist_intake":
+        questionnaire = build_combined_intro_questionnaire()
+        return {
+            "response_mode": "specialist_intake",
+            "questionnaire": questionnaire,
+            "message_text": render_combined_intro_questionnaire(),
+            "routing": ["Health Director"],
+        }
+
+    if any(x in message.lower() for x in ["dietitian", "fitness coach", "consistency coach", "progress analyst", "personal chef"]) or "good week" in message.lower() or "what kind of prompting helps" in message.lower():
+        intake = parse_intake_answers(message, message_id, timestamp)
+        followup = build_followup_questions(intake)
+        validation = {"status": "PASS", "violations": [], "safe_to_ingest": True, "suggested_action": "accept", "notes": []}
+        event_result = store_events(intake)
+        snapshot = update_snapshot(event_result["appended"])
+        daily = generate_daily_summary(event_result["appended"], snapshot)
+        weekly = generate_weekly_summary(__import__("datetime").datetime.fromisoformat(timestamp.replace("Z", "+00:00")))
+        return {
+            "response_mode": "specialist_intake_answers",
+            "validation": validation,
+            "events": event_result,
+            "snapshot": snapshot,
+            "daily_summary": daily,
+            "weekly_summary": weekly,
+            "routing": intake["ROUTING_HINTS"],
+            "followup": followup,
+        }
+
     adapter = memory_adapter(message, message_id, timestamp)
     validation = validate_memory_adapter_output(adapter)
 

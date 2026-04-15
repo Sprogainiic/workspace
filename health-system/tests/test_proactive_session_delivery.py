@@ -50,10 +50,12 @@ class ProactiveSessionDeliveryTests(unittest.TestCase):
             allow_test_fixture=True,
             activity_source="persisted",
             session_sender=fake_sender,
+            sessions_history_tool=lambda **kwargs: {"messages": [{"role": "assistant", "content": [{"type": "text", "text": "Quick nutrition check: any update on lunch status?"}]}]},
             session_key=OPENCLAW_HEALTH_SESSION_KEY,
         )
         self.assertTrue(result["transport_result"]["sent"])
         self.assertEqual(result["transport_result"]["delivery_status"], "sent")
+        self.assertTrue(result["delivery_verification"]["verified"])
         rows = read_nudge_log()
         self.assertEqual(rows[0]["transport"], "openclaw_session")
         self.assertEqual(rows[0]["session_key"], OPENCLAW_HEALTH_SESSION_KEY)

@@ -34,10 +34,19 @@ class NudgeBootstrapLiveModeTests(unittest.TestCase):
             return {"ok": True}
 
         result = execute_slot(
-            "lunch_check",
+            "evening_wrap_up",
             "openclaw_session",
             "ignored",
             exec_mode="live_session",
+            fixture={
+                "snapshot": {"state": {"fatigue": {"value": None}, "motivation": {"value": None}, "behavior_state": {"value": None}, "recent_misses": 0}, "simplification_level": "normal"},
+                "today_events": [],
+                "daily_summary": {"date": "2026-04-15", "facts": {"events_count": 1}},
+                "weekly_summary": {"week_end": "2026-04-15", "interpretation": {"summary": "Observed completion was mixed."}},
+                "sent_nudges_today": [],
+                "recent_user_activity": [],
+                "activity_source": "persisted",
+            },
             session_sender=fake_sender,
         )
         self.assertTrue(result["selection"]["send"])

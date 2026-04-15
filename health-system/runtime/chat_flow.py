@@ -15,6 +15,7 @@ from .advisor_runtime import run_proactive_turn
 from .outbound_transport import send_message
 from .config import OPENCLAW_HEALTH_SESSION_KEY
 from .nudge_delivery_audit import log_delivery_audit
+from .nudge_delivery_verify import verify_message_in_session_history
 
 
 def _route(message: str) -> Dict[str, Any]:
@@ -170,6 +171,7 @@ def evaluate_nudge_slot(
     allow_test_fixture: bool = False,
     activity_source: str = "missing",
     session_sender=None,
+    sessions_history_tool=None,
     session_key: Optional[str] = None,
     launcher_mode: str = "local_test",
 ) -> Dict[str, Any]:
@@ -459,6 +461,14 @@ def evaluate_nudge_slot(
         "delivery_error": transport_result.get("delivery_error"),
         "launcher_mode": transport_result.get("launcher_mode", launcher_mode),
     })
+    verification = None
+    if transport_name == "openclaw_session" and effective_session_key and runtime_result["approved"] and transport_result.get("sent"):
+        verification = verify_message_in_session_history(
+            effective_session_key,
+            runtime_result.get("message_text", ""),
+            sessions_history_tool=sessions_history_tool,
+        )
+
     audit_row = log_delivery_audit({
         "timestamp": now.isoformat(),
         "slot": selection["slot"],
@@ -466,8 +476,8 @@ def evaluate_nudge_slot(
         "skip_reason": None if runtime_result["approved"] else "not_approved",
         "transport": transport_name,
         "session_key": effective_session_key,
-        "delivery_status": transport_result.get("delivery_status", "sent"),
-        "delivery_error": transport_result.get("delivery_error"),
+        "delivery_status": transport_result.get("delivery_status", "sent") if not verification else ("verified" if verification.get("verified") else transport_result.get("delivery_status", "sent")),
+        "delivery_error": transport_result.get("delivery_error") if not verification or verification.get("verified") else verification.get("error"),
         "message_text": runtime_result.get("message_text"),
         "message_intent": selection.get("message_intent"),
         "fingerprint": selection.get("fingerprint"),
@@ -483,6 +493,7 @@ def evaluate_nudge_slot(
         "transport_result": transport_result,
         "log": log_entry,
         "delivery_audit": audit_row,
+        "delivery_verification": verification,
         "state_source": state_source,
     }
 

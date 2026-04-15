@@ -79,7 +79,8 @@ class ProactiveSessionDeliveryTests(unittest.TestCase):
             session_sender=fake_sender,
             session_key=OPENCLAW_HEALTH_SESSION_KEY,
         )
-        self.assertEqual(result["error"], "delivery_failure")
+        self.assertFalse(result["transport_result"]["sent"])
+        self.assertEqual(result["transport_result"]["delivery_status"], "failed")
         rows = read_nudge_log()
         self.assertEqual(rows[0]["delivery_status"], "failed")
         self.assertEqual(rows[0]["transport"], "openclaw_session")

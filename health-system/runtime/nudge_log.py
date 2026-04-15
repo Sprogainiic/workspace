@@ -34,6 +34,7 @@ def log_nudge_decision(entry: Dict[str, Any]) -> Dict[str, Any]:
         "session_key": entry.get("session_key"),
         "delivery_status": entry.get("delivery_status"),
         "delivery_error": entry.get("delivery_error"),
+        "launcher_mode": entry.get("launcher_mode"),
     }
     with LOG.open("a", encoding="utf-8") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")

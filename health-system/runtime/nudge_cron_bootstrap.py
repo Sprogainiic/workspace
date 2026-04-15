@@ -28,7 +28,7 @@ def _cron_line(slot: str) -> str:
     from .nudge_schedule import get_slot_policy
     hh, mm = CRON_MAP[slot].split(":", 1)
     policy = get_slot_policy(slot)
-    return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --channel test --recipient local-test-recipient >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
+    return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode local_test --channel test --recipient local-test-recipient >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
 
 
 def bootstrap_schedule() -> List[Dict[str, str]]:
@@ -41,7 +41,7 @@ def bootstrap_schedule() -> List[Dict[str, str]]:
                 "slot": slot,
                 "local_time": CRON_MAP[slot],
                 "timezone": policy["local_timezone"],
-                "runner": f"/usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --channel test --recipient local-test-recipient",
+                "runner": f"/usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode local_test --channel test --recipient local-test-recipient",
                 "kind": "slot_evaluator",
             }
         )
@@ -57,21 +57,33 @@ def bootstrap_payload() -> Dict[str, object]:
     }
 
 
-def execute_slot(slot: str, channel: str, recipient: str, *, mode: str = "prod", fixture: Dict[str, Any] | None = None, session_sender=None) -> Dict[str, Any]:
+def execute_slot(
+    slot: str,
+    channel: str,
+    recipient: str,
+    *,
+    exec_mode: str = "local_test",
+    fixture: Dict[str, Any] | None = None,
+    session_sender=None,
+) -> Dict[str, Any]:
     from .nudge_schedule import NUDGE_SLOTS
     from .state_loader import MissingRuntimeStateError, load_runtime_state
     from .chat_flow import evaluate_nudge_slot
 
     if slot not in NUDGE_SLOTS:
         raise ValueError(f"Invalid slot: {slot}")
+    if exec_mode == "live_session" and channel != "openclaw_session":
+        raise ValueError("live_session mode requires channel=openclaw_session")
+    if exec_mode == "local_test" and channel not in {"test", "console"}:
+        raise ValueError("local_test mode requires channel=test|console")
 
     now = datetime.now().astimezone()
     try:
-        state = load_runtime_state(now, allow_test_fixture=(mode == "test"), fixture=fixture)
+        state = load_runtime_state(now, allow_test_fixture=(exec_mode == "local_test" and fixture is not None), fixture=fixture)
     except MissingRuntimeStateError:
         return {"error": "missing_runtime_state", "slot": slot}
 
-    result = evaluate_nudge_slot(
+    return evaluate_nudge_slot(
         current_snapshot=state.get("snapshot"),
         todays_events=state.get("today_events"),
         daily_summary=state.get("daily_summary"),
@@ -84,8 +96,9 @@ def execute_slot(slot: str, channel: str, recipient: str, *, mode: str = "prod",
         state_source=state.get("state_source", "persisted"),
         activity_source=state.get("activity_source", "missing"),
         session_sender=session_sender,
+        allow_test_fixture=(exec_mode == "local_test" and fixture is not None),
+        launcher_mode=exec_mode,
     )
-    return result
 
 
 def main(argv: List[str] | None = None) -> int:
@@ -93,7 +106,7 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument("--slot", help="slot to evaluate")
     parser.add_argument("--channel", default="test")
     parser.add_argument("--recipient", default="local-test-recipient")
-    parser.add_argument("--mode", choices=["prod", "test"], default="prod")
+    parser.add_argument("--exec-mode", choices=["local_test", "live_session"], default="local_test")
     args = parser.parse_args(argv)
 
     if not args.slot:
@@ -101,7 +114,7 @@ def main(argv: List[str] | None = None) -> int:
         return 0
 
     try:
-        result = execute_slot(args.slot, args.channel, args.recipient, mode=args.mode)
+        result = execute_slot(args.slot, args.channel, args.recipient, exec_mode=args.exec_mode)
     except Exception as exc:
         print(json.dumps({"error": str(exc), "slot": args.slot}))
         return 1
@@ -118,6 +131,8 @@ def main(argv: List[str] | None = None) -> int:
         "state_source": result.get("log", {}).get("state_source"),
         "activity_source": result.get("log", {}).get("activity_source"),
         "recent_user_activity_count": result.get("log", {}).get("recent_user_activity_count", 0),
+        "transport": result.get("log", {}).get("transport"),
+        "launcher_mode": result.get("log", {}).get("launcher_mode"),
     }))
     return 0
 

@@ -162,6 +162,7 @@ def evaluate_nudge_slot(
     activity_source: str = "missing",
     session_sender=None,
     session_key: Optional[str] = None,
+    launcher_mode: str = "local_test",
 ) -> Dict[str, Any]:
     activity_count = len(recent_user_activity or [])
     transport_name = outbound_channel
@@ -191,6 +192,7 @@ def evaluate_nudge_slot(
             "session_key": effective_session_key,
             "delivery_status": "failed",
             "delivery_error": "missing_runtime_state",
+            "launcher_mode": launcher_mode,
         })
         return {
             "evaluated": True,
@@ -236,6 +238,7 @@ def evaluate_nudge_slot(
             "session_key": effective_session_key,
             "delivery_status": "failed",
             "delivery_error": selection.get("skip_reason"),
+            "launcher_mode": launcher_mode,
         })
         return {
             "evaluated": True,
@@ -291,6 +294,7 @@ def evaluate_nudge_slot(
             "session_key": effective_session_key,
             "delivery_status": "failed",
             "delivery_error": str(exc),
+            "launcher_mode": launcher_mode,
         })
         return {
             "evaluated": True,
@@ -315,7 +319,8 @@ def evaluate_nudge_slot(
                 "domain": selection["domain"],
             },
             session_sender=session_sender,
-        ) if runtime_result["approved"] else {"sent": False, "delivery_status": "failed", "delivery_error": "not_approved"}
+            launcher_mode=launcher_mode,
+        ) if runtime_result["approved"] else {"sent": False, "delivery_status": "failed", "delivery_error": "not_approved", "launcher_mode": launcher_mode}
     except Exception as exc:
         log_entry = log_nudge_decision({
             "timestamp": now.isoformat(),
@@ -341,6 +346,7 @@ def evaluate_nudge_slot(
             "session_key": effective_session_key,
             "delivery_status": "failed",
             "delivery_error": str(exc),
+            "launcher_mode": launcher_mode,
         })
         return {
             "evaluated": True,
@@ -376,6 +382,7 @@ def evaluate_nudge_slot(
         "session_key": effective_session_key,
         "delivery_status": transport_result.get("delivery_status", "sent"),
         "delivery_error": transport_result.get("delivery_error"),
+        "launcher_mode": transport_result.get("launcher_mode", launcher_mode),
     })
     return {
         "evaluated": True,

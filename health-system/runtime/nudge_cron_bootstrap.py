@@ -7,27 +7,19 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
-CRON_MAP = {
-    "morning_plan_check": "08:05",
-    "late_morning_check": "10:30",
-    "lunch_check": "12:30",
-    "afternoon_check": "15:30",
-    "dinner_check": "18:30",
-    "evening_wrap_up": "20:30",
-}
-
 WORKDIR = Path(__file__).resolve().parents[1]
 RUNNER_COMMAND = f"cd {WORKDIR} && /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot"
 
 
 def local_cron_map() -> Dict[str, str]:
-    return dict(CRON_MAP)
+    from .nudge_schedule import NUDGE_SLOTS, get_slot_policy
+    return {slot: get_slot_policy(slot)["earliest_send_time"] for slot in NUDGE_SLOTS}
 
 
 def _cron_line(slot: str) -> str:
     from .nudge_schedule import get_slot_policy
-    hh, mm = CRON_MAP[slot].split(":", 1)
     policy = get_slot_policy(slot)
+    hh, mm = policy["earliest_send_time"].split(":", 1)
     return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient scheduled-health-session >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
 
 
@@ -39,7 +31,7 @@ def bootstrap_schedule() -> List[Dict[str, str]]:
         jobs.append(
             {
                 "slot": slot,
-                "local_time": CRON_MAP[slot],
+                "local_time": policy["earliest_send_time"],
                 "timezone": policy["local_timezone"],
                 "runner": f"/usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient scheduled-health-session",
                 "kind": "slot_evaluator",
@@ -107,7 +99,7 @@ def main(argv: List[str] | None = None) -> int:
     parser.add_argument("--slot", help="slot to evaluate")
     parser.add_argument("--channel", default="openclaw_session")
     parser.add_argument("--recipient", default="scheduled-health-session")
-    parser.add_argument("--exec-mode", choices=["local_test", "live_session"], default="live_session")
+    parser.add_argument("--exec-mode", choices=["local_test", "live_session"], default="local_test")
     args = parser.parse_args(argv)
 
     if not args.slot:

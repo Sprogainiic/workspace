@@ -32,11 +32,11 @@ class NudgeFlowIntegrationTests(unittest.TestCase):
     def test_cron_map_is_explicit(self):
         self.assertEqual(local_cron_map(), {
             "morning_plan_check": "08:05",
-            "late_morning_check": "10:30",
-            "lunch_check": "12:30",
+            "late_morning_check": "10:45",
+            "lunch_check": "12:15",
             "afternoon_check": "15:30",
-            "dinner_check": "18:30",
-            "evening_wrap_up": "20:30"
+            "dinner_check": "18:00",
+            "evening_wrap_up": "20:00"
         })
 
     def test_skip_path_logs_recent_activity_suppression(self):

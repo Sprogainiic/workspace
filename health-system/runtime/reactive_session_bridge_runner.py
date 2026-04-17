@@ -7,40 +7,36 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from .reactive_session_bridge import process_session_messages
-
-ROOT = Path(__file__).resolve().parents[1]
-CHECKPOINT = ROOT / "runtime" / "data" / "reactive_bridge_checkpoint.json"
-CHECKPOINT.parent.mkdir(parents=True, exist_ok=True)
-
-
-def _load_checkpoint() -> Dict[str, Any]:
-    if not CHECKPOINT.exists():
-        return {"session_key": "", "last_seen_message_ids": []}
-    return json.loads(CHECKPOINT.read_text(encoding="utf-8"))
-
-
-def _save_checkpoint(session_key: str, message_ids: List[str]) -> None:
-    CHECKPOINT.write_text(json.dumps({"session_key": session_key, "last_seen_message_ids": message_ids[-500:]}, indent=2, ensure_ascii=False), encoding="utf-8")
+from .reactive_session_bridge_state import load_bridge_checkpoint, save_bridge_checkpoint
 
 
 def _extract_message_id(message: Dict[str, Any]) -> str:
     return message.get("__openclaw", {}).get("id", "")
 
 
-def _eligible_messages(session_key: str, messages: List[Dict[str, Any]], seen_ids: set[str]) -> List[Dict[str, Any]]:
+def _eligible_messages(session_key: str, messages: List[Dict[str, Any]], checkpoint: Dict[str, Any]) -> List[Dict[str, Any]]:
     eligible: List[Dict[str, Any]] = []
+    recent_ids = set(checkpoint.get('recent_message_ids', [])) if checkpoint.get('session_key') == session_key else set()
+    last_ts = checkpoint.get('last_processed_timestamp', '') if checkpoint.get('session_key') == session_key else ''
+    last_id = checkpoint.get('last_processed_message_id', '') if checkpoint.get('session_key') == session_key else ''
     for message in messages:
         message_id = _extract_message_id(message)
-        role = message.get("role")
-        if role != "user":
+        role = message.get('role')
+        msg_ts = str(message.get('timestamp') or '')
+        if role != 'user':
             continue
-        if not message_id or message_id in seen_ids:
+        if not message_id or message_id in recent_ids:
             continue
+        if last_ts:
+            if msg_ts < last_ts:
+                continue
+            if msg_ts == last_ts and last_id and message_id <= last_id:
+                continue
         text_parts = []
-        for part in message.get("content", []):
-            if isinstance(part, dict) and part.get("type") == "text":
-                text_parts.append(part.get("text", ""))
-        message_text = "\n".join(part for part in text_parts if part).strip()
+        for part in message.get('content', []):
+            if isinstance(part, dict) and part.get('type') == 'text':
+                text_parts.append(part.get('text', ''))
+        message_text = '\n'.join(part for part in text_parts if part).strip()
         if not message_text:
             continue
         eligible.append(message)
@@ -48,14 +44,20 @@ def _eligible_messages(session_key: str, messages: List[Dict[str, Any]], seen_id
 
 
 def run_once(session_key: str, history_fetcher, poll_iteration: int = 0, reply_sender=None) -> Dict[str, Any]:
-    checkpoint = _load_checkpoint()
-    seen_ids = set(checkpoint.get("last_seen_message_ids", [])) if checkpoint.get("session_key") == session_key else set()
+    checkpoint = load_bridge_checkpoint()
     data = history_fetcher(sessionKey=session_key, limit=50, includeTools=False)
-    messages = data.get("messages", [])
-    eligible = _eligible_messages(session_key, messages, seen_ids)
+    messages = data.get('messages', [])
+    eligible = _eligible_messages(session_key, messages, checkpoint)
     results = process_session_messages(session_key, eligible, reply_sender=reply_sender)
-    new_ids = seen_ids | { _extract_message_id(message) for message in eligible }
-    _save_checkpoint(session_key, sorted(new_ids))
+    recent_ids = list(checkpoint.get('recent_message_ids', [])) if checkpoint.get('session_key') == session_key else []
+    processed_ids = [_extract_message_id(message) for message in eligible if _extract_message_id(message)]
+    latest_ts = checkpoint.get('last_processed_timestamp', '') if checkpoint.get('session_key') == session_key else ''
+    latest_id = checkpoint.get('last_processed_message_id', '') if checkpoint.get('session_key') == session_key else ''
+    if eligible:
+        last_msg = eligible[-1]
+        latest_ts = str(last_msg.get('timestamp') or latest_ts)
+        latest_id = _extract_message_id(last_msg) or latest_id
+    save_bridge_checkpoint(session_key, latest_ts, latest_id, recent_ids + processed_ids)
     for row in results:
         row["runner_mode"] = "once"
         row["poll_iteration"] = poll_iteration

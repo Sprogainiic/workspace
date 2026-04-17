@@ -46,11 +46,21 @@ def load_context(decision_complexity: str = "low", unresolved: bool = False, sti
     if decision_complexity == "medium":
         context_payload["daily_summary"] = _latest(DATA / "daily_summaries" / "latest.json")
         layers_used.append("daily_summary")
+        events = _read_jsonl(DATA / "events" / "events.jsonl")
+        strava_recent = [e for e in events if e.get('facts', {}).get('source') == 'strava'][-3:]
+        if strava_recent:
+            context_payload["recent_strava"] = strava_recent
+            layers_used.append("recent_strava")
     elif decision_complexity == "high":
         context_payload["weekly_summary"] = _latest(DATA / "weekly_summaries" / "latest.json")
         layers_used.append("weekly_summary")
         context_payload["daily_summary"] = _latest(DATA / "daily_summaries" / "latest.json")
         layers_used.append("daily_summary")
+        events = _read_jsonl(DATA / "events" / "events.jsonl")
+        strava_recent = [e for e in events if e.get('facts', {}).get('source') == 'strava'][-5:]
+        if strava_recent:
+            context_payload["recent_strava"] = strava_recent
+            layers_used.append("recent_strava")
 
     if unresolved:
         events = _read_jsonl(DATA / "events" / "events.jsonl")

@@ -88,6 +88,7 @@ def update_snapshot(structured_events: List[Dict[str, Any]]) -> Dict[str, Any]:
                     'evidence_event_ids': [ev.get('event_id', '')],
                     'staleness': 'fresh',
                 }
+            snapshot['state']['last_training_event_at'] = ts
         for field in ("adherence", "fatigue", "motivation", "hunger", "training_load", "nutrition_consistency", "weight_trend", "behavior_state"):
             if field not in facts:
                 continue
@@ -134,6 +135,7 @@ def update_snapshot(structured_events: List[Dict[str, Any]]) -> Dict[str, Any]:
             tone["suggested_style"] = "direct_encouraging"
             tone["evidence"] = list(dict.fromkeys((tone.get("evidence") or []) + ["recent_completion"]))[-5:]
             tone["reflection_notes"] = list(dict.fromkeys((tone.get("reflection_notes") or []) + ["Completion evidence supports slightly more direct encouragement."]))[-5:]
+            snapshot['state']['last_training_event_at'] = ts
         elif ev.get("event_type") == "fatigue_report" and facts.get("fatigue") == "high":
             tone["suggested_style"] = "gentle_low_pressure"
             tone["evidence"] = list(dict.fromkeys((tone.get("evidence") or []) + ["high_fatigue"]))[-5:]

@@ -1,1 +1,88 @@
-{"state": {"fatigue": {"value": null}, "motivation": {"value": null}, "behavior_state": {"value": null}, "recent_misses": 0, "training_load": {"value": "medium", "confidence": "medium", "updated_at": "2026-04-17T09:00:00+03:00", "evidence_event_ids": ["strava_1_load"], "staleness": "fresh"}}, "simplification_level": "normal"}
+{
+  "snapshot_id": "snap_initial",
+  "updated_at": "2026-04-09T14:05:17Z",
+  "state": {
+    "adherence": {
+      "value": null,
+      "confidence": "unsupported",
+      "updated_at": "",
+      "evidence_event_ids": [],
+      "staleness": "stale"
+    },
+    "fatigue": {
+      "value": null,
+      "confidence": "unsupported",
+      "updated_at": "",
+      "evidence_event_ids": [],
+      "staleness": "stale"
+    },
+    "motivation": {
+      "value": null,
+      "confidence": "unsupported",
+      "updated_at": "",
+      "evidence_event_ids": [],
+      "staleness": "stale"
+    },
+    "hunger": {
+      "value": null,
+      "confidence": "unsupported",
+      "updated_at": "",
+      "evidence_event_ids": [],
+      "staleness": "stale"
+    },
+    "training_load": {
+      "value": "high",
+      "confidence": "medium",
+      "updated_at": "2026-04-16T14:01:37Z",
+      "evidence_event_ids": [
+        "strava_18133792664_load"
+      ],
+      "staleness": "fresh"
+    },
+    "nutrition_consistency": {
+      "value": null,
+      "confidence": "unsupported",
+      "updated_at": "",
+      "evidence_event_ids": [],
+      "staleness": "stale"
+    },
+    "weight_trend": {
+      "value": null,
+      "confidence": "unsupported",
+      "updated_at": "",
+      "evidence_event_ids": [],
+      "staleness": "stale"
+    },
+    "behavior_state": {
+      "value": null,
+      "confidence": "unsupported",
+      "updated_at": "",
+      "evidence_event_ids": [],
+      "staleness": "stale"
+    },
+    "recent_misses": 0,
+    "streak_days": 0,
+    "last_training_event_at": null,
+    "last_meal_log_at": null,
+    "last_weight_at": null
+  },
+  "risk_flags": [],
+  "simplification_level": "normal",
+  "active_modes": [],
+  "open_ambiguities": [],
+  "tone_adaptation": {
+    "suggested_style": "direct_encouraging",
+    "evidence": [
+      "recent_completion"
+    ],
+    "reflection_notes": [
+      "Completion evidence supports slightly more direct encouragement."
+    ]
+  },
+  "outcome_tracking": {
+    "last_outcome_at": null,
+    "last_outcome_label": null,
+    "completion_score_rolling": null,
+    "observed_outcomes": 0
+  }
+}

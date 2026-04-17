@@ -47,13 +47,13 @@ def _eligible_messages(session_key: str, messages: List[Dict[str, Any]], seen_id
     return eligible
 
 
-def run_once(session_key: str, history_fetcher, poll_iteration: int = 0) -> Dict[str, Any]:
+def run_once(session_key: str, history_fetcher, poll_iteration: int = 0, reply_sender=None) -> Dict[str, Any]:
     checkpoint = _load_checkpoint()
     seen_ids = set(checkpoint.get("last_seen_message_ids", [])) if checkpoint.get("session_key") == session_key else set()
     data = history_fetcher(sessionKey=session_key, limit=50, includeTools=False)
     messages = data.get("messages", [])
     eligible = _eligible_messages(session_key, messages, seen_ids)
-    results = process_session_messages(session_key, eligible)
+    results = process_session_messages(session_key, eligible, reply_sender=reply_sender)
     new_ids = seen_ids | { _extract_message_id(message) for message in eligible }
     _save_checkpoint(session_key, sorted(new_ids))
     for row in results:

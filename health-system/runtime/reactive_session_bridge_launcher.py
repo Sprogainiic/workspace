@@ -78,6 +78,8 @@ def launch_bridge(session_key: str, mode: str, history_fetcher=None, poll_second
 
     if runtime_mode == "prod" and history_fetcher is not None:
         return {"status": "failed", "processed": 0, "accepted": 0, "ignored": 0, "failed": 1, "failure_point": "session_history_unavailable"}
+    if runtime_mode == "prod" and sessions_history_tool is None:
+        return {"status": "failed", "processed": 0, "accepted": 0, "ignored": 0, "failed": 1, "failure_point": "session_history_unavailable"}
     if runtime_mode == "test" and history_fetcher is None:
         return {"status": "failed", "processed": 0, "accepted": 0, "ignored": 0, "failed": 1, "failure_point": "session_history_unavailable"}
 

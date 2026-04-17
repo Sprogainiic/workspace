@@ -552,7 +552,9 @@ def run_chat_turn(message: str, message_id: str, timestamp: str) -> Dict[str, An
 
     event_result = store_events(adapter)
     snapshot = update_snapshot(event_result["appended"])
-    context = load_context(decision_complexity="medium" if "what should i eat" in message.lower() else "low", unresolved=False, still_unresolved=False)
+    lowered = message.lower()
+    needs_medium_context = any(x in lowered for x in ["what should i eat", "strava", "ride", "activity", "training load"])
+    context = load_context(decision_complexity="medium" if needs_medium_context else "low", unresolved=False, still_unresolved=False)
     daily = generate_daily_summary(event_result["appended"], snapshot)
     weekly = generate_weekly_summary(__import__("datetime").datetime.fromisoformat(timestamp.replace("Z", "+00:00")))
     log_token_usage("health_director", 180, 90, context["layers_used"])

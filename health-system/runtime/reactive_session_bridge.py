@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from .reactive_session_ingest import ingest_reactive_session_event
+from .reactive_reply import build_reactive_reply
 
 ROOT = Path(__file__).resolve().parents[1]
 INGEST_DIR = ROOT / "runtime" / "data" / "ingest"
@@ -50,7 +51,7 @@ def read_bridge_log() -> List[Dict[str, Any]]:
     return [json.loads(line) for line in BRIDGE_LOG.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def process_session_messages(session_key: str, messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def process_session_messages(session_key: str, messages: List[Dict[str, Any]], reply_sender=None) -> List[Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
     for message in messages:
         role = message.get("role")
@@ -98,6 +99,9 @@ def process_session_messages(session_key: str, messages: List[Dict[str, Any]]) -
         })
         status = "accepted" if ingest.get("status") == "accepted" else ("ignored" if ingest.get("status") == "ignored" else "failed")
         reason = ingest.get("ingest_reason", "")
+        if status == "accepted" and reply_sender is not None:
+            reply = build_reactive_reply(message_text, message_id, str(timestamp))
+            reply_sender(sessionKey=session_key, message=reply["message_text"], timeoutSeconds=30)
         results.append(log_bridge_event({
             "timestamp": timestamp,
             "session_key": session_key,

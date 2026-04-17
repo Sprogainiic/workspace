@@ -22,6 +22,7 @@ class ReactiveSessionBridgeRunnerTests(unittest.TestCase):
                 path.unlink()
 
     def test_once_mode_processes_one_new_inbound_event(self):
+        sent = []
         def fetcher(**kwargs):
             return {"messages": [{
                 "role": "user",
@@ -30,9 +31,14 @@ class ReactiveSessionBridgeRunnerTests(unittest.TestCase):
                 "__openclaw": {"id": "m1"},
                 "senderLabel": "user1",
             }]}
-        result = run_once("agent:health:discord:channel:1491124367638401024", fetcher)
+        result = run_once(
+            "agent:health:discord:channel:1491124367638401024",
+            fetcher,
+            reply_sender=lambda **kwargs: sent.append(kwargs),
+        )
         self.assertEqual(result["processed"], 1)
         self.assertEqual(result["results"][0]["bridge_status"], "accepted")
+        self.assertEqual(len(sent), 1)
 
     def test_loop_mode_can_be_simulated(self):
         calls = [

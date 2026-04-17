@@ -28,6 +28,7 @@ class NudgeSessionLauncherTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "sent")
         self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0]["message"], "hello")
 
     def test_failure_path(self):
         def fake_sender(**kwargs):

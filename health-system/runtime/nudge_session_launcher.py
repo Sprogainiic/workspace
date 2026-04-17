@@ -14,7 +14,11 @@ def launch_to_session(input_payload: Dict[str, Any], session_sender) -> Dict[str
     if any(key not in payload for key in required):
         return {"status": "failed", "session_key": session_key, "delivery_error": "malformed_payload"}
     try:
-        session_sender(sessionKey=session_key, message=str(payload), timeoutSeconds=30)
+        session_sender(
+            sessionKey=session_key,
+            message=str(payload.get("message_text", "")),
+            timeoutSeconds=30,
+        )
     except Exception as exc:
         return {"status": "failed", "session_key": session_key, "delivery_error": str(exc)}
     return {"status": "sent", "session_key": session_key, "delivery_error": None}

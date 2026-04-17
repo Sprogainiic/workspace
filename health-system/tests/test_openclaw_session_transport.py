@@ -25,8 +25,9 @@ class OpenClawSessionTransportTests(unittest.TestCase):
         )
         self.assertTrue(result["sent"])
         self.assertEqual(result["delivery_status"], "sent")
+        self.assertEqual(result["payload_kind"], "proactive_nudge")
         self.assertEqual(calls[0]["sessionKey"], OPENCLAW_HEALTH_SESSION_KEY)
-        self.assertIn("proactive_nudge", calls[0]["message"])
+        self.assertEqual(calls[0]["message"], "hello")
 
     def test_unsupported_transport_fails_without_fallback(self):
         with self.assertRaises(Exception):

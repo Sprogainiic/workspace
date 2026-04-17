@@ -47,13 +47,14 @@ class NudgeBootstrapLiveModeTests(unittest.TestCase):
                 "recent_user_activity": [],
                 "activity_source": "persisted",
             },
-            session_sender=fake_sender,
+            sessions_send_tool=fake_sender,
         )
         self.assertTrue(result["selection"]["send"])
         self.assertEqual(result["log"]["transport"], "openclaw_session")
         self.assertEqual(result["log"]["session_key"], OPENCLAW_HEALTH_SESSION_KEY)
         self.assertEqual(result["log"]["delivery_status"], "sent")
         self.assertEqual(result["log"]["launcher_mode"], "live_session")
+        self.assertEqual(calls[0]["message"], "Quick wrap-up: what got done today, even if it was the minimum?")
         self.assertEqual(len(calls), 1)
 
 

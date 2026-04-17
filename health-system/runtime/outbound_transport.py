@@ -56,7 +56,7 @@ def send_message(
             "session_key": effective_session_key,
             "target_type": target_type,
             "message_text": message_text,
-            "payload": payload,
+            "payload_kind": payload.get("kind"),
             "sent": launch["status"] == "sent",
             "delivery_status": launch["status"],
             "delivery_error": launch["delivery_error"],

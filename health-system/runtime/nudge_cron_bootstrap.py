@@ -57,6 +57,7 @@ def execute_slot(
     exec_mode: str = "local_test",
     fixture: Dict[str, Any] | None = None,
     session_sender=None,
+    sessions_send_tool=None,
 ) -> Dict[str, Any]:
     from .nudge_schedule import NUDGE_SLOTS
     from .state_loader import MissingRuntimeStateError, load_runtime_state
@@ -75,6 +76,10 @@ def execute_slot(
     except MissingRuntimeStateError:
         return {"error": "missing_runtime_state", "slot": slot}
 
+    effective_session_sender = session_sender
+    if effective_session_sender is None and channel == "openclaw_session" and sessions_send_tool is not None:
+        effective_session_sender = sessions_send_tool
+
     return evaluate_nudge_slot(
         current_snapshot=state.get("snapshot"),
         todays_events=state.get("today_events"),
@@ -88,7 +93,7 @@ def execute_slot(
         sent_nudges_today=state.get("sent_nudges_today"),
         state_source=state.get("state_source", "persisted"),
         activity_source=state.get("activity_source", "missing"),
-        session_sender=session_sender,
+        session_sender=effective_session_sender,
         allow_test_fixture=(exec_mode == "local_test" and fixture is not None),
         launcher_mode=exec_mode,
     )

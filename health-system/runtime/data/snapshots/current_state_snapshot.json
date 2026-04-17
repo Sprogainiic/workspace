@@ -1,0 +1,1 @@
+{"state": {"fatigue": {"value": null}, "motivation": {"value": null}, "behavior_state": {"value": null}, "recent_misses": 0, "training_load": {"value": "medium", "confidence": "medium", "updated_at": "2026-04-17T09:00:00+03:00", "evidence_event_ids": ["strava_1_load"], "staleness": "fresh"}}, "simplification_level": "normal"}

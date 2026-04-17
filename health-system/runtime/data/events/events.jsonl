@@ -1,0 +1,1 @@
+{"event_id": "strava_1_load", "timestamp": "2026-04-17T09:00:00+03:00", "event_type": "training_load_signal", "source_message_id": "strava:1", "facts": {"load_level": "medium", "duration_sec": 3600, "average_heartrate": 130, "suffer_score": 60}, "confidence": "medium", "ambiguities": [], "write_scope": "canonical", "safe_to_write": true}

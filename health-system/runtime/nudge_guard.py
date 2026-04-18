@@ -35,8 +35,19 @@ def _parse_ts(value: str) -> datetime:
     return datetime.fromisoformat(value)
 
 
+def _counts_as_real_delivery(row: Dict[str, Any]) -> bool:
+    if not row.get("send"):
+        return False
+    status = row.get("delivery_status")
+    if status == "verified":
+        return True
+    if status == "sent" and not row.get("delivery_error"):
+        return True
+    return False
+
+
 def nudges_sent_today(sent_nudges_today: List[Dict[str, Any]]) -> int:
-    return sum(1 for row in sent_nudges_today if row.get("send"))
+    return sum(1 for row in sent_nudges_today if _counts_as_real_delivery(row))
 
 
 def check_daily_cap(sent_nudges_today: List[Dict[str, Any]], policy: Dict[str, Any]) -> Optional[str]:
@@ -46,7 +57,7 @@ def check_daily_cap(sent_nudges_today: List[Dict[str, Any]], policy: Dict[str, A
 
 
 def check_gap_rule(now: datetime, sent_nudges_today: List[Dict[str, Any]], policy: Dict[str, Any]) -> Optional[str]:
-    sent = [row for row in sent_nudges_today if row.get("send") and row.get("timestamp")]
+    sent = [row for row in sent_nudges_today if _counts_as_real_delivery(row) and row.get("timestamp")]
     if not sent:
         return None
     last = max(_parse_ts(row["timestamp"]) for row in sent)
@@ -58,7 +69,7 @@ def check_gap_rule(now: datetime, sent_nudges_today: List[Dict[str, Any]], polic
 def check_domain_cooldown(now: datetime, domain: str, sent_nudges_today: List[Dict[str, Any]], policy: Dict[str, Any]) -> Optional[str]:
     relevant = [
         row for row in sent_nudges_today
-        if row.get("send") and row.get("domain") == domain and row.get("timestamp")
+        if _counts_as_real_delivery(row) and row.get("domain") == domain and row.get("timestamp")
     ]
     if not relevant:
         return None

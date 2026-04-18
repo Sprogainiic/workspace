@@ -469,6 +469,7 @@ def evaluate_nudge_slot(
         verification = verify_message_in_session_history(
             effective_session_key,
             runtime_result.get("message_text", ""),
+            earliest_timestamp=now.isoformat(),
             sessions_history_tool=sessions_history_tool,
         )
 

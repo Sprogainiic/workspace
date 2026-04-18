@@ -38,6 +38,9 @@ def load_sent_nudges_today(now: datetime, rows: Optional[List[Dict[str, Any]]] =
                 "send": True,
                 "delivery_status": row.get("delivery_status"),
                 "delivery_error": row.get("delivery_error"),
+                "launcher_mode": row.get("launcher_mode"),
+                "runtime_mode": row.get("runtime_mode"),
+                "source": row.get("source") or row.get("launcher_mode") or "persisted_log",
             }
         )
     return {"sent_nudges_today": sent_nudges_today}

@@ -50,9 +50,13 @@ def _parse_ts(value: str) -> datetime:
 def _counts_as_real_delivery(row: Dict[str, Any]) -> bool:
     if not row.get("send"):
         return False
+    if row.get("launcher_mode") == "local_test":
+        return False
+    if row.get("source") in {"manual", "preflight", "debug", "local_test"}:
+        return False
     status = row.get("delivery_status")
     if status in {None, ""}:
-        return True
+        return False
     if status == "verified":
         return True
     if status == "sent" and not row.get("delivery_error"):
@@ -70,10 +74,14 @@ def check_daily_cap(sent_nudges_today: List[Dict[str, Any]], policy: Dict[str, A
     return None
 
 
-def check_gap_rule(now: datetime, sent_nudges_today: List[Dict[str, Any]], policy: Dict[str, Any]) -> Optional[str]:
+def check_gap_rule(now: datetime, sent_nudges_today: List[Dict[str, Any]], policy: Dict[str, Any], slot: str | None = None) -> Optional[str]:
     sent = [row for row in sent_nudges_today if _counts_as_real_delivery(row) and row.get("timestamp")]
     if not sent:
         return None
+    if slot:
+        same_slot = [row for row in sent if row.get("slot") == slot]
+        if same_slot:
+            sent = same_slot
     last = max(_parse_ts(row["timestamp"]) for row in sent)
     if now - last < timedelta(minutes=policy["min_minutes_between_proactive_messages"]):
         return "spam_guard"
@@ -140,7 +148,7 @@ def enforce_guardrails(
     applied = {**DEFAULT_POLICY, **(policy or {})}
     return (
         check_daily_cap(sent_nudges_today, applied)
-        or check_gap_rule(now, sent_nudges_today, applied)
+        or check_gap_rule(now, sent_nudges_today, applied, slot)
         or check_domain_cooldown(now, domain, sent_nudges_today, applied)
         or check_recent_user_activity(now, recent_user_activity, applied, slot or "", domain)
     )
@@ -159,6 +167,10 @@ def explain_guardrail_skip(
         return "daily_cap"
     sent = [row for row in sent_nudges_today if _counts_as_real_delivery(row) and row.get("timestamp")]
     if sent:
+        if slot:
+            same_slot = [row for row in sent if row.get("slot") == slot]
+            if same_slot:
+                sent = same_slot
         last = max(_parse_ts(row["timestamp"]) for row in sent)
         if now - last < timedelta(minutes=applied["min_minutes_between_proactive_messages"]):
             return "min_gap"

@@ -27,3 +27,7 @@ The system is now designed around a token-efficient context model:
 - `workflows/daily-summary-flow.md`
 - `workflows/weekly-summary-flow.md`
 - `workflows/context-loading-policy.md`
+
+## Runtime configuration
+- `OPENCLAW_SESSIONS_INDEX` (optional): absolute path to `sessions.json` used by `runtime/session_history_client.py` when verifying delivery against session history.
+- Outbound proactive transport supports `discord_direct` as the canonical direct-send channel name; `openclaw_session` remains supported as a compatibility alias.

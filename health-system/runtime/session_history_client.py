@@ -1,17 +1,26 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
-SESSIONS_INDEX = Path('/home/sprogainiic/.openclaw/agents/health/sessions/sessions.json')
+DEFAULT_SESSIONS_INDEX = Path.home() / ".openclaw" / "agents" / "health" / "sessions" / "sessions.json"
+
+
+def _sessions_index_path() -> Path:
+    configured = os.getenv("OPENCLAW_SESSIONS_INDEX", "").strip()
+    if configured:
+        return Path(configured).expanduser()
+    return DEFAULT_SESSIONS_INDEX
 
 
 def _load_session_file(session_key: str) -> Path | None:
-    if not SESSIONS_INDEX.exists():
+    sessions_index = _sessions_index_path()
+    if not sessions_index.exists():
         return None
     try:
-        index = json.loads(SESSIONS_INDEX.read_text(encoding='utf-8'))
+        index = json.loads(sessions_index.read_text(encoding='utf-8'))
     except Exception:
         return None
     entry = index.get(session_key)

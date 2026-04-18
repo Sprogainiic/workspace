@@ -28,6 +28,17 @@ class OpenClawSessionTransportTests(unittest.TestCase):
         with self.assertRaises(Exception):
             send_message(channel="bad", recipient_id="x", message_text="y")
 
+    def test_discord_direct_alias_uses_same_transport(self):
+        with patch('runtime.outbound_transport.send_discord_direct', return_value={'sent': True, 'delivery_status': 'sent', 'delivery_error': None, 'raw': {'ok': True}}) as mock_send:
+            result = send_message(
+                channel="discord_direct",
+                recipient_id="1491124367638401024",
+                message_text="hello",
+            )
+        self.assertTrue(result["sent"])
+        self.assertEqual(result["channel"], "discord_direct")
+        mock_send.assert_called_once_with('1491124367638401024', 'hello')
+
 
 if __name__ == "__main__":
     unittest.main()

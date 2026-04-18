@@ -7,7 +7,7 @@ from .nudge_log import read_nudge_log
 
 
 def _parse_ts(value: str) -> datetime:
-    return datetime.fromisoformat(value)
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
 def load_sent_nudges_today(now: datetime, rows: Optional[List[Dict[str, Any]]] = None) -> Dict[str, List[Dict[str, Any]]]:
@@ -20,7 +20,10 @@ def load_sent_nudges_today(now: datetime, rows: Optional[List[Dict[str, Any]]] =
         timestamp = row.get("timestamp")
         if not timestamp:
             continue
-        ts = _parse_ts(timestamp)
+        try:
+            ts = _parse_ts(timestamp)
+        except ValueError:
+            continue
         if ts.date() != today:
             continue
         sent_nudges_today.append(

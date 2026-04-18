@@ -36,6 +36,8 @@ def load_sent_nudges_today(now: datetime, rows: Optional[List[Dict[str, Any]]] =
                 "message_intent": row.get("message_intent") or row.get("nudge_type"),
                 "fingerprint": row.get("fingerprint") or row.get("message_fingerprint"),
                 "send": True,
+                "delivery_status": row.get("delivery_status"),
+                "delivery_error": row.get("delivery_error"),
             }
         )
     return {"sent_nudges_today": sent_nudges_today}

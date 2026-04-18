@@ -4,9 +4,11 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from zoneinfo import ZoneInfo
 
 from .nudge_state_loader import load_sent_nudges_today
 from .user_activity_loader import load_recent_user_activity
+from .nudge_schedule import DEFAULT_LOCAL_TIMEZONE
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "runtime" / "data"
@@ -62,6 +64,8 @@ def load_runtime_state(now: datetime, *, allow_test_fixture: bool = False, fixtu
     snapshot = _read_json(SNAPSHOT_PATH)
     all_events = _read_jsonl(EVENTS_PATH)
     today_events = []
+    local_tz = ZoneInfo(DEFAULT_LOCAL_TIMEZONE)
+    now_local_date = now.astimezone(local_tz).date()
     for row in all_events:
         timestamp = row.get("timestamp")
         if not timestamp:
@@ -70,7 +74,7 @@ def load_runtime_state(now: datetime, *, allow_test_fixture: bool = False, fixtu
             ts = _parse_ts(timestamp)
         except ValueError:
             continue
-        if ts.date() == now.date():
+        if ts.astimezone(local_tz).date() == now_local_date:
             today_events.append(row)
 
     daily_summary = _read_json(DAILY_SUMMARY_PATH) if DAILY_SUMMARY_PATH.exists() else {}

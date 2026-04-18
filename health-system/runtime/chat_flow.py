@@ -67,7 +67,8 @@ def memory_adapter(message: str, message_id: str, timestamp: str) -> Dict[str, A
 
     if any(x in m for x in ["tired", "energy low", "sleep", "headache", "low energy", "super tired"]):
         intents.append("status_update")
-        extractions["fatigue"] = "high" if "super tired" in m or "tired" in m else "low"
+        high_fatigue_markers = ["super tired", "tired", "energy low", "low energy", "headache"]
+        extractions["fatigue"] = "high" if any(marker in m for marker in high_fatigue_markers) else "low"
         conf["fatigue"] = "high"
         proposals.append({"field": "fatigue", "value": extractions["fatigue"], "confidence": "high", "write_type": "canonical_append", "safe_to_write": True, "write_scope": "canonical", "event_id": f"ev_{message_id}_fatigue", "event_type": "fatigue_report", "timestamp": timestamp, "source_message_id": message_id})
 

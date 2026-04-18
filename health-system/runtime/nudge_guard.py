@@ -87,8 +87,7 @@ def _activity_relevant_to_slot(activity: Dict[str, Any], slot: str, domain: str)
         return True
     if signal in relevant_signals:
         return True
-    text = str(activity.get("text", "")).strip()
-    return bool(text)
+    return False
 
 
 def check_recent_user_activity(now: datetime, recent_user_activity: List[Dict[str, Any]], policy: Dict[str, Any], slot: str, domain: str) -> Optional[str]:
@@ -100,6 +99,8 @@ def check_recent_user_activity(now: datetime, recent_user_activity: List[Dict[st
         if not row.get("timestamp"):
             continue
         ts = _parse_ts(row["timestamp"])
+        if ts > now + timedelta(seconds=30):
+            continue
         if now - ts >= threshold:
             continue
         if _activity_relevant_to_slot(row, slot, domain):

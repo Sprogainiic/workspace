@@ -92,9 +92,19 @@ class NudgeRuntimeTests(unittest.TestCase):
         self.assertEqual(lunch, {"send": False, "skip_reason": "already_reported"})
 
     def test_frequent_user_messages_suppress_proactive_nudges(self):
-        recent = [{"timestamp": "2026-04-15T12:00:00+03:00", "text": "just checking in again"}]
+        recent = [{"timestamp": "2026-04-15T12:00:00+03:00", "signal_type": "meal_log", "domain": "nutrition"}]
         result = select_nudge(BASE_SNAPSHOT, [], None, None, [], recent, "lunch_check", ts("2026-04-15T12:20:00+03:00"))
         self.assertEqual(result, {"send": False, "skip_reason": "recent_user_activity"})
+
+    def test_irrelevant_text_only_activity_does_not_suppress(self):
+        recent = [{"timestamp": "2026-04-15T12:00:00+03:00", "text": "just checking in again"}]
+        result = select_nudge(BASE_SNAPSHOT, [], None, None, [], recent, "lunch_check", ts("2026-04-15T12:20:00+03:00"))
+        self.assertTrue(result["send"])
+
+    def test_future_activity_does_not_suppress(self):
+        recent = [{"timestamp": "2026-04-15T12:50:00+03:00", "signal_type": "meal_log", "domain": "nutrition"}]
+        result = select_nudge(BASE_SNAPSHOT, [], None, None, [], recent, "lunch_check", ts("2026-04-15T12:20:00+03:00"))
+        self.assertTrue(result["send"])
 
     def test_low_motivation_afternoon_allows_coaching(self):
         snapshot = {

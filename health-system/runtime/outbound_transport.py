@@ -3,8 +3,6 @@ from __future__ import annotations
 from typing import Dict, Optional
 
 from .config import OPENCLAW_HEALTH_SESSION_KEY
-from .transports.openclaw_session_transport import build_session_message
-from .nudge_session_launcher import launch_to_session
 from .transports.discord_direct_transport import send_discord_direct
 
 
@@ -45,7 +43,7 @@ def send_message(
             "delivery_error": None,
             "launcher_mode": launcher_mode,
         }
-    if channel == "openclaw_session":
+    if channel in {"discord_direct", "openclaw_session"}:
         direct = send_discord_direct(recipient_id, message_text)
         return {
             "channel": "discord_direct",

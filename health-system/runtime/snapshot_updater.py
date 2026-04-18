@@ -60,6 +60,19 @@ def _save(snapshot: Dict[str, Any]) -> Dict[str, Any]:
 
 def update_snapshot(structured_events: List[Dict[str, Any]]) -> Dict[str, Any]:
     snapshot = _load()
+    snapshot.setdefault("open_ambiguities", [])
+    snapshot.setdefault("risk_flags", [])
+    snapshot.setdefault("active_modes", [])
+    snapshot.setdefault("tone_adaptation", {"suggested_style": "neutral_supportive", "evidence": [], "reflection_notes": []})
+    snapshot.setdefault(
+        "outcome_tracking",
+        {
+            "last_outcome_at": None,
+            "last_outcome_label": None,
+            "completion_score_rolling": None,
+            "observed_outcomes": 0,
+        },
+    )
     for ev in structured_events:
         facts = ev.get("facts", {})
         if not isinstance(facts, dict):

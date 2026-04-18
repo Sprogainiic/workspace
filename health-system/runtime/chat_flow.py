@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from .context_loader import load_context
@@ -162,11 +163,11 @@ def _snapshot_subset_for_proactive(current_snapshot: Dict[str, Any]) -> Dict[str
 def evaluate_nudge_slot(
     current_snapshot: Dict[str, Any],
     todays_events: List[Dict[str, Any]],
-    daily_summary: Optional[Dict[str, Any]],
-    weekly_summary: Optional[Dict[str, Any]],
-    recent_user_activity: List[Dict[str, Any]],
-    current_slot: str,
-    now,
+    daily_summary: Optional[Dict[str, Any]] = None,
+    weekly_summary: Optional[Dict[str, Any]] = None,
+    recent_user_activity: Optional[List[Dict[str, Any]]] = None,
+    current_slot: str = "",
+    now=None,
     policy_overrides: Optional[Dict[str, Any]] = None,
     outbound_channel: str = "test",
     recipient_id: str = "local-test-recipient",
@@ -179,6 +180,8 @@ def evaluate_nudge_slot(
     session_key: Optional[str] = None,
     launcher_mode: str = "local_test",
 ) -> Dict[str, Any]:
+    if now is None:
+        now = datetime.now().astimezone()
     activity_count = len(recent_user_activity or [])
     transport_name = outbound_channel
     effective_session_key = session_key or (OPENCLAW_HEALTH_SESSION_KEY if outbound_channel == "openclaw_session" else None)

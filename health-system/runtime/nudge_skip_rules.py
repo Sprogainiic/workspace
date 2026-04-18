@@ -32,7 +32,7 @@ SLOT_SIGNAL_RULES = {
 
 
 def _parse_ts(value: str) -> datetime:
-    return datetime.fromisoformat(value)
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
 def _recent(items: List[Dict], now: datetime, minutes: int = 720) -> List[Dict]:
@@ -41,7 +41,10 @@ def _recent(items: List[Dict], now: datetime, minutes: int = 720) -> List[Dict]:
     for item in items:
         if not item.get("timestamp"):
             continue
-        ts = _parse_ts(item["timestamp"])
+        try:
+            ts = _parse_ts(item["timestamp"])
+        except Exception:
+            continue
         if ts >= cutoff:
             kept.append(item)
     return kept

@@ -30,6 +30,18 @@ DOMAIN_SIGNAL_MAP = {
     "wrap_up": {"wrap_up", "day_summary", "workout_outcome", "checkin_reply"},
 }
 
+DOMAIN_TEXT_HINTS = {
+    "nutrition": {"eat", "ate", "food", "meal", "lunch", "dinner", "cook", "nutrition"},
+    "training": {"train", "training", "workout", "fatigue", "tired", "session"},
+    "behavior": {"motivation", "stuck", "avoid", "shutdown", "habit"},
+    "wrap_up": {"summary", "wrap", "done", "outcome"},
+}
+
+GENERIC_TEXT_SIGNAL_HINTS = {
+    "eat", "ate", "meal", "food", "workout", "train", "training", "tired", "fatigue",
+    "motivation", "summary", "done", "skip", "skipped",
+}
+
 
 def _parse_ts(value: str) -> datetime:
     return datetime.fromisoformat(value)
@@ -39,6 +51,8 @@ def _counts_as_real_delivery(row: Dict[str, Any]) -> bool:
     if not row.get("send"):
         return False
     status = row.get("delivery_status")
+    if status in {None, ""}:
+        return True
     if status == "verified":
         return True
     if status == "sent" and not row.get("delivery_error"):
@@ -82,10 +96,15 @@ def check_domain_cooldown(now: datetime, domain: str, sent_nudges_today: List[Di
 def _activity_relevant_to_slot(activity: Dict[str, Any], slot: str, domain: str) -> bool:
     signal = activity.get("signal_type", "other")
     activity_domain = activity.get("domain")
+    activity_text = str(activity.get("text", "")).strip().lower()
     relevant_signals: Set[str] = SLOT_RELEVANT_SIGNALS.get(slot, set()) | DOMAIN_SIGNAL_MAP.get(domain, set())
     if activity_domain and activity_domain == domain:
         return True
     if signal in relevant_signals:
+        return True
+    if activity_text and any(token in activity_text for token in DOMAIN_TEXT_HINTS.get(domain, set())):
+        return True
+    if activity_text and any(token in activity_text for token in GENERIC_TEXT_SIGNAL_HINTS):
         return True
     return False
 

@@ -4,6 +4,8 @@ from typing import Dict, Optional
 
 from .config import OPENCLAW_HEALTH_SESSION_KEY
 from .transports.discord_direct_transport import send_discord_direct
+from .transports.discord_adapter import adapt_openclaw_session_payload
+from .nudge_session_launcher import launch_to_session
 
 
 class UnsupportedTransportError(ValueError):
@@ -43,7 +45,41 @@ def send_message(
             "delivery_error": None,
             "launcher_mode": launcher_mode,
         }
-    if channel in {"discord_direct", "openclaw_session"}:
+    if channel == "openclaw_session":
+        payload = adapt_openclaw_session_payload(message_text, metadata)
+        if session_sender is not None:
+            result = launch_to_session(
+                {"session_key": session_key or OPENCLAW_HEALTH_SESSION_KEY, "payload": payload},
+                session_sender=session_sender,
+            )
+            return {
+                "channel": "openclaw_session",
+                "recipient_id": recipient_id,
+                "session_key": session_key or OPENCLAW_HEALTH_SESSION_KEY,
+                "target_type": target_type,
+                "message_text": message_text,
+                "payload_kind": payload.get("kind"),
+                "sent": result.get("status") == "sent",
+                "delivery_status": "sent" if result.get("status") == "sent" else "failed",
+                "delivery_error": result.get("delivery_error"),
+                "launcher_mode": launcher_mode,
+                "raw": result,
+            }
+        direct = send_discord_direct(recipient_id, message_text)
+        return {
+            "channel": "discord_direct_fallback",
+            "recipient_id": recipient_id,
+            "session_key": session_key or OPENCLAW_HEALTH_SESSION_KEY,
+            "target_type": target_type,
+            "message_text": message_text,
+            "payload_kind": "discord_direct_message",
+            "sent": bool(direct["sent"]),
+            "delivery_status": direct["delivery_status"],
+            "delivery_error": direct["delivery_error"],
+            "launcher_mode": launcher_mode,
+            "raw": direct.get("raw"),
+        }
+    if channel == "discord_direct":
         direct = send_discord_direct(recipient_id, message_text)
         return {
             "channel": "discord_direct",

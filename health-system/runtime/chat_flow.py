@@ -249,12 +249,15 @@ def evaluate_nudge_slot(
     )
 
     if not selection.get("send"):
+        selection_skip = selection.get("skip_reason")
+        selection_detail = selection.get("skip_detail")
+        skip_error = f"{selection_skip}:{selection_detail}" if selection_detail else selection_skip
         log_entry = log_nudge_decision({
             "timestamp": now.isoformat(),
             "slot": current_slot,
             "evaluated": True,
             "send": False,
-            "skip_reason": selection.get("skip_reason"),
+            "skip_reason": selection_skip,
             "nudge_type": None,
             "domain": None,
             "tokens_in": 0,
@@ -272,18 +275,18 @@ def evaluate_nudge_slot(
             "transport": transport_name,
             "session_key": effective_session_key,
             "delivery_status": "failed",
-            "delivery_error": selection.get("skip_reason"),
+            "delivery_error": skip_error,
             "launcher_mode": launcher_mode,
         })
         log_delivery_audit({
             "timestamp": now.isoformat(),
             "slot": current_slot,
             "send": False,
-            "skip_reason": selection.get("skip_reason"),
+            "skip_reason": selection_skip,
             "transport": transport_name,
             "session_key": effective_session_key,
             "delivery_status": "failed",
-            "delivery_error": selection.get("skip_reason"),
+            "delivery_error": skip_error,
             "message_text": None,
             "message_intent": None,
             "fingerprint": None,

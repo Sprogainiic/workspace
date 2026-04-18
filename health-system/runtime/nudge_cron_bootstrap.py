@@ -7,6 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
+DISCORD_TARGET = "1491124367638401024"
+
 WORKDIR = Path(__file__).resolve().parents[1]
 RUNNER_COMMAND = f"cd {WORKDIR} && /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot"
 
@@ -20,7 +22,7 @@ def _cron_line(slot: str) -> str:
     from .nudge_schedule import get_slot_policy
     policy = get_slot_policy(slot)
     hh, mm = policy["earliest_send_time"].split(":", 1)
-    return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient scheduled-health-session >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
+    return f"{int(mm)} {int(hh)} * * * cd {WORKDIR} && TZ={policy['local_timezone']} /usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient {DISCORD_TARGET} >> {WORKDIR}/runtime/data/nudge_logs/cron_runner.log 2>&1"
 
 
 def bootstrap_schedule() -> List[Dict[str, str]]:
@@ -33,7 +35,7 @@ def bootstrap_schedule() -> List[Dict[str, str]]:
                 "slot": slot,
                 "local_time": policy["earliest_send_time"],
                 "timezone": policy["local_timezone"],
-                "runner": f"/usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient scheduled-health-session",
+                "runner": f"/usr/bin/python3 -m runtime.nudge_cron_bootstrap --slot {slot} --exec-mode live_session --channel openclaw_session --recipient {DISCORD_TARGET}",
                 "kind": "slot_evaluator",
             }
         )
@@ -103,7 +105,7 @@ def main(argv: List[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--slot", help="slot to evaluate")
     parser.add_argument("--channel", default="openclaw_session")
-    parser.add_argument("--recipient", default="scheduled-health-session")
+    parser.add_argument("--recipient", default=DISCORD_TARGET)
     parser.add_argument("--exec-mode", choices=["local_test", "live_session"], default="local_test")
     args = parser.parse_args(argv)
 

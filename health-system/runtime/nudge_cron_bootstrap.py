@@ -139,6 +139,7 @@ def main(argv: List[str] | None = None) -> int:
         "slot": args.slot,
         "send": result["selection"].get("send", False),
         "skip_reason": result["selection"].get("skip_reason"),
+        "skip_detail": result["selection"].get("skip_detail"),
         "runtime_mode": result.get("log", {}).get("runtime_mode"),
         "state_source": result.get("log", {}).get("state_source"),
         "activity_source": result.get("log", {}).get("activity_source"),

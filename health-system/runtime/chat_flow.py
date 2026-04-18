@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from .context_loader import load_context
@@ -162,11 +163,11 @@ def _snapshot_subset_for_proactive(current_snapshot: Dict[str, Any]) -> Dict[str
 def evaluate_nudge_slot(
     current_snapshot: Dict[str, Any],
     todays_events: List[Dict[str, Any]],
-    daily_summary: Optional[Dict[str, Any]],
-    weekly_summary: Optional[Dict[str, Any]],
-    recent_user_activity: List[Dict[str, Any]],
-    current_slot: str,
-    now,
+    daily_summary: Optional[Dict[str, Any]] = None,
+    weekly_summary: Optional[Dict[str, Any]] = None,
+    recent_user_activity: Optional[List[Dict[str, Any]]] = None,
+    current_slot: str = "",
+    now=None,
     policy_overrides: Optional[Dict[str, Any]] = None,
     outbound_channel: str = "test",
     recipient_id: str = "local-test-recipient",
@@ -179,6 +180,8 @@ def evaluate_nudge_slot(
     session_key: Optional[str] = None,
     launcher_mode: str = "local_test",
 ) -> Dict[str, Any]:
+    if now is None:
+        now = datetime.now().astimezone()
     activity_count = len(recent_user_activity or [])
     transport_name = outbound_channel
     effective_session_key = session_key or (OPENCLAW_HEALTH_SESSION_KEY if outbound_channel == "openclaw_session" else None)
@@ -246,12 +249,15 @@ def evaluate_nudge_slot(
     )
 
     if not selection.get("send"):
+        selection_skip = selection.get("skip_reason")
+        selection_detail = selection.get("skip_detail")
+        skip_error = f"{selection_skip}:{selection_detail}" if selection_detail else selection_skip
         log_entry = log_nudge_decision({
             "timestamp": now.isoformat(),
             "slot": current_slot,
             "evaluated": True,
             "send": False,
-            "skip_reason": selection.get("skip_reason"),
+            "skip_reason": selection_skip,
             "nudge_type": None,
             "domain": None,
             "tokens_in": 0,
@@ -269,18 +275,18 @@ def evaluate_nudge_slot(
             "transport": transport_name,
             "session_key": effective_session_key,
             "delivery_status": "failed",
-            "delivery_error": selection.get("skip_reason"),
+            "delivery_error": skip_error,
             "launcher_mode": launcher_mode,
         })
         log_delivery_audit({
             "timestamp": now.isoformat(),
             "slot": current_slot,
             "send": False,
-            "skip_reason": selection.get("skip_reason"),
+            "skip_reason": selection_skip,
             "transport": transport_name,
             "session_key": effective_session_key,
             "delivery_status": "failed",
-            "delivery_error": selection.get("skip_reason"),
+            "delivery_error": skip_error,
             "message_text": None,
             "message_intent": None,
             "fingerprint": None,

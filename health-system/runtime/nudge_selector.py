@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from typing import Any, Dict, List, Optional
 
 from .nudge_schedule import get_slot_policy
-from .nudge_guard import DEFAULT_POLICY, enforce_guardrails
+from .nudge_guard import DEFAULT_POLICY, enforce_guardrails, explain_guardrail_skip
 from .nudge_skip_rules import should_skip_for_reported_signal
 from .nudge_content_guard import content_guard_decision
 
@@ -129,7 +129,17 @@ def select_nudge(
     domain = defaults["domain"]
     guard_skip = enforce_guardrails(now, domain, sent_nudges_today, recent_user_activity, merged_guard_policy, slot=current_slot)
     if guard_skip:
-        return {"send": False, "skip_reason": guard_skip}
+        if guard_skip == "recent_user_activity":
+            return {"send": False, "skip_reason": "recent_user_activity"}
+        detail = explain_guardrail_skip(
+            now,
+            domain,
+            sent_nudges_today,
+            recent_user_activity,
+            merged_guard_policy,
+            slot=current_slot,
+        )
+        return {"send": False, "skip_reason": "spam_guard", "skip_detail": detail or "guard_policy"}
 
     state_flags = _state_flags(current_snapshot)
     weekly_reflection = weekly_summary or {}
@@ -165,7 +175,7 @@ def select_nudge(
     }
     ok, fingerprint = content_guard_decision(current_slot, domain, nudge_type, payload_brief, sent_nudges_today)
     if not ok:
-        return {"send": False, "skip_reason": "spam_guard"}
+        return {"send": False, "skip_reason": "spam_guard", "skip_detail": "content_duplicate"}
 
     reason = defaults["goal"]
     if nudge_type == "coaching":

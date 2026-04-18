@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Set
 
 DEFAULT_POLICY = {
-    "max_proactive_messages_per_day": 4,
+    "max_proactive_messages_per_day": 6,
     "min_minutes_between_proactive_messages": 90,
     "domain_cooldown_minutes": 180,
     "recent_user_activity_suppression_minutes": 45,
@@ -30,6 +30,18 @@ DOMAIN_SIGNAL_MAP = {
     "wrap_up": {"wrap_up", "day_summary", "workout_outcome", "checkin_reply"},
 }
 
+DOMAIN_TEXT_HINTS = {
+    "nutrition": {"eat", "ate", "food", "meal", "lunch", "dinner", "cook", "nutrition"},
+    "training": {"train", "training", "workout", "fatigue", "tired", "session"},
+    "behavior": {"motivation", "stuck", "avoid", "shutdown", "habit"},
+    "wrap_up": {"summary", "wrap", "done", "outcome"},
+}
+
+GENERIC_TEXT_SIGNAL_HINTS = {
+    "eat", "ate", "meal", "food", "workout", "train", "training", "tired", "fatigue",
+    "motivation", "summary", "done", "skip", "skipped",
+}
+
 
 def _parse_ts(value: str) -> datetime:
     return datetime.fromisoformat(value)
@@ -39,6 +51,8 @@ def _counts_as_real_delivery(row: Dict[str, Any]) -> bool:
     if not row.get("send"):
         return False
     status = row.get("delivery_status")
+    if status in {None, ""}:
+        return True
     if status == "verified":
         return True
     if status == "sent" and not row.get("delivery_error"):
@@ -82,10 +96,15 @@ def check_domain_cooldown(now: datetime, domain: str, sent_nudges_today: List[Di
 def _activity_relevant_to_slot(activity: Dict[str, Any], slot: str, domain: str) -> bool:
     signal = activity.get("signal_type", "other")
     activity_domain = activity.get("domain")
+    activity_text = str(activity.get("text", "")).strip().lower()
     relevant_signals: Set[str] = SLOT_RELEVANT_SIGNALS.get(slot, set()) | DOMAIN_SIGNAL_MAP.get(domain, set())
     if activity_domain and activity_domain == domain:
         return True
     if signal in relevant_signals:
+        return True
+    if activity_text and any(token in activity_text for token in DOMAIN_TEXT_HINTS.get(domain, set())):
+        return True
+    if activity_text and any(token in activity_text for token in GENERIC_TEXT_SIGNAL_HINTS):
         return True
     return False
 
@@ -125,3 +144,32 @@ def enforce_guardrails(
         or check_domain_cooldown(now, domain, sent_nudges_today, applied)
         or check_recent_user_activity(now, recent_user_activity, applied, slot or "", domain)
     )
+
+
+def explain_guardrail_skip(
+    now: datetime,
+    domain: str,
+    sent_nudges_today: List[Dict[str, Any]],
+    recent_user_activity: List[Dict[str, Any]],
+    policy: Dict[str, Any] | None = None,
+    slot: str | None = None,
+) -> Optional[str]:
+    applied = {**DEFAULT_POLICY, **(policy or {})}
+    if nudges_sent_today(sent_nudges_today) >= applied["max_proactive_messages_per_day"]:
+        return "daily_cap"
+    sent = [row for row in sent_nudges_today if _counts_as_real_delivery(row) and row.get("timestamp")]
+    if sent:
+        last = max(_parse_ts(row["timestamp"]) for row in sent)
+        if now - last < timedelta(minutes=applied["min_minutes_between_proactive_messages"]):
+            return "min_gap"
+    relevant = [
+        row for row in sent_nudges_today
+        if _counts_as_real_delivery(row) and row.get("domain") == domain and row.get("timestamp")
+    ]
+    if relevant:
+        last = max(_parse_ts(row["timestamp"]) for row in relevant)
+        if now - last < timedelta(minutes=applied["domain_cooldown_minutes"]):
+            return "domain_cooldown"
+    if check_recent_user_activity(now, recent_user_activity, applied, slot or "", domain):
+        return "recent_user_activity"
+    return None

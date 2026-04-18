@@ -13,7 +13,15 @@ def send_discord_direct(recipient_id: str, message_text: str) -> Dict[str, Any]:
         '--message', message_text,
         '--json',
     ]
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+    except subprocess.TimeoutExpired:
+        return {
+            'sent': False,
+            'delivery_status': 'failed',
+            'delivery_error': 'command_timeout',
+            'raw': '',
+        }
     if proc.returncode != 0:
         return {
             'sent': False,

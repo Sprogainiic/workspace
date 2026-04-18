@@ -112,7 +112,19 @@ def main(argv: List[str] | None = None) -> int:
         return 0
 
     try:
-        result = execute_slot(args.slot, args.channel, args.recipient, exec_mode=args.exec_mode)
+        sessions_send_tool = None
+        if args.exec_mode == "live_session" and args.channel == "openclaw_session":
+            try:
+                from functions import sessions_send as sessions_send_tool  # type: ignore
+            except Exception:
+                sessions_send_tool = None
+        result = execute_slot(
+            args.slot,
+            args.channel,
+            args.recipient,
+            exec_mode=args.exec_mode,
+            sessions_send_tool=sessions_send_tool,
+        )
     except Exception as exc:
         print(json.dumps({"error": str(exc), "slot": args.slot}))
         return 1

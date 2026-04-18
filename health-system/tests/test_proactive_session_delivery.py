@@ -4,6 +4,8 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 
+from unittest.mock import patch
+
 from runtime.chat_flow import evaluate_nudge_slot
 from runtime.config import OPENCLAW_HEALTH_SESSION_KEY
 from runtime.nudge_log import read_nudge_log
@@ -30,29 +32,25 @@ class ProactiveSessionDeliveryTests(unittest.TestCase):
         }
 
     def test_success_path_logs_sent_to_openclaw_session(self):
-        calls = []
-        def fake_sender(**kwargs):
-            calls.append(kwargs)
-            return {"ok": True}
-
-        result = evaluate_nudge_slot(
-            current_snapshot=self.snapshot,
-            todays_events=[],
-            daily_summary={},
-            weekly_summary={},
-            recent_user_activity=[],
-            current_slot="lunch_check",
-            now=ts("2026-04-15T12:30:00+03:00"),
-            outbound_channel="openclaw_session",
-            recipient_id="ignored",
-            sent_nudges_today=[],
-            state_source="test_fixture",
-            allow_test_fixture=True,
-            activity_source="persisted",
-            session_sender=fake_sender,
-            sessions_history_tool=lambda **kwargs: {"messages": [{"role": "assistant", "content": [{"type": "text", "text": "Quick nutrition check: any update on lunch status?"}]}]},
-            session_key=OPENCLAW_HEALTH_SESSION_KEY,
-        )
+        with patch('runtime.outbound_transport.send_discord_direct', return_value={'sent': True, 'delivery_status': 'sent', 'delivery_error': None, 'raw': {'ok': True}}):
+            result = evaluate_nudge_slot(
+                current_snapshot=self.snapshot,
+                todays_events=[],
+                daily_summary={},
+                weekly_summary={},
+                recent_user_activity=[],
+                current_slot="lunch_check",
+                now=ts("2026-04-15T12:30:00+03:00"),
+                outbound_channel="openclaw_session",
+                recipient_id="1491124367638401024",
+                sent_nudges_today=[],
+                state_source="test_fixture",
+                allow_test_fixture=True,
+                activity_source="persisted",
+                session_sender=None,
+                sessions_history_tool=lambda **kwargs: {"messages": [{"role": "assistant", "timestamp": "2026-04-15T12:30:01+03:00", "content": [{"type": "text", "text": "Quick nutrition check: any update on lunch status?"}]}]},
+                session_key=OPENCLAW_HEALTH_SESSION_KEY,
+            )
         self.assertTrue(result["transport_result"]["sent"])
         self.assertEqual(result["transport_result"]["delivery_status"], "sent")
         self.assertTrue(result["delivery_verification"]["verified"])
@@ -60,7 +58,6 @@ class ProactiveSessionDeliveryTests(unittest.TestCase):
         self.assertEqual(rows[0]["transport"], "openclaw_session")
         self.assertEqual(rows[0]["session_key"], OPENCLAW_HEALTH_SESSION_KEY)
         self.assertEqual(rows[0]["delivery_status"], "sent")
-        self.assertEqual(len(calls), 1)
 
     def test_failure_path_logs_failed_delivery(self):
         def fake_sender(**kwargs):

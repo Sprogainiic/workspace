@@ -5,6 +5,18 @@ from typing import Any, Dict, List
 from .token_logger import log_token_usage
 
 
+def _choose_model(slot: str, payload: Dict[str, Any]) -> str:
+    model_routing = payload.get("model_routing", {}) if isinstance(payload, dict) else {}
+    primary = model_routing.get("primary_model") or "openai/gpt-5.4"
+    fallback = model_routing.get("fallback_model") or primary
+    simple_slot = bool(model_routing.get("simple_slot", False))
+    if simple_slot:
+        return primary
+    return primary or fallback
+
+
+
+
 def _route_specialists(domain: str, nudge_type: str, snapshot_subset: Dict[str, Any]) -> List[str]:
     routing: List[str] = ["Health Director"]
     fatigue = snapshot_subset.get("fatigue")
@@ -75,6 +87,8 @@ def run_health_director_proactive_turn(payload: Dict[str, Any]) -> Dict[str, Any
     snapshot_subset = payload.get("snapshot_subset", {})
     routing_metadata = payload.get("routing_metadata", {})
     activity_context = payload.get("activity_context", {})
+    model_routing = payload.get("model_routing", {}) if isinstance(payload, dict) else {}
+    selected_model = _choose_model(slot, payload)
 
     prompt = {
         "slot": slot,
@@ -84,13 +98,14 @@ def run_health_director_proactive_turn(payload: Dict[str, Any]) -> Dict[str, Any
         "snapshot_subset": snapshot_subset,
         "routing_metadata": routing_metadata,
         "activity_context": activity_context,
+        "selected_model": selected_model,
     }
     prompt_text = str(prompt)
     tokens_in = max(1, (len(prompt_text) + 3) // 4)
     routing = _route_specialists(domain, nudge_type, snapshot_subset)
     message_text = _render_message(slot, nudge_type, domain, brief, snapshot_subset)
     tokens_out = max(1, (len(message_text) + 3) // 4)
-    log_token_usage("health_director_orchestrated_proactive", tokens_in, tokens_out, ["proactive_brief", "snapshot_subset", "activity_context"])
+    log_token_usage(f"health_director_orchestrated_proactive:{selected_model}", tokens_in, tokens_out, ["proactive_brief", "snapshot_subset", "activity_context", selected_model])
     return {
         "approved": True,
         "message_text": message_text,
@@ -98,4 +113,6 @@ def run_health_director_proactive_turn(payload: Dict[str, Any]) -> Dict[str, Any
         "tokens_in": tokens_in,
         "tokens_out": tokens_out,
         "runtime_mode": "orchestrated",
+        "selected_model": selected_model,
+        "model_routing": model_routing,
     }

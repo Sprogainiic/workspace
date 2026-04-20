@@ -53,11 +53,12 @@ class ProactiveSessionDeliveryTests(unittest.TestCase):
             )
         self.assertTrue(result["transport_result"]["sent"])
         self.assertEqual(result["transport_result"]["delivery_status"], "sent")
-        self.assertTrue(result["delivery_verification"]["verified"])
         rows = read_nudge_log()
         self.assertEqual(rows[0]["transport"], "openclaw_session")
         self.assertEqual(rows[0]["session_key"], OPENCLAW_HEALTH_SESSION_KEY)
-        self.assertEqual(rows[0]["delivery_status"], "sent")
+        self.assertEqual(rows[0]["attempt_status"], "attempted")
+        self.assertEqual(rows[0]["transport_status"], "sent")
+        self.assertEqual(result["delivery_audit"]["delivery_event_type"], "delivered")
 
     def test_failure_path_logs_failed_delivery(self):
         def fake_sender(**kwargs):
@@ -83,7 +84,7 @@ class ProactiveSessionDeliveryTests(unittest.TestCase):
         self.assertFalse(result["transport_result"]["sent"])
         self.assertEqual(result["transport_result"]["delivery_status"], "failed")
         rows = read_nudge_log()
-        self.assertEqual(rows[0]["delivery_status"], "failed")
+        self.assertEqual(rows[0]["transport_status"], "failed")
         self.assertEqual(rows[0]["transport"], "openclaw_session")
 
 

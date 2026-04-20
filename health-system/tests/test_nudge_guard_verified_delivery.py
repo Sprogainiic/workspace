@@ -15,8 +15,9 @@ class NudgeGuardVerifiedDeliveryTests(unittest.TestCase):
         sent = [
             {
                 'timestamp': '2026-04-18T09:45:21+03:00',
-                'send': True,
-                'delivery_status': 'sent',
+                'delivery_event_type': 'attempted_send',
+                'reason_code': 'provider_confirmation_pending',
+                'provider_confirmed': False,
                 'delivery_error': 'message_not_found',
                 'domain': 'wrap_up',
             }
@@ -28,8 +29,9 @@ class NudgeGuardVerifiedDeliveryTests(unittest.TestCase):
         sent = [
             {
                 'timestamp': '2026-04-18T09:45:21+03:00',
-                'send': True,
-                'delivery_status': 'verified',
+                'delivery_event_type': 'delivered',
+                'reason_code': None,
+                'provider_confirmed': True,
                 'delivery_error': None,
                 'domain': 'wrap_up',
             }

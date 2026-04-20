@@ -15,23 +15,25 @@ class NudgeStateLoaderParsingTests(unittest.TestCase):
         rows = [
             {
                 "timestamp": "2026-04-15T16:00:00Z",
-                "send": True,
+                "delivery_event_type": "delivered",
+                "reason_code": None,
                 "slot": "lunch_check",
-                "nudge_type": "reminder",
-                "domain": "nutrition",
                 "message_intent": "reminder",
                 "fingerprint": "fp-z",
             },
             {
                 "timestamp": "not-a-timestamp",
-                "send": True,
+                "delivery_event_type": "attempted_send",
+                "reason_code": "provider_confirmation_pending",
                 "slot": "afternoon_check",
-                "nudge_type": "check_in",
+                "message_intent": "check_in",
                 "domain": "behavior",
             },
         ]
         loaded = load_sent_nudges_today(ts("2026-04-15T18:30:00+00:00"), rows=rows)
         self.assertEqual(len(loaded["sent_nudges_today"]), 1)
+        self.assertEqual(loaded["sent_nudges_today"][0]["delivery_event_type"], "delivered")
+        self.assertEqual(loaded["sent_nudges_today"][0]["delivery_status"], "delivered")
         self.assertEqual(loaded["sent_nudges_today"][0]["fingerprint"], "fp-z")
 
 

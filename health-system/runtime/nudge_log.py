@@ -14,7 +14,9 @@ def log_nudge_decision(entry: Dict[str, Any]) -> Dict[str, Any]:
         "timestamp": entry.get("timestamp", ""),
         "slot": entry.get("slot", ""),
         "evaluated": bool(entry.get("evaluated", True)),
-        "send": bool(entry.get("send", False)),
+        "decision_approved": bool(entry.get("decision_approved", entry.get("send", False))),
+        "attempted_send": bool(entry.get("attempted_send", False)),
+        "attempt_status": entry.get("attempt_status") or ("attempted" if entry.get("attempted_send") else "decision_only"),
         "skip_reason": entry.get("skip_reason"),
         "nudge_type": entry.get("nudge_type"),
         "domain": entry.get("domain"),
@@ -32,8 +34,8 @@ def log_nudge_decision(entry: Dict[str, Any]) -> Dict[str, Any]:
         "advisor_tokens_out": int(entry.get("advisor_tokens_out", 0) or 0),
         "transport": entry.get("transport"),
         "session_key": entry.get("session_key"),
-        "delivery_status": entry.get("delivery_status"),
-        "delivery_error": entry.get("delivery_error"),
+        "attempt_transport_status": entry.get("transport_status"),
+        "attempt_transport_error": entry.get("transport_error"),
         "launcher_mode": entry.get("launcher_mode"),
     }
     with LOG.open("a", encoding="utf-8") as f:

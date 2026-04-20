@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
@@ -14,10 +15,39 @@ INGEST_DIR.mkdir(parents=True, exist_ok=True)
 BRIDGE_LOG = INGEST_DIR / "reactive_bridge_log.jsonl"
 PRE_INGEST_LOG = INGEST_DIR / "reactive_bridge_pre_ingest.jsonl"
 
+PRE_INGEST_ROTATION_BYTES = 25 * 1024 * 1024
+PRE_INGEST_RETENTION_COUNT = 3
+_PRE_INGEST_LOCK = threading.Lock()
+
+
+def _pre_ingest_archives() -> List[Path]:
+    return sorted(
+        [p for p in INGEST_DIR.glob("reactive_bridge_pre_ingest.*.jsonl") if p.name != PRE_INGEST_LOG.name],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+
+
+def _rotate_pre_ingest_if_needed(path: Path = PRE_INGEST_LOG) -> None:
+    if not path.exists() or path.stat().st_size < PRE_INGEST_ROTATION_BYTES:
+        return
+    stamp = datetime.now().astimezone().strftime("%Y%m%dT%H%M%S")
+    archive = INGEST_DIR / f"reactive_bridge_pre_ingest.{stamp}.jsonl"
+    path.rename(archive)
+    path.touch(exist_ok=True)
+    for old in _pre_ingest_archives()[PRE_INGEST_RETENTION_COUNT:]:
+        try:
+            old.unlink()
+        except FileNotFoundError:
+            pass
+
 
 def _append_jsonl(path: Path, row: Dict[str, Any]) -> Dict[str, Any]:
-    with path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    with _PRE_INGEST_LOCK:
+        if path == PRE_INGEST_LOG:
+            _rotate_pre_ingest_if_needed(path)
+        with path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
     return row
 
 

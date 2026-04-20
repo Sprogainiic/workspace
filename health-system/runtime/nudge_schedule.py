@@ -7,8 +7,6 @@ from typing import Any, Dict, List
 
 DEFAULT_LOCAL_TIMEZONE = "Europe/Riga"
 NUDGE_SLOTS = [
-    "morning_plan_check",
-    "late_morning_check",
     "lunch_check",
     "afternoon_check",
     "dinner_check",
@@ -31,14 +29,6 @@ class SlotPolicy:
 
 
 SLOT_POLICIES: Dict[str, SlotPolicy] = {
-    "morning_plan_check": SlotPolicy(
-        slot="morning_plan_check",
-        earliest_send_time="08:05",
-        latest_send_time="09:30",
-        local_timezone=DEFAULT_LOCAL_TIMEZONE,
-        eligible_weekdays=[0, 1, 2, 3, 4, 5, 6],
-        intent_type="check_in",
-    ),
     "late_morning_check": SlotPolicy(
         slot="late_morning_check",
         earliest_send_time="10:45",

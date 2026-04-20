@@ -44,24 +44,18 @@ GENERIC_TEXT_SIGNAL_HINTS = {
 
 
 def _parse_ts(value: str) -> datetime:
-    return datetime.fromisoformat(value)
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
 def _counts_as_real_delivery(row: Dict[str, Any]) -> bool:
-    if not row.get("send"):
+    event_type = row.get("delivery_event_type")
+    if event_type != "delivered":
         return False
-    if row.get("launcher_mode") == "local_test":
+    if row.get("provider_confirmed") is False:
         return False
-    if row.get("source") in {"manual", "preflight", "debug", "local_test"}:
+    if row.get("reason_code"):
         return False
-    status = row.get("delivery_status")
-    if status in {None, ""}:
-        return False
-    if status == "verified":
-        return True
-    if status == "sent" and not row.get("delivery_error"):
-        return True
-    return False
+    return True
 
 
 def nudges_sent_today(sent_nudges_today: List[Dict[str, Any]]) -> int:
